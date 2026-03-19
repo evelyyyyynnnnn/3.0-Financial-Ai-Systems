@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025年投资展望交互式仪表板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #F8F9FA;
+            color: #212529;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        .section-title {
+            color: #003366;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .nav-link {
+            transition: color 0.3s ease;
+            color: #495057;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #0056b3;
+        }
+        .tab-button {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #0056b3;
+            color: white;
+        }
+        .pill {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+        .pill-green {
+            background-color: #e6f4ea;
+            color: #34a853;
+        }
+        .pill-red {
+            background-color: #fce8e6;
+            color: #ea4335;
+        }
+        .pill-blue {
+            background-color: #e8f0fe;
+            color: #4285f4;
+        }
+        .pill-yellow {
+            background-color: #feefc3;
+            color: #fbbc04;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header id="main-header" class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-xl md:text-2xl font-bold section-title">2025投资展望</h1>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#macro" class="nav-link active">宏观展望</a>
+                    <a href="#strategy" class="nav-link">投资策略</a>
+                    <a href="#allocation" class="nav-link">资产配置</a>
+                    <a href="#risks" class="nav-link">风险分析</a>
+                </nav>
+                <button id="mobile-menu-button" class="md:hidden text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <a href="#macro" class="block py-2 px-4 text-sm nav-link active">宏观展望</a>
+                <a href="#strategy" class="block py-2 px-4 text-sm nav-link">投资策略</a>
+                <a href="#allocation" class="block py-2 px-4 text-sm nav-link">资产配置</a>
+                <a href="#risks" class="block py-2 px-4 text-sm nav-link">风险分析</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="macro" class="py-12">
+            <h2 class="text-3xl font-bold text-center mb-4 section-title">全球经济环境</h2>
+            <p class="max-w-3xl mx-auto text-center text-gray-600 mb-12">2025年全球经济呈现增长放缓、通胀持续及政策分化的复杂格局。本部分通过核心指标和区域对比，为您揭示宏观经济的全貌，助您洞察机遇与挑战。</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div class="card p-6 text-center">
+                    <h3 class="font-bold text-xl mb-2">全球GDP增长</h3>
+                    <p class="text-4xl font-bold text-blue-600">~3.1%</p>
+                    <p class="text-gray-500">2025年预测，温和放缓</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <h3 class="font-bold text-xl mb-2">美国通胀峰值</h3>
+                    <p class="text-4xl font-bold text-red-600">3-3.5%</p>
+                    <p class="text-gray-500">2025年Q3预测，受关税影响</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <h3 class="font-bold text-xl mb-2">央行政策</h3>
+                    <p class="text-4xl font-bold text-green-600">分化</p>
+                    <p class="text-gray-500">多数宽松，美日谨慎/收紧</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <h3 class="font-bold text-xl mb-2">核心风险</h3>
+                    <p class="text-4xl font-bold text-yellow-600">不确定性</p>
+                    <p class="text-gray-500">贸易政策与地缘政治</p>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <div class="flex justify-center mb-4 space-x-2">
+                    <button id="gdp-btn" class="px-4 py-2 text-sm font-medium rounded-md tab-button active">GDP增长预测 (%)</button>
+                    <button id="inflation-btn" class="px-4 py-2 text-sm font-medium rounded-md tab-button">整体通胀预测 (%)</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="regionalOutlookChart"></canvas>
+                </div>
+                 <p class="text-xs text-center text-gray-500 mt-4">此图表比较了主要经济体在2025年和2026年的经济增长和通胀预测。点击上方按钮可在不同指标间切换，将鼠标悬停在图表条上可查看具体数值。</p>
+            </div>
+        </section>
+
+        <section id="strategy" class="py-12">
+            <h2 class="text-3xl font-bold text-center mb-4 section-title">核心投资策略</h2>
+            <p class="max-w-3xl mx-auto text-center text-gray-600 mb-12">面对复杂的市场环境，采取多元化、重质量、有纪律的投资策略至关重要。本部分将深入探讨各大类资产的机遇与挑战，为您提供具体的投资方向。</p>
+            
+            <div class="bg-white rounded-lg shadow-lg p-2 md:p-4">
+                <div id="asset-tabs" class="flex flex-wrap justify-center border-b border-gray-200 mb-6">
+                    <button data-tab="stocks" class="tab-button text-sm md:text-base px-4 py-3 font-medium active">股票策略</button>
+                    <button data-tab="bonds" class="tab-button text-sm md:text-base px-4 py-3 font-medium">固定收益</button>
+                    <button data-tab="real_estate" class="tab-button text-sm md:text-base px-4 py-3 font-medium">房地产 (REITs)</button>
+                    <button data-tab="commodities" class="tab-button text-sm md:text-base px-4 py-3 font-medium">大宗商品</button>
+                </div>
+
+                <div id="tab-content">
+                    <div id="stocks-content" class="tab-pane active">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div>
+                                <h3 class="font-bold text-xl mb-4">行业展望：机遇与分歧</h3>
+                                <p class="text-gray-600 mb-6">股票市场机遇与挑战并存。一方面，AI等结构性趋势驱动部分行业增长；另一方面，短期市场表现与长期基本面出现分歧，投资者需审慎辨别。</p>
+                                <div class="space-y-4">
+                                    <div class="card p-4">
+                                        <h4 class="font-bold">📈 建议增持/关注</h4>
+                                        <p class="text-sm text-gray-600 mt-1">信息技术(AI驱动)、医疗保健、金融、通信服务、防御性板块(公用事业/必需消费品)。</p>
+                                        <div class="mt-2"><span class="pill pill-green">长期趋势</span> <span class="pill pill-blue">防御属性</span></div>
+                                    </div>
+                                    <div class="card p-4">
+                                        <h4 class="font-bold">📉 建议减持/谨慎</h4>
+                                        <p class="text-sm text-gray-600 mt-1">非必需消费品、资本品。部分行业如科技、能源、医疗保健存在短期表现不佳与长期看好之间的矛盾。</p>
+                                        <div class="mt-2"><span class="pill pill-red">周期性弱</span> <span class="pill pill-yellow">短期承压</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card p-6">
+                               <h3 class="font-bold text-lg mb-4 text-center">行业年初至今表现</h3>
+                                <div class="chart-container" style="height: 350px;">
+                                    <canvas id="sectorPerformanceChart"></canvas>
+                                </div>
+                                <p class="text-xs text-center text-gray-500 mt-4">此图表展示了2025年迄今表现最佳与最差的行业，直观反映了市场轮动和短期情绪。请注意，短期表现不完全代表长期投资价值。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="bonds-content" class="tab-pane hidden">
+                        <h3 class="font-bold text-xl mb-4">固定收益：重获吸引力</h3>
+                        <p class="text-gray-600 mb-6">在利率走高和经济不确定性增加的背景下，债券因其有吸引力的收益率和分散风险的特性，重新成为投资组合的核心。策略上应侧重于对抗通胀和管理久期风险。</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="card p-6">
+                                <h4 class="font-bold text-lg mb-2">通胀保值债券 (TIPS)</h4>
+                                <p class="text-sm text-gray-600">直接对冲通胀风险，本金随CPI调整，是当前环境下的首选品种之一。</p>
+                                <div class="mt-3"><span class="pill pill-green">通胀对冲</span></div>
+                            </div>
+                            <div class="card p-6">
+                                <h4 class="font-bold text-lg mb-2">高质量公司债</h4>
+                                <p class="text-sm text-gray-600">投资级公司债在温和增长环境中表现稳健，提供具吸引力的收益率。</p>
+                                 <div class="mt-3"><span class="pill pill-blue">收益稳健</span></div>
+                            </div>
+                            <div class="card p-6">
+                                <h4 class="font-bold text-lg mb-2">短期久期策略</h4>
+                                <p class="text-sm text-gray-600">鉴于收益率曲线可能陡峭化，增持短期债券有助于在获取收益的同时降低利率风险。</p>
+                                <div class="mt-3"><span class="pill pill-yellow">风险可控</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="real_estate-content" class="tab-pane hidden">
+                        <h3 class="font-bold text-xl mb-4">房地产：机遇与挑战并存</h3>
+                        <p class="text-gray-600 mb-6">房地产市场对利率高度敏感，面临再融资挑战。然而，特定子行业的需求依然强劲，REITs也提供了通胀对冲和流动性的优势。</p>
+                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="card p-6">
+                                <h4 class="font-bold text-lg mb-2">工业与物流地产</h4>
+                                <p class="text-sm text-gray-600">受益于电商发展和供应链重构，仓储和物流设施需求强劲。</p>
+                                <div class="mt-3"><span class="pill pill-green">需求强劲</span></div>
+                            </div>
+                            <div class="card p-6">
+                                <h4 class="font-bold text-lg mb-2">多户住宅</h4>
+                                <p class="text-sm text-gray-600">城市化进程和住房需求提供稳定现金流，是防御性较好的选择。</p>
+                                 <div class="mt-3"><span class="pill pill-blue">需求稳定</span></div>
+                            </div>
+                            <div class="card p-6">
+                                <h4 class="font-bold text-lg mb-2">利率风险</h4>
+                                <p class="text-sm text-gray-600">商业地产面临高利率和再融资压力，可能出现不良资产机会，需谨慎选择。</p>
+                                <div class="mt-3"><span class="pill pill-red">高敏感性</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="commodities-content" class="tab-pane hidden">
+                        <h3 class="font-bold text-xl mb-4">大宗商品：战略性对冲</h3>
+                        <p class="text-gray-600 mb-6">在通胀持续和地缘政治不稳定的环境中，大宗商品是重要的风险对冲工具。但不同品种前景分化，需要精挑细选。</p>
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="card p-6">
+                                <h4 class="font-bold text-lg mb-2">黄金：核心避险资产</h4>
+                                <p class="text-sm text-gray-600">作为传统的避险资产，黄金受益于不确定性、央行购买和潜在的美元走弱，是战略配置的核心。</p>
+                                <div class="mt-3"><span class="pill pill-green">避险首选</span></div>
+                            </div>
+                            <div class="card p-6">
+                                <h4 class="font-bold text-lg mb-2">石油：谨慎看待</h4>
+                                <p class="text-sm text-gray-600">全球需求增长放缓，而供应预计增加，可能导致2025年末出现供过于求，价格承压。</p>
+                                 <div class="mt-3"><span class="pill pill-yellow">供过于求</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="allocation" class="py-12">
+            <h2 class="text-3xl font-bold text-center mb-4 section-title">多元化资产配置</h2>
+            <p class="max-w-3xl mx-auto text-center text-gray-600 mb-12">在当前环境下，超越传统的60/40股债组合，构建一个更具韧性的多元化投资组合至关重要。这有助于分散风险，捕捉不同市场的增长机会。</p>
+            <div class="card p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div class="chart-container" style="height: 350px; max-width: 400px;">
+                        <canvas id="assetAllocationChart"></canvas>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl mb-4">示例投资组合解读</h3>
+                        <p class="text-gray-600 mb-4">这是一个基于报告建议构建的韧性投资组合模型。点击图表的不同部分，可以了解各类资产在组合中的作用。</p>
+                        <ul id="allocation-details" class="space-y-3">
+                             <li class="p-3 bg-gray-50 rounded-lg">
+                                <strong class="text-blue-700">股票 (40%):</strong> 增长引擎，聚焦AI科技和防御性板块，实现长期资本增值。
+                            </li>
+                            <li class="p-3 bg-gray-50 rounded-lg">
+                                <strong class="text-green-700">固定收益 (30%):</strong> 稳定器，以TIPS和高质量公司债为主，提供稳定现金流并对冲通胀。
+                            </li>
+                             <li class="p-3 bg-gray-50 rounded-lg">
+                                <strong class="text-yellow-700">大宗商品 (10%):</strong> 风险对冲，以黄金为主，抵御地缘政治风险和极端通胀。
+                            </li>
+                            <li class="p-3 bg-gray-50 rounded-lg">
+                                <strong class="text-purple-700">房地产 (10%):</strong> 多元化收益，通过REITs投资于工业、多户住宅等高需求领域。
+                            </li>
+                             <li class="p-3 bg-gray-50 rounded-lg">
+                                <strong class="text-gray-700">替代品/现金 (10%):</strong> 流动性与机会，保持灵活性，捕捉私募市场等非传统机会。
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="risks" class="py-12">
+            <h2 class="text-3xl font-bold text-center mb-4 section-title">主要投资风险分析</h2>
+            <p class="max-w-3xl mx-auto text-center text-gray-600 mb-12">识别和理解潜在风险是成功投资的前提。当前市场主要面临政策不确定性、通胀持续以及利率变化带来的多重挑战。</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="card p-6 text-center">
+                    <div class="text-4xl mb-4">⚖️</div>
+                    <h3 class="font-bold text-lg mb-2">政策不确定性</h3>
+                    <p class="text-sm text-gray-600">贸易关税和地缘政治紧张局势加剧市场波动，影响企业信心和全球供应链。</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <div class="text-4xl mb-4">📈</div>
+                    <h3 class="font-bold text-lg mb-2">持续通胀风险</h3>
+                    <p class="text-sm text-gray-600">高于预期的通胀，尤其是服务业通胀，可能迫使央行维持紧缩政策，侵蚀投资回报。</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <div class="text-4xl mb-4">🏦</div>
+                    <h3 class="font-bold text-lg mb-2">利率风险</h3>
+                    <p class="text-sm text-gray-600">利率的变动直接影响债券和房地产等资产的估值，高利率环境对高负债公司构成压力。</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <div class="text-4xl mb-4">📉</div>
+                    <h3 class="font-bold text-lg mb-2">经济增长放缓</h3>
+                    <p class="text-sm text-gray-600">全球主要经济体增长放缓，可能导致企业盈利不及预期，影响周期性股票表现。</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="container mx-auto p-8 text-center">
+            <p>2025年全球投资展望</p>
+            <p class="text-sm text-gray-400 mt-2">本内容基于提供的分析报告生成，仅供参考，不构成任何投资建议。投资有风险，决策需谨慎。</p>
+        </div>
+    </footer>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const chartColors = {
+        blue: 'rgba(54, 162, 235, 0.8)',
+        green: 'rgba(75, 192, 192, 0.8)',
+        red: 'rgba(255, 99, 132, 0.8)',
+        yellow: 'rgba(255, 206, 86, 0.8)',
+        purple: 'rgba(153, 102, 255, 0.8)',
+        orange: 'rgba(255, 159, 64, 0.8)',
+        grey: 'rgba(201, 203, 207, 0.8)',
+    };
+    
+    const chartBgColors = {
+        blue: 'rgba(54, 162, 235, 0.2)',
+        green: 'rgba(75, 192, 192, 0.2)',
+        red: 'rgba(255, 99, 132, 0.2)',
+        yellow: 'rgba(255, 206, 86, 0.2)',
+        purple: 'rgba(153, 102, 255, 0.2)',
+        orange: 'rgba(255, 159, 64, 0.2)',
+        grey: 'rgba(201, 203, 207, 0.2)',
+    }
+
+    const chartDefaults = {
+        plugins: {
+            legend: {
+                labels: {
+                    font: {
+                        family: "'Noto Sans SC', sans-serif"
+                    }
+                }
+            },
+            tooltip: {
+                titleFont: { family: "'Noto Sans SC', sans-serif" },
+                bodyFont: { family: "'Noto Sans SC', sans-serif" }
+            }
+        },
+        scales: {
+            x: {
+                ticks: {
+                     font: { family: "'Noto Sans SC', sans-serif" }
+                }
+            },
+            y: {
+                ticks: {
+                    font: { family: "'Noto Sans SC', sans-serif" }
+                }
+            }
+        },
+        maintainAspectRatio: false,
+    };
+
+    const regionalData = {
+        labels: ['美国', '欧元区', '中国', '日本', '全球'],
+        gdp: {
+            '2025': [1.5, 1.0, 4.8, 1.3, 3.1],
+            '2026': [1.6, 1.2, 4.4, 1.1, 3.0]
+        },
+        inflation: {
+            '2025': [3.3, 2.2, -0.5, 2.0, 3.8],
+            '2026': [2.2, 1.7, -0.2, 2.0, 3.2]
+        }
+    };
+
+    const regionalCtx = document.getElementById('regionalOutlookChart').getContext('2d');
+    let regionalChart;
+
+    function createRegionalChart(dataType) {
+        if (regionalChart) {
+            regionalChart.destroy();
+        }
+        const chartData = {
+            labels: regionalData.labels,
+            datasets: [{
+                label: '2025年预测',
+                data: regionalData[dataType]['2025'],
+                backgroundColor: chartBgColors.blue,
+                borderColor: chartColors.blue,
+                borderWidth: 1
+            }, {
+                label: '2026年预测',
+                data: regionalData[dataType]['2026'],
+                backgroundColor: chartBgColors.green,
+                borderColor: chartColors.green,
+                borderWidth: 1
+            }]
+        };
+        regionalChart = new Chart(regionalCtx, {
+            type: 'bar',
+            data: chartData,
+            options: { ...chartDefaults,
+                plugins: { ...chartDefaults.plugins,
+                    title: {
+                        display: true,
+                        text: dataType === 'gdp' ? '主要经济体GDP增长预测 (%)' : '主要经济体整体通胀预测 (%)',
+                        font: { size: 16, family: "'Noto Sans SC', sans-serif" }
+                    }
+                },
+                scales: {
+                     y: {
+                        beginAtZero: true,
+                        ticks: {
+                           callback: function(value) { return value + '%'; },
+                           font: { family: "'Noto Sans SC', sans-serif" }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                           font: { family: "'Noto Sans SC', sans-serif" }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    createRegionalChart('gdp');
+    document.getElementById('gdp-btn').addEventListener('click', () => {
+        createRegionalChart('gdp');
+        document.getElementById('gdp-btn').classList.add('active');
+        document.getElementById('inflation-btn').classList.remove('active');
+    });
+    document.getElementById('inflation-btn').addEventListener('click', () => {
+        createRegionalChart('inflation');
+        document.getElementById('inflation-btn').classList.add('active');
+        document.getElementById('gdp-btn').classList.remove('active');
+    });
+
+
+    const sectorCtx = document.getElementById('sectorPerformanceChart').getContext('2d');
+    const sectorData = {
+        labels: ['必需消费品', '公用事业', '服务业', '资本品', '科技', '能源', '医疗保健'],
+        performance: [10.58, 7.27, 3.83, -0.98, -1.38, -8.27, -14.08]
+    };
+    new Chart(sectorCtx, {
+        type: 'bar',
+        data: {
+            labels: sectorData.labels,
+            datasets: [{
+                label: '2025年初至今表现 (%)',
+                data: sectorData.performance,
+                backgroundColor: sectorData.performance.map(p => p > 0 ? chartBgColors.green : chartBgColors.red),
+                borderColor: sectorData.performance.map(p => p > 0 ? chartColors.green : chartColors.red),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            ...chartDefaults,
+            indexAxis: 'y'
+        }
+    });
+
+    const allocationCtx = document.getElementById('assetAllocationChart').getContext('2d');
+    new Chart(allocationCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['股票', '固定收益', '大宗商品', '房地产', '替代品/现金'],
+            datasets: [{
+                data: [40, 30, 10, 10, 10],
+                backgroundColor: [chartColors.blue, chartColors.green, chartColors.yellow, chartColors.purple, chartColors.grey],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            ...chartDefaults,
+            plugins: { ...chartDefaults.plugins,
+                title: {
+                    display: true,
+                    text: '示例韧性投资组合',
+                    font: { size: 16, family: "'Noto Sans SC', sans-serif" }
+                }
+            }
+        }
+    });
+
+    const tabs = document.querySelectorAll('[data-tab]');
+    const tabContents = document.querySelectorAll('.tab-pane');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            const target = tab.getAttribute('data-tab');
+            tabContents.forEach(content => {
+                if (content.id === `${target}-content`) {
+                    content.classList.remove('hidden');
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                    content.classList.add('hidden');
+                }
+            });
+        });
+    });
+    
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('section');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === entry.target.id) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    }, { rootMargin: '-50% 0px -50% 0px' });
+
+    sections.forEach(section => {
+        observer.observe(section);
+    });
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+            if (mobileMenu.classList.contains('hidden') === false) {
+                 mobileMenu.classList.add('hidden');
+            }
+        });
+    });
+
+});
+</script>
+
+</body>
+</html>

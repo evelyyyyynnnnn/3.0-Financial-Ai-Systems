@@ -1,0 +1,607 @@
+<!--请你根据近段时间的行情(分别以今年、这个季度和这个月为基准），给出投资建议，建议我们可以买哪些不同的产品（产品要细化，例如针对
+
+
+股票（个股或ETF）
+
+债券或国债
+
+加密货币
+
+商品（如黄金、原油）
+
+房地产信托基金（REITs），必须要给出具体的哪一些产品的投资建议），并且给出理由，然后把整个分析面板生成为可视化的html网站
+ -->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交互式投资分析仪表板 (2025年)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices: 
+        - Goal: Compare regional/sector stock performance. Method: Bar Chart (Chart.js). Interaction: Tooltips on hover show precise data. Justification: Bar charts are excellent for direct comparison of categorical data like market sectors.
+        - Goal: Show performance trends of specific assets (e.g., Gold, Indices). Method: Line Chart (Chart.js). Interaction: Tooltips and dynamic filtering by time. Justification: Line charts effectively visualize data changes over a continuous period.
+        - Goal: Present specific investment recommendations. Method: Structured HTML cards. Interaction: None, direct information display. Justification: Clear, scannable cards are best for presenting actionable text-based advice with rationale.
+        - Goal: Summarize qualitative insights. Method: Collapsible text blocks/accordions (HTML/JS). Interaction: Click to expand/collapse. Justification: Manages information density, allowing users to focus on high-level points first and drill into details as needed.
+    -->
+    <style>
+        body { font-family: 'Noto Sans SC', sans-serif; background-color: #f8f7f4; color: #4a4a4a; }
+        .tab-active { color: #3b82f6; border-bottom-color: #3b82f6; font-weight: 500; }
+        .tab-inactive { color: #6b7280; border-bottom-color: transparent; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .chart-container { position: relative; width: 100%; max-width: 700px; margin: 2rem auto; height: 350px; max-height: 50vh; }
+        .btn-filter { transition: all 0.2s ease-in-out; }
+        .btn-filter.active { background-color: #3b82f6; color: white; }
+        .btn-filter.inactive { background-color: #e5e7eb; color: #374151; }
+        .card { background-color: white; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); padding: 1.5rem; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+        h2 { font-size: 1.75rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
+        h3 { font-size: 1.25rem; font-weight: 600; color: #374151; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        .kpi-value { font-size: 2.25rem; font-weight: 700; color: #3b82f6; }
+        .kpi-label { font-size: 0.875rem; color: #6b7280; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">投资分析与市场展望仪表板</h1>
+            <p class="text-lg text-gray-600">基于2025年上半年市场表现的交互式洞察</p>
+        </header>
+
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+             <h2 class="text-2xl font-bold text-gray-800 mb-4">执行摘要：2025年市场脉搏</h2>
+             <p class="text-gray-700 leading-relaxed">
+                2025年上半年，全球金融市场在全球通胀担忧和地缘政治因素的影响下，呈现出显著的波动性与分化。本仪表板旨在为您解析当前复杂的市场环境，提炼关键洞察，并提供基于不同时间维度（<span class="font-semibold text-blue-600">今年至今</span>、<span class="font-semibold text-blue-600">本季度</span>、<span class="font-semibold text-blue-600">本月</span>）的 actionable 投资建议。您可以通过切换下方的资产类别和时间筛选器，深入探索每个市场的具体表现和潜在机会。
+            </p>
+        </div>
+
+
+        <div class="sticky top-0 bg-f8f7f4/80 backdrop-blur-md z-10 py-4 mb-8">
+            <div class="flex justify-center border-b border-gray-200 mb-4" id="asset-tabs">
+                <button class="flex-1 md:flex-none text-center py-3 px-4 md:px-6 text-base md:text-lg tab-active" data-tab="stocks">📈 股票</button>
+                <button class="flex-1 md:flex-none text-center py-3 px-4 md:px-6 text-base md:text-lg tab-inactive" data-tab="bonds">📑 债券</button>
+                <button class="flex-1 md:flex-none text-center py-3 px-4 md:px-6 text-base md:text-lg tab-inactive" data-tab="crypto">💎 加密货币</button>
+                <button class="flex-1 md:flex-none text-center py-3 px-4 md:px-6 text-base md:text-lg tab-inactive" data-tab="commodities">🥇 商品</button>
+                <button class="flex-1 md:flex-none text-center py-3 px-4 md:px-6 text-base md:text-lg tab-inactive" data-tab="reits">🏢 REITs</button>
+            </div>
+             <div class="flex justify-center space-x-2 md:space-x-4" id="time-filters">
+                <button class="btn-filter active px-4 py-2 rounded-full text-sm font-medium" data-period="ytd">今年至今</button>
+                <button class="btn-filter inactive px-4 py-2 rounded-full text-sm font-medium" data-period="qtd">本季度</button>
+                <button class="btn-filter inactive px-4 py-2 rounded-full text-sm font-medium" data-period="mtd">本月</button>
+            </div>
+        </div>
+
+        <main id="content-container">
+            <section id="stocks" class="content-section active">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800">股票市场：区域分化与行业轮动</h2>
+                    <p class="text-gray-600 mt-2 max-w-3xl mx-auto">全球股市在2025年经历“颠簸”开局，区域表现差异显著。美国市场出现向价值和防御性板块的轮动，欧洲市场因估值优势显现吸引力，而亚洲市场则提供了多元化的人工智能投资机会。</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 text-center">
+                    <div class="card">
+                        <div id="stocks-ytd-kpi" class="kpi-value">+1.0%</div>
+                        <div class="kpi-label">标普500指数 (今年至今)</div>
+                    </div>
+                    <div class="card">
+                        <div id="stocks-qtd-kpi" class="kpi-value">+4.02%</div>
+                        <div class="kpi-label">欧洲STOXX 600指数 (本季度)</div>
+                    </div>
+                    <div class="card">
+                        <div id="stocks-mtd-kpi" class="kpi-value">+20.01%</div>
+                        <div class="kpi-label">香港恒生指数 (今年至今)</div>
+                    </div>
+                </div>
+
+                <div class="card mb-8">
+                    <h3>关键洞察</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li><b>美国市场轮动:</b> 价值股跑赢成长股，非周期性消费品、公用事业等防御性行业表现突出，反映市场避险情绪。</li>
+                        <li><b>欧洲估值洼地:</b> 相对美国，欧洲股票估值更具吸引力，叠加经济改善预期，可能吸引资金流入。</li>
+                        <li><b>亚洲AI机遇:</b> 亚洲市场，特别是中国和韩国，在AI产业链中提供与美国同行关联度较低的多元化投资选择。</li>
+                         <li><b>长期趋势:</b> 尽管短期波动，主流科技巨头持续增加AI资本支出，表明人工智能的长期结构性趋势依然强劲。</li>
+                    </ul>
+                </div>
+                
+                <div class="card mb-8">
+                     <h3><span id="stocks-chart-title"></span></h3>
+                     <div class="chart-container">
+                        <canvas id="stocksChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>具体投资建议</h3>
+                     <div class="space-y-4">
+                        <div>
+                            <h4 class="font-semibold text-lg text-blue-700">股票ETF</h4>
+                            <p class="text-gray-600 mb-2">通过ETF可以方便地进行多元化和区域配置。</p>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li><b>Vanguard S&P 500 ETF (VOO):</b> 投资美国大盘股，基本面健康，适合长期持有。</li>
+                                <li><b>iShares MSCI China ETF (MCHI):</b> 捕捉中国市场反弹和政策支持机会，年至今表现强劲。</li>
+                                <li><b>Vanguard FTSE Europe ETF (VGK):</b> 受益于欧洲市场的低估值和经济复苏潜力。</li>
+                                <li><b>金融精选行业SPDR基金 (XLF):</b> 在利率相对较高的环境中，金融行业表现稳健。</li>
+                            </ul>
+                        </div>
+                         <div>
+                            <h4 class="font-semibold text-lg text-blue-700">个股关注</h4>
+                            <p class="text-gray-600 mb-2">关注防御性及受益于结构性趋势的公司。</p>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li><b>防御性消费股 (如宝洁, P&G):</b> 在不确定环境中需求稳定，提供稳定股息。</li>
+                                <li><b>公用事业股 (如新纪元能源, NEE):</b> 受益于能源转型和稳定的现金流，防御性强。</li>
+                                <li><b>AI基础设施巨头 (如英伟达, NVDA; 微软, MSFT):</b> 尽管短期股价波动，但长期资本支出计划表明增长趋势不变。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="bonds" class="content-section">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800">固定收益市场：重置后的收益机会</h2>
+                    <p class="text-gray-600 mt-2 max-w-3xl mx-auto">经历大幅调整后，债券市场已完成“重置”，目前提供有吸引力的收益流。较高的初始收益率为投资者提供了缓冲，以应对未来利率波动和通胀风险。</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 text-center">
+                     <div class="card">
+                        <div id="bonds-ytd-kpi" class="kpi-value">4.41%</div>
+                        <div class="kpi-label">美国10年期国债收益率</div>
+                    </div>
+                    <div class="card">
+                        <div id="bonds-qtd-kpi" class="kpi-value">5.15%</div>
+                        <div class="kpi-label">投资级公司债到期收益率 (Q1)</div>
+                    </div>
+                    <div class="card">
+                        <div id="bonds-mtd-kpi" class="kpi-value">+0.82%</div>
+                        <div class="kpi-label">高收益市政债指数回报 (Q1)</div>
+                    </div>
+                </div>
+
+                <div class="card mb-8">
+                    <h3>关键洞察</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li><b>收益吸引力恢复:</b> 当前债券收益率处于高位，收入成为回报的主要部分，增强了其在投资组合中的价值。</li>
+                        <li><b>久期策略:</b> 投资者可根据对经济增长的预期调整久期。看好增长放缓，可增加长期债券；担忧通胀，则青睐短期债券。</li>
+                        <li><b>信用利差扩大:</b> 公司债与国债的利差因关税不确定性而扩大，这既是风险信号，也为能承受风险的投资者提供了更高的潜在回报。</li>
+                        <li><b>市政债价值凸显:</b> 对于高税阶投资者，市政债券的免税优势和具吸引力的相对价值，使其成为高效创收工具。</li>
+                    </ul>
+                </div>
+                
+                <div class="card mb-8">
+                    <h3><span id="bonds-chart-title"></span></h3>
+                    <div class="chart-container">
+                        <canvas id="bondsChart"></canvas>
+                    </div>
+                </div>
+
+                 <div class="card">
+                    <h3>具体投资建议</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-semibold text-lg text-blue-700">债券ETF</h4>
+                             <p class="text-gray-600 mb-2">提供便捷的流动性和多元化固定收益敞口。</p>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li><b>Vanguard Total Bond Market ETF (BND):</b> 分散投资于整个美国投资级债券市场，是核心持仓的稳健选择。</li>
+                                <li><b>iShares Short-Term National Muni Bond ETF (SUB):</b> 适合寻求税收优惠和较低利率风险的投资者。</li>
+                                <li><b>Vanguard Intermediate-Term Corporate Bond ETF (VCIT):</b> 投资中期投资级公司债，在当前收益率下提供较好回报。</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg text-blue-700">直接债券</h4>
+                            <p class="text-gray-600 mb-2">对于希望锁定收益率的投资者。</p>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li><b>美国国债:</b> 直接购买2年期或10年期国债，获得无风险收益。</li>
+                                <li><b>高评级公司债券 (如苹果, AAPL; 微软, MSFT):</b> 这些公司的债券提供比国债稍高的收益，且信用风险较低。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="crypto" class="content-section">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800">加密货币市场：监管明朗化与机构入场</h2>
+                    <p class="text-gray-600 mt-2 max-w-3xl mx-auto">随着美国监管环境日趋清晰，加密货币市场正加速从边缘投机资产向主流金融资产转变。现货ETF的批准极大推动了机构资金流入，比特币和以太坊在5月份表现强劲。</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-center">
+                    <div class="card">
+                        <div id="crypto-ytd-kpi" class="kpi-value">$104,687</div>
+                        <div class="kpi-label">比特币 (BTC) 现价</div>
+                    </div>
+                    <div class="card">
+                        <div id="crypto-mtd-kpi" class="kpi-value">+46%</div>
+                        <div class="kpi-label">以太坊 (ETH) 5月涨幅</div>
+                    </div>
+                </div>
+
+                 <div class="card mb-8">
+                    <h3>关键洞察</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li><b>监管是关键催化剂:</b> 美国SEC态度的转变和相关法案的推进，为机构大规模投资铺平了道路，降低了市场的不确定性。</li>
+                        <li><b>ETF效应显著:</b> 现货比特币和以太坊ETF的推出，不仅带来了大量资金流入，也改善了市场的流动性和深度。</li>
+                        <li><b>供应与需求:</b> 比特币的上涨同时受到ETF资金流入（需求端）和供应紧缩（如减半效应）的双重推动。</li>
+                         <li><b>生态系统演进:</b> 以太坊通过持续升级（如Pectra）不断优化其网络，而代币化现实世界资产（RWA）被认为是下一个增长点。</li>
+                    </ul>
+                </div>
+                
+                 <div class="card mb-8">
+                    <h3><span id="crypto-chart-title"></span></h3>
+                    <div class="chart-container">
+                        <canvas id="cryptoChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>具体投资建议</h3>
+                    <div class="space-y-4">
+                        <div>
+                             <h4 class="font-semibold text-lg text-blue-700">核心加密资产</h4>
+                              <p class="text-gray-600 mb-2">作为高风险高回报的卫星配置。</p>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li><b>比特币 (BTC):</b> 作为数字黄金和价值储存手段，受益于机构采用和供应稀缺性。可通过主流交易所或ETF投资。</li>
+                                <li><b>以太坊 (ETH):</b> 作为领先的智能合约平台，是DeFi和NFT生态系统的基础。其通缩机制和质押收益是长期价值支撑。</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg text-blue-700">加密货币相关ETF</h4>
+                            <p class="text-gray-600 mb-2">对于偏好传统投资渠道的投资者，是参与加密市场的便捷方式。</p>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li><b>iShares Bitcoin Trust (IBIT) / Fidelity Wise Origin Bitcoin Fund (FBTC):</b> 直接投资比特币的现货ETF，费用低廉，流动性好。</li>
+                                 <li><b>ProShares Ether Strategy ETF (EETH):</b> 投资以太坊期货合约，虽然非现货，但提供便捷的以太坊价格敞口。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+             <section id="commodities" class="content-section">
+                 <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800">大宗商品市场：黄金闪耀，原油承压</h2>
+                    <p class="text-gray-600 mt-2 max-w-3xl mx-auto">大宗商品市场走势分化。黄金在地缘政治紧张和宏观不确定性中作为避险资产大放异彩，创下历史新高。而原油则因需求放缓和供应增加的预期而面临下行压力。</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-center">
+                    <div class="card">
+                        <div id="commodities-ytd-kpi" class="kpi-value">+25.48%</div>
+                        <div class="kpi-label">黄金现货价格 (今年至今)</div>
+                    </div>
+                    <div class="card">
+                        <div id="commodities-mtd-kpi" class="kpi-value">-$10/桶</div>
+                        <div class="kpi-label">布伦特原油价格变化 (4月-5月)</div>
+                    </div>
+                </div>
+
+                 <div class="card mb-8">
+                    <h3>关键洞察</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li><b>黄金的避险地位:</b> 贸易冲突、对美元信任度下降及央行强劲购买是金价上涨的核心驱动力。黄金与股债的低相关性使其成为重要的投资组合多元化工具。</li>
+                        <li><b>结构性需求支撑黄金:</b> 央行增持黄金反映了全球去美元化和储备多元化的长期趋势，为金价提供了坚实支撑。</li>
+                        <li><b>原油基本面看跌:</b> 全球经济逆风和电动车普及导致需求增长放缓，而OPEC+及非OPEC+国家供应增加，导致供需失衡，库存预计将大幅增加。</li>
+                        <li><b>多元化价值:</b> 尽管单一商品（如原油）前景不佳，但广泛的大宗商品组合仍具多元化价值，可对冲通胀和地缘政治风险。</li>
+                    </ul>
+                </div>
+
+                <div class="card mb-8">
+                    <h3><span id="commodities-chart-title"></span></h3>
+                    <div class="chart-container">
+                        <canvas id="commoditiesChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>具体投资建议</h3>
+                    <div class="space-y-4">
+                        <div>
+                             <h4 class="font-semibold text-lg text-blue-700">黄金</h4>
+                             <p class="text-gray-600 mb-2">作为投资组合的“压舱石”，对冲宏观风险。</p>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li><b>SPDR Gold Shares (GLD):</b> 全球最大的黄金ETF，流动性极佳，紧密跟踪金价。</li>
+                                <li><b>iShares Gold Trust Micro (IAUM):</b> 费用比率更低的黄金ETF选择，适合成本敏感的长期投资者。</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg text-blue-700">原油及其他商品</h4>
+                             <p class="text-gray-600 mb-2">对原油持谨慎态度，但可通过多元化商品基金获取敞口。</p>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li><b>对原油持谨慎态度:</b> 鉴于看跌基本面，不建议此时对原油进行大量多头配置。United States Oil Fund (USO) 年至今表现不佳。</li>
+                                <li><b>Direxion Auspice Broad Commodity Strategy ETF (COM):</b> 一种管理型期货基金，可根据市场趋势调整多空头寸，能在下跌趋势中转向持有国库券以规避风险。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="reits" class="content-section">
+                 <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800">REITs市场：利率压制下的价值洼地</h2>
+                    <p class="text-gray-600 mt-2 max-w-3xl mx-auto">受利率上升影响，REITs行业近期表现不佳，但这也为中长期投资者创造了以折价买入优质资产的机会。不同物业类型表现分化显著，数据中心、基础设施等科技相关领域展现出更强的韧性。</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 text-center">
+                    <div class="card">
+                        <div id="reits-ytd-kpi" class="kpi-value">-9.10%</div>
+                        <div class="kpi-label">REITs行业平均回报 (今年至今)</div>
+                    </div>
+                     <div class="card">
+                        <div id="reits-qtd-kpi" class="kpi-value">-2.0%</div>
+                        <div class="kpi-label">FTSE Nareit All Equity REITs (本季度)</div>
+                    </div>
+                    <div class="card">
+                        <div id="reits-mtd-kpi" class="kpi-value">+7.28%</div>
+                        <div class="kpi-label">数据中心REITs (4月)</div>
+                    </div>
+                </div>
+
+                <div class="card mb-8">
+                    <h3>关键洞察</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li><b>价值机会浮现:</b> 市场对利率的短期担忧导致许多REITs以低于其资产净值的价格交易，提供了具吸引力的安全边际。</li>
+                        <li><b>利率敏感性:</b> 历史上，REITs在美联储停止加息或开始降息后表现良好。当前市场可能正处于一个转折点。</li>
+                        <li><b>行业表现分化:</b> 办公和酒店REITs受远程办公和经济放缓影响严重，而数据中心、基础设施（如手机信号塔）和医疗保健等REITs因其结构性需求而表现更佳。</li>
+                        <li><b>稳健的资产负债表:</b> 多数大型REITs拥有固定利率的长期债务，这有助于它们抵御短期利率波动。</li>
+                    </ul>
+                </div>
+                
+                <div class="card mb-8">
+                    <h3><span id="reits-chart-title"></span></h3>
+                    <div class="chart-container">
+                        <canvas id="reitsChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>具体投资建议</h3>
+                    <div class="space-y-4">
+                         <div>
+                            <h4 class="font-semibold text-lg text-blue-700">REITs ETF</h4>
+                            <p class="text-gray-600 mb-2">分散投资于整个房地产市场，降低单一物业类型风险。</p>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li><b>Vanguard Real Estate ETF (VNQ):</b> 市场覆盖最广、流动性最好的REITs ETF之一，是核心配置的理想选择。</li>
+                                <li><b>Real Estate Select Sector SPDR Fund (XLRE):</b> 专注于标普500指数中的大型房地产公司。</li>
+                            </ul>
+                        </div>
+                        <div>
+                           <h4 class="font-semibold text-lg text-blue-700">特定行业REITs</h4>
+                            <p class="text-gray-600 mb-2">专注于具有长期增长趋势的细分领域。</p>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li><b>Digital Realty Trust (DLR) / Equinix (EQIX):</b> 全球领先的数据中心REITs，直接受益于云计算和AI的数据存储需求。</li>
+                                <li><b>American Tower (AMT):</b> 基础设施REIT，拥有并运营无线和广播通信塔，受益于5G网络扩张。</li>
+                                <li><b>Welltower (WELL):</b> 医疗保健REIT，专注于老龄化人口驱动的高级住宅和医疗设施，需求具有韧性。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const assetTabs = document.getElementById('asset-tabs');
+    const timeFilters = document.getElementById('time-filters');
+    const contentContainer = document.getElementById('content-container');
+    
+    let currentAsset = 'stocks';
+    let currentPeriod = 'ytd';
+
+    const data = {
+        stocks: {
+            ytd: {
+                title: '美国股市行业表现 (今年至今)',
+                labels: ['非周期性消费品', '综合企业', '公用事业', '金融', '科技', '能源', '医疗保健'],
+                values: [10.58, 9.01, 7.27, 1.22, -1.38, -8.27, -14.08]
+            },
+            qtd: {
+                title: '全球主要股指表现 (本季度)',
+                labels: ['欧洲STOXX 600', '德国DAXK', '香港恒生', '上海综合', '法国CAC40'],
+                values: [4.02, 3.95, 3.49, 0.95, -0.24]
+            },
+            mtd: {
+                title: '全球主要股指表现 (5月)',
+                labels: ['德国DAXK', '欧洲Euro Stoxx 50', '法国CAC 40', '上海综合', '香港恒生'],
+                values: [0.27, -0.08, -0.36, -0.47, -1.20]
+            }
+        },
+        bonds: {
+            ytd: {
+                title: '主要债券市场回报 (今年至今/Q1)',
+                labels: ['应税市政债', '美国国债', '公司债', '高收益市政债', '市政债指数'],
+                values: [2.99, 2.92, 2.31, 0.82, -0.22]
+            },
+            qtd: {
+                title: '美国国债收益率曲线 (截至5月30日)',
+                labels: ['2年期', '10年期', '30年期'],
+                values: [3.89, 4.41, 4.92]
+            },
+            mtd: {
+                 title: '美国10年期国债收益率预测',
+                 labels: ['Q2 2025', 'Q3 2025', 'Q4 2025', 'Q1 2026'],
+                 values: [4.3, 4.25, 4.2, 4.1],
+                 type: 'line'
+            }
+        },
+        crypto: {
+            ytd: {
+                title: '比特币价格走势 (2025至今)',
+                labels: ['1月', '2月', '3月', '4月', '5月', '6月1日'],
+                values: [98000, 102000, 109000, 90000, 95000, 104687],
+                type: 'line'
+            },
+            qtd: {
+                title: '以太坊未平仓合约量 (5月, $亿美元)',
+                labels: ['5月初', '5月末'],
+                values: [121.8, 175.3] 
+            },
+            mtd: {
+                title: '主要加密资产月度表现 (5月)',
+                labels: ['以太坊 (ETH)', '比特币 (BTC)'],
+                values: [46, 15]
+            }
+        },
+        commodities: {
+            ytd: {
+                title: '主要商品ETF表现 (今年至今)',
+                labels: ['黄金(FGDL)', '黄金(GLD)', '原油(USO)'],
+                values: [44.02, 26.2, -11.1]
+            },
+            qtd: {
+                title: '能源价格指数变化 (4月)',
+                labels: ['原油', '美国天然气', '整体能源指数'],
+                values: [-6.8, -17.6, -7.6]
+            },
+            mtd: {
+                title: '黄金价格走势 (2025年, $/盎司)',
+                labels: ['年初', '4月初', '4月末(高点)', '5月末'],
+                values: [2658, 3200, 3400, 3335],
+                type: 'line'
+            }
+        },
+        reits: {
+            ytd: {
+                title: 'REITs物业类型表现 (今年至今)',
+                labels: ['医疗保健', '基础设施', '赌场', '办公', '酒店'],
+                values: [7.23, 6.88, 6.00, -24.06, -22.90]
+            },
+            qtd: {
+                title: 'REITs行业指数回报 (4月)',
+                labels: ['全球房地产', 'FTSE Nareit All Equity', 'REITs行业平均'],
+                values: [1.3, -2.0, -6.45]
+            },
+            mtd: {
+                 title: 'REITs物业类型表现 (4月)',
+                 labels: ['数据中心', '基础设施', '商场', '木材'],
+                 values: [7.28, 2.47, -10.52, -12.90]
+            }
+        }
+    };
+    
+    let charts = {};
+
+    function createOrUpdateChart(asset, period) {
+        const chartData = data[asset][period];
+        const chartId = asset + 'Chart';
+        const ctx = document.getElementById(chartId).getContext('2d');
+        const chartTitleEl = document.getElementById(asset + '-chart-title');
+
+        if (chartTitleEl) {
+            chartTitleEl.textContent = chartData.title;
+        }
+
+        if (charts[asset]) {
+            charts[asset].destroy();
+        }
+
+        const chartType = chartData.type || 'bar';
+        
+        charts[asset] = new Chart(ctx, {
+            type: chartType,
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: '表现/数值',
+                    data: chartData.values,
+                    backgroundColor: chartData.values.map(v => v >= 0 ? 'rgba(59, 130, 246, 0.6)' : 'rgba(239, 68, 68, 0.6)'),
+                    borderColor: chartData.values.map(v => v >= 0 ? 'rgba(59, 130, 246, 1)' : 'rgba(239, 68, 68, 1)'),
+                    borderWidth: chartType === 'line' ? 2 : 1,
+                    pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                    tension: 0.1,
+                    fill: chartType === 'line'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: { color: 'rgba(200, 200, 200, 0.2)' },
+                        ticks: {
+                            callback: function(value) { return chartType === 'bar' ? value + '%' : value; },
+                            color: '#6b7280'
+                        }
+                    },
+                    x: {
+                       grid: { display: false },
+                       ticks: { color: '#6b7280' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: '#1f2937',
+                        titleColor: '#ffffff',
+                        bodyColor: '#ffffff',
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    let value = context.parsed.y;
+                                    if(chartType === 'bar') value += '%';
+                                    label += value;
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function handleTabClick(e) {
+        if (e.target.tagName !== 'BUTTON') return;
+        
+        currentAsset = e.target.dataset.tab;
+
+        assetTabs.querySelectorAll('button').forEach(tab => {
+            tab.classList.remove('tab-active');
+            tab.classList.add('tab-inactive');
+        });
+        e.target.classList.add('tab-active');
+        e.target.classList.remove('tab-inactive');
+
+        contentContainer.querySelectorAll('.content-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById(currentAsset).classList.add('active');
+
+        createOrUpdateChart(currentAsset, currentPeriod);
+    }
+    
+    function handleFilterClick(e) {
+        if (e.target.tagName !== 'BUTTON') return;
+        
+        currentPeriod = e.target.dataset.period;
+        
+        timeFilters.querySelectorAll('button').forEach(filter => {
+            filter.classList.remove('active');
+            filter.classList.add('inactive');
+        });
+        e.target.classList.add('active');
+        e.target.classList.remove('inactive');
+        
+        createOrUpdateChart(currentAsset, currentPeriod);
+    }
+
+    assetTabs.addEventListener('click', handleTabClick);
+    timeFilters.addEventListener('click', handleFilterClick);
+
+    // Initial chart render
+    createOrUpdateChart(currentAsset, currentPeriod);
+});
+</script>
+
+</body>
+</html>

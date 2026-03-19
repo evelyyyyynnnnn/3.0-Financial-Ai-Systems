@@ -1,0 +1,21 @@
+name: lstm-volatility
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pytorch=2.1.0
+  - pip:
+      - numpy==1.24.4
+      - pandas==1.5.3
+      - scikit-learn==1.2.2
+      - yfinance==0.2.38
+      - matplotlib==3.7.2
+      - seaborn==0.12.2
+      - optuna==3.4.0
+      - tqdm==4.66.1
+      - python-dotenv==1.0.0
+      - wandb==0.15.12
+

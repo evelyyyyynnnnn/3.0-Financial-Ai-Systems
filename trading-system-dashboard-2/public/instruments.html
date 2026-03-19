@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金融工具分析平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .instruments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .instrument-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .instrument-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .instrument-title {
+            font-size: 1.5rem;
+            color: #667eea;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .instrument-features {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .instrument-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .instrument-features li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .feature-value {
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .controls {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .control-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-item label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .control-item input, .control-item select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-item input:focus, .control-item select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .results {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .results h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .result-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-title {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .chart-title {
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .ascii-chart {
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.2;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        @media (max-width: 768px) {
+            .instruments-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .control-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 金融工具分析平台</h1>
+            <p>基于10年期7%固定利率债券的利率风险管理工具</p>
+        </div>
+
+        <div class="instruments-grid">
+            <div class="instrument-card">
+                <h2 class="instrument-title">📈 浮动利率工具 (每日重置)</h2>
+                <ul class="instrument-features">
+                    <li>
+                        <span class="feature-label">类型:</span>
+                        <span class="feature-value">浮动利率，每日重置</span>
+                    </li>
+                    <li>
+                        <span class="feature-label">久期:</span>
+                        <span class="feature-value">1天</span>
+                    </li>
+                    <li>
+                        <span class="feature-label">风险特征:</span>
+                        <span class="feature-value">极低久期风险</span>
+                    </li>
+                    <li>
+                        <span class="feature-label">适用场景:</span>
+                        <span class="feature-value">利率风险对冲，稳定现金流</span>
+                    </li>
+                    <li>
+                        <span class="feature-label">工作原理:</span>
+                        <span class="feature-value">每日根据市场利率计算支付</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="instrument-card">
+                <h2 class="instrument-title">⚖️ 利率差工具 (10年期)</h2>
+                <ul class="instrument-features">
+                    <li>
+                        <span class="feature-label">类型:</span>
+                        <span class="feature-value">利率差支付，固定久期</span>
+                    </li>
+                    <li>
+                        <span class="feature-label">久期:</span>
+                        <span class="feature-value">10年</span>
+                    </li>
+                    <li>
+                        <span class="feature-label">风险特征:</span>
+                        <span class="feature-value">高利率敏感性</span>
+                    </li>
+                    <li>
+                        <span class="feature-label">适用场景:</span>
+                        <span class="feature-value">利率方向性交易，久期管理</span>
+                    </li>
+                    <li>
+                        <span class="feature-label">工作原理:</span>
+                        <span class="feature-value">支付市场利率与7%的差额</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="controls">
+            <h3>🔧 参数设置</h3>
+            <div class="control-group">
+                <div class="control-item">
+                    <label for="principal">本金 ($)</label>
+                    <input type="number" id="principal" value="100000" min="1000" step="1000">
+                </div>
+                <div class="control-item">
+                    <label for="marketRate">市场利率 (%)</label>
+                    <input type="number" id="marketRate" value="5" min="0" max="20" step="0.1">
+                </div>
+                <div class="control-item">
+                    <label for="floatingWeight">浮动利率权重 (%)</label>
+                    <input type="number" id="floatingWeight" value="50" min="0" max="100" step="5">
+                </div>
+                <div class="control-item">
+                    <label for="daysToMaturity">到期天数</label>
+                    <input type="number" id="daysToMaturity" value="3650" min="365" step="365">
+                </div>
+            </div>
+            <button class="btn" onclick="calculateInstruments()">🚀 计算分析</button>
+        </div>
+
+        <div class="results" id="results" style="display: none;">
+            <h3>📊 分析结果</h3>
+            <div class="result-grid" id="resultGrid"></div>
+        </div>
+
+        <div class="chart-container" id="chartContainer" style="display: none;">
+            <h3 class="chart-title">📈 可视化图表</h3>
+            <div class="ascii-chart" id="asciiChart"></div>
+        </div>
+    </div>
+
+    <script>
+        // 简化的金融工具计算函数
+        class SimpleInstrumentCalculator {
+            constructor() {
+                this.baseRate = 0.07; // 7% 固定利率
+            }
+
+            createFloatingRateInstrument(principal, currentMarketRate, daysToMaturity) {
+                const dailyRate = currentMarketRate / 365;
+                const dailyPayment = principal * dailyRate;
+                const totalInterest = dailyPayment * daysToMaturity;
+                
+                return {
+                    type: 'floating-rate-daily-reset',
+                    principal: principal,
+                    currentMarketRate: currentMarketRate,
+                    dailyRate: dailyRate,
+                    duration: 1,
+                    daysToMaturity: daysToMaturity,
+                    dailyPayment: dailyPayment,
+                    totalInterest: totalInterest
+                };
+            }
+
+            createInterestRateGapInstrument(principal, currentMarketRate, yearsToMaturity = 10) {
+                const rateGap = currentMarketRate - this.baseRate;
+                const annualPayment = principal * rateGap;
+                const duration = yearsToMaturity;
+                
+                return {
+                    type: 'interest-rate-gap',
+                    principal: principal,
+                    baseRate: this.baseRate,
+                    currentMarketRate: currentMarketRate,
+                    rateGap: rateGap,
+                    annualPayment: annualPayment,
+                    duration: duration,
+                    yearsToMaturity: yearsToMaturity
+                };
+            }
+
+            calculatePortfolioMetrics(floatingRateWeight, interestRateGapWeight, principal, currentMarketRate, daysToMaturity) {
+                const floatingRate = this.createFloatingRateInstrument(principal, currentMarketRate, daysToMaturity);
+                const interestRateGap = this.createInterestRateGapInstrument(principal, currentMarketRate);
+                
+                const portfolioDuration = floatingRateWeight * floatingRate.duration + 
+                                         interestRateGapWeight * interestRateGap.duration;
+                
+                const floatingRateReturn = floatingRate.totalInterest / principal;
+                const interestRateGapReturn = interestRateGap.annualPayment * interestRateGap.yearsToMaturity / principal;
+                const portfolioReturn = floatingRateWeight * floatingRateReturn + 
+                                       interestRateGapWeight * interestRateGapReturn;
+                
+                return {
+                    portfolioDuration: portfolioDuration,
+                    portfolioReturn: portfolioReturn,
+                    weights: {
+                        floatingRate: floatingRateWeight,
+                        interestRateGap: interestRateGapWeight
+                    },
+                    individualMetrics: {
+                        floatingRate: floatingRate,
+                        interestRateGap: interestRateGap
+                    }
+                };
+            }
+        }
+
+        const calculator = new SimpleInstrumentCalculator();
+
+        function calculateInstruments() {
+            const principal = parseFloat(document.getElementById('principal').value);
+            const marketRate = parseFloat(document.getElementById('marketRate').value) / 100;
+            const floatingWeight = parseFloat(document.getElementById('floatingWeight').value) / 100;
+            const daysToMaturity = parseInt(document.getElementById('daysToMaturity').value);
+            
+            const interestRateGapWeight = 1 - floatingWeight;
+            
+            // 计算投资组合指标
+            const portfolioMetrics = calculator.calculatePortfolioMetrics(
+                floatingWeight,
+                interestRateGapWeight,
+                principal,
+                marketRate,
+                daysToMaturity
+            );
+            
+            // 显示结果
+            displayResults(portfolioMetrics);
+            
+            // 显示图表
+            displayCharts(portfolioMetrics);
+        }
+
+        function displayResults(metrics) {
+            const resultGrid = document.getElementById('resultGrid');
+            const results = document.getElementById('results');
+            
+            resultGrid.innerHTML = `
+                <div class="result-card">
+                    <div class="result-title">投资组合久期</div>
+                    <div class="result-value">${metrics.portfolioDuration.toFixed(2)} 年</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-title">投资组合收益率</div>
+                    <div class="result-value">${(metrics.portfolioReturn * 100).toFixed(2)}%</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-title">浮动利率权重</div>
+                    <div class="result-value">${(metrics.weights.floatingRate * 100).toFixed(0)}%</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-title">利率差工具权重</div>
+                    <div class="result-value">${(metrics.weights.interestRateGap * 100).toFixed(0)}%</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-title">浮动利率日支付</div>
+                    <div class="result-value">$${metrics.individualMetrics.floatingRate.dailyPayment.toFixed(2)}</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-title">利率差年支付</div>
+                    <div class="result-value">$${metrics.individualMetrics.interestRateGap.annualPayment.toFixed(0)}</div>
+                </div>
+            `;
+            
+            results.style.display = 'block';
+        }
+
+        function displayCharts(metrics) {
+            const chartContainer = document.getElementById('chartContainer');
+            const asciiChart = document.getElementById('asciiChart');
+            
+            // 创建简单的ASCII图表
+            const chart = createAsciiChart(metrics);
+            asciiChart.textContent = chart;
+            
+            chartContainer.style.display = 'block';
+        }
+
+        function createAsciiChart(metrics) {
+            const duration = metrics.portfolioDuration;
+            const return_ = metrics.portfolioReturn * 100;
+            
+            // 创建久期条形图
+            const durationBarLength = Math.round((duration / 10) * 50);
+            const durationBar = '█'.repeat(durationBarLength);
+            
+            // 创建收益率条形图
+            const returnBarLength = Math.round(((return_ + 20) / 60) * 50);
+            const returnBar = '█'.repeat(Math.max(0, returnBarLength));
+            
+            return `
+投资组合分析图表
+================
+
+久期分析 (目标: 10年)
+${durationBar} ${duration.toFixed(2)}年
+
+收益率分析 (范围: -20% 到 +40%)
+${returnBar} ${return_.toFixed(2)}%
+
+权重分布
+浮动利率: ${(metrics.weights.floatingRate * 100).toFixed(0)}% ${'█'.repeat(Math.round(metrics.weights.floatingRate * 20))}
+利率差工具: ${(metrics.weights.interestRateGap * 100).toFixed(0)}% ${'█'.repeat(Math.round(metrics.weights.interestRateGap * 20))}
+
+风险评级
+${getRiskRating(metrics.portfolioDuration)}
+            `;
+        }
+
+        function getRiskRating(duration) {
+            if (duration < 3) return '🟢 低风险 (保守)';
+            if (duration < 6) return '🟡 中等风险 (平衡)';
+            return '🔴 高风险 (激进)';
+        }
+
+        // 页面加载完成后自动计算一次
+        window.addEventListener('load', () => {
+            calculateInstruments();
+        });
+    </script>
+</body>
+</html>

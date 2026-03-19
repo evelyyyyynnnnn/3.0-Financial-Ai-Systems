@@ -1,0 +1,28 @@
+# Virtual environment
+.venv
+
+# Python files
+.pyc
+__pycache__
+__pycache__/*
+*.egg-info
+build
+dist
+
+# Log files
+log/*
+*.log
+log.*
+
+# IDEs
+.vscode
+*.pyproj
+
+# Environment variables file
+.env
+
+# PyCharm files
+.idea
+
+# Pytest
+.pytest_cache

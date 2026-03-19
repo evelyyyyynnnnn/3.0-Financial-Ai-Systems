@@ -1,0 +1,67 @@
+{
+  "api": {
+    "key": "PKVFX17VIP19CWGQPOBN",
+    "secret": "SG0MX5gJ3LwnGt9LasXYUbVywCZ7SH4slJkXqPZl",
+    "base_url": "https://paper-api.alpaca.markets",
+    "ws_url": "wss://stream.data.alpaca.markets/v2/iex"
+  },
+  "trading": {
+    "symbols": ["AAPL", "MSFT", "GOOGL", "TSLA", "NVDA", "AMZN", "META", "NFLX"],
+    "starting_capital": 100000.0,
+    "max_position_size": 10000.0,
+    "max_daily_loss": 1000.0,
+    "max_drawdown": 0.2,
+    "commission_per_trade": 1.0,
+    "slippage_bps": 5.0
+  },
+  "strategies": {
+    "momentum": {
+      "enabled": true,
+      "lookback_period": 20,
+      "momentum_threshold": 0.02,
+      "position_size": 0.1,
+      "max_positions": 10
+    },
+    "mean_reversion": {
+      "enabled": true,
+      "lookback_period": 20,
+      "zscore_threshold": 2.0,
+      "position_size": 0.1,
+      "max_positions": 10
+    },
+    "volume_breakout": {
+      "enabled": true,
+      "lookback_period": 20,
+      "volume_multiplier": 2.0,
+      "price_threshold": 0.01,
+      "position_size": 0.1,
+      "max_positions": 10
+    }
+  },
+  "risk_management": {
+    "position_limits": {
+      "AAPL": 1000,
+      "MSFT": 1000,
+      "GOOGL": 100,
+      "TSLA": 500,
+      "NVDA": 500
+    },
+    "max_orders_per_symbol": 5,
+    "max_total_orders": 100,
+    "stop_loss_pct": 0.05,
+    "take_profit_pct": 0.10
+  },
+  "performance": {
+    "monitoring_interval_seconds": 60,
+    "backtest_start_date": "2023-01-01",
+    "backtest_end_date": "2023-12-31",
+    "data_timeframe": "1Min",
+    "max_history_bars": 1000
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "trading_system.log",
+    "max_file_size_mb": 100,
+    "max_files": 10
+  }
+}

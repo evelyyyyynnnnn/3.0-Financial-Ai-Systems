@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U.S. Stock Market Indicators Infographic - April 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <!-- Visualization & Content Choices: 
+        - Executive Summary: Goal: Inform. Method: Styled text (HTML/Tailwind). Justification: Overview.
+        - S&P Levels (Apr'25, Mar'25, Apr'24): Goal: Compare. Viz: Bar Chart (Chart.js). Justification: Clear level comparison. No SVG.
+        - S&P MoM/YoY Changes: Goal: Inform. Method: Big Numbers in cards (HTML/Tailwind). Justification: Quick stats. No SVG.
+        - S&P April Volatility (Apr 2-10): Goal: Change. Viz: Line Chart (Chart.js). Justification: Shows dip/recovery. No SVG.
+        - S&P Q1 Earnings Growth (Blended, Mag7, S&P493): Goal: Compare. Viz: Bar Chart (Chart.js). Justification: Compares growth contributions. No SVG.
+        - S&P Top Earnings Contributors & Tariff Movers: Goal: Organize/Inform. Method: Styled HTML Lists. Justification: Clear lists. No SVG.
+        - Fed Rate: Goal: Inform. Method: Big Number in card. Justification: Key policy stat. No SVG.
+        - CPI/Core CPI Trends: Goal: Change/Compare. Viz: Line Chart (Chart.js). Justification: Inflation trends. No SVG.
+        - PCE Data: Goal: Inform. Method: Static text in card. Justification: Latest available. No SVG.
+        - Labor Market Key Stats (Payroll, Unemp, Wage, Partic.): Goal: Inform. Method: Grid of Big Number cards. Justification: Quick overview. No SVG.
+        - Nonfarm Payroll (vs Avg): Goal: Compare. Viz: Bar Chart (Chart.js). Justification: Current vs avg. No SVG.
+        - Unemployment Rate Trend: Goal: Change. Viz: Line Chart (Chart.js). Justification: Trend over time. No SVG.
+        - Corporate Earnings (TSLA, AAPL, MSFT, AMZN): Goal: Inform/Compare. Method: Individual cards with Big Numbers for financials, YoY Bar Chart for Revenue/Net Income (Chart.js), text for drivers. Justification: Detailed company snapshot. No SVG.
+        - Conclusion: Goal: Inform. Method: Styled text. Justification: Summary.
+        All Chart.js instances use Canvas, label wrapping, and specified tooltip config. No Mermaid JS.
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .nav-link { transition: color 0.3s ease, border-bottom-color 0.3s ease; }
+        .nav-link:hover, .nav-link.active { color: #ff6361; border-bottom-color: #ff6361; } /* Coral for active/hover */
+        .section-card { background-color: white; border-radius: 0.75rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); padding: 1.5rem; margin-bottom: 2rem; } /* Material shadow */
+        .stat-value { font-size: 2.25rem; font-weight: 700; color: #003f5c; } /* Dark Blue */
+        .stat-label { font-size: 0.875rem; color: #58508d; text-transform: uppercase; letter-spacing: 0.05em; } /* Purple */
+        h1, h2, h3 { color: #003f5c; } /* Dark Blue for headings */
+        .accent-text { color: #ff6361; } /* Coral */
+        .highlight-text { color: #ffa600; } /* Orange */
+        .primary-bg { background-color: #003f5c; }
+        .secondary-bg { background-color: #58508d; }
+        .accent-bg-magenta { background-color: #bc5090; }
+        .accent-bg-coral { background-color: #ff6361; }
+        .accent-bg-orange { background-color: #ffa600; }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-100 text-gray-700 antialiased">
+
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <a href="#introduction" class="text-3xl font-extrabold" style="color: #003f5c;">Market<span style="color: #ff6361;">Watch</span> April '25</a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#sp500" class="nav-link px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">S&P 500</a>
+                        <a href="#monetary-policy" class="nav-link px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">Policy & Inflation</a>
+                        <a href="#labor-market" class="nav-link px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">Labor</a>
+                        <a href="#corporate-earnings" class="nav-link px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">Earnings</a>
+                        <a href="#conclusion" class="nav-link px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">Conclusion</a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" id="mobile-menu-button" class="bg-slate-100 inline-flex items-center justify-center p-2 rounded-md text-slate-500 hover:text-coral-500 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-coral-500" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="block h-6 w-6" id="icon-menu" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        <svg class="hidden h-6 w-6" id="icon-close" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#introduction" class="nav-link block px-3 py-2 rounded-md text-base font-medium border-b-2 border-transparent">Introduction</a>
+                <a href="#sp500" class="nav-link block px-3 py-2 rounded-md text-base font-medium border-b-2 border-transparent">S&P 500</a>
+                <a href="#monetary-policy" class="nav-link block px-3 py-2 rounded-md text-base font-medium border-b-2 border-transparent">Policy & Inflation</a>
+                <a href="#labor-market" class="nav-link block px-3 py-2 rounded-md text-base font-medium border-b-2 border-transparent">Labor Market</a>
+                <a href="#corporate-earnings" class="nav-link block px-3 py-2 rounded-md text-base font-medium border-b-2 border-transparent">Corporate Earnings</a>
+                <a href="#conclusion" class="nav-link block px-3 py-2 rounded-md text-base font-medium border-b-2 border-transparent">Conclusion</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <section id="introduction" class="pt-16 -mt-16 mb-12">
+            <div class="section-card">
+                <h2 class="text-3xl font-bold mb-4">Executive Summary: Resilience Amidst Volatility</h2>
+                <p class="text-lg text-slate-600 mb-3">April 2025 painted a complex U.S. market landscape, marked by resilience against significant trade policy-induced volatility. The S&P 500 recovered from an early-month dip to post strong YoY gains. The Federal Reserve held rates steady, citing trade policy's impact on inflation and unemployment risks. Inflation (CPI) continued its disinflationary trend, while the labor market showed modest, stable growth. Corporate earnings were mixed: tech giants like Microsoft and Amazon thrived on AI and cloud, whereas Tesla faced specific headwinds and tariff impacts.</p>
+                <p class="text-slate-600 leading-relaxed">This period highlights financial markets' heightened sensitivity to geopolitical and trade developments, now as critical as traditional economic fundamentals. This infographic explores these key indicators in detail, providing insights into the dynamic interplay of policy, economic data, and corporate performance shaping the U.S. market.</p>
+            </div>
+        </section>
+
+        <section id="sp500" class="pt-16 -mt-16 mb-12">
+            <div class="section-card">
+                <h2 class="text-3xl font-bold mb-6">S&P 500: Navigating Turbulence</h2>
+                <p class="text-lg text-slate-600 mb-6">This section dissects the S&P 500's performance, highlighting its closing levels, the dramatic volatility spurred by tariff news in early April, and the underlying earnings drivers. We examine which companies fueled growth and which were most affected by trade dynamics.</p>
+
+                <div class="grid md:grid-cols-3 gap-6 mb-8 text-center">
+                    <div class="bg-slate-50 p-4 rounded-lg shadow">
+                        <p class="stat-label">S&P 500 Close (Apr '25)</p>
+                        <p class="stat-value">5569.06</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-lg shadow">
+                        <p class="stat-label">MoM Change</p>
+                        <p class="stat-value accent-text">-0.76%</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-lg shadow">
+                        <p class="stat-label">YoY Change</p>
+                        <p class="stat-value highlight-text">+10.59%</p>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">Index Level Comparison</h3>
+                        <p class="text-slate-600 mb-4">Despite a slight monthly dip, the S&P 500 maintained significant year-over-year growth, indicating underlying market strength.</p>
+                        <div class="chart-container h-72 md:h-80">
+                            <canvas id="sp500LevelsChart"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">April Tariff Volatility (Apr 2-10)</h3>
+                        <p class="text-slate-600 mb-4">New tariff policies triggered sharp declines early in April, with the S&P 500 hitting a low of 4,982.77 before a notable rebound.</p>
+                        <div class="chart-container h-72 md:h-80">
+                            <canvas id="sp500VolatilityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">Q1 2025 Earnings Growth Drivers</h3>
+                        <p class="text-slate-600 mb-4">The "Magnificent 7" significantly outpaced the rest of the S&P 500 in earnings growth for Q1 2025.</p>
+                        <div class="chart-container h-72 md:h-80">
+                            <canvas id="sp500EarningsGrowthChart"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">Top 5 S&P 500 Earnings Contributors (Q1 '25)</h3>
+                        <ul class="list-none space-y-2 mt-4">
+                            <li class="p-3 bg-sky-50 rounded-md shadow-sm"><span class="font-semibold text-sky-700">1. Bristol Myers Squibb</span></li>
+                            <li class="p-3 bg-sky-50 rounded-md shadow-sm"><span class="font-semibold text-sky-700">2. NVIDIA</span></li>
+                            <li class="p-3 bg-sky-50 rounded-md shadow-sm"><span class="font-semibold text-sky-700">3. Gilead Sciences</span></li>
+                            <li class="p-3 bg-sky-50 rounded-md shadow-sm"><span class="font-semibold text-sky-700">4. Amazon.com</span></li>
+                            <li class="p-3 bg-sky-50 rounded-md shadow-sm"><span class="font-semibold text-sky-700">5. Broadcom</span></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <h3 class="text-xl font-semibold mb-3 mt-8">Tariff Impact: Market Movers (Apr 2-16)</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-green-50 p-4 rounded-lg shadow">
+                        <h4 class="text-lg font-medium text-green-700 mb-2">Top Performers Post-Tariff</h4>
+                        <ul class="list-disc list-inside text-slate-600 space-y-1 text-sm">
+                            <li><strong>UnitedHealth Group (+11.54%):</strong> Higher Medicare Advantage payments.</li>
+                            <li><strong>Newmont Corp:</strong> Safe-haven rally (gold).</li>
+                            <li><strong>Humana Inc.:</strong> Positive Medicare Advantage policy shifts.</li>
+                            <li><strong>Palantir Technologies Inc.:</strong> NATO contract win.</li>
+                            <li><strong>Ross Stores Inc.:</strong> Effective tariff navigation (sourcing).</li>
+                        </ul>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg shadow">
+                        <h4 class="text-lg font-medium text-red-700 mb-2">Most Impacted by Tariffs</h4>
+                        <ul class="list-disc list-inside text-slate-600 space-y-1 text-sm">
+                            <li><strong>APA Corp</strong></li>
+                            <li><strong>Charles River Labs (-28.1% Apr 10)</strong></li>
+                            <li><strong>Albemarle Corp (-12.6% Apr 8)</strong></li>
+                            <li><strong>Devon Energy Corp:</strong> Oil price drop on recession fears.</li>
+                            <li><strong>Stanley Black & Decker Inc.</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                 <p class="text-sm text-slate-500 mt-6">This divergence highlights how specific events like tariff announcements can create short-term winners and losers distinct from long-term earnings drivers, adding nuance to market analysis.</p>
+            </div>
+        </section>
+
+        <section id="monetary-policy" class="pt-16 -mt-16 mb-12">
+            <div class="section-card">
+                <h2 class="text-3xl font-bold mb-6">Monetary Policy & Inflation Dynamics</h2>
+                <p class="text-lg text-slate-600 mb-6">This section reviews the Federal Reserve's May 2025 rate decision and dives into the latest inflation figures from the CPI and PCE Price Index. We explore how trade policy uncertainties are shaping the Fed's cautious stance and influencing the inflation outlook.</p>
+                
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div class="bg-sky-50 p-6 rounded-lg shadow text-center">
+                        <p class="stat-label mb-1">Federal Funds Rate Target</p>
+                        <p class="stat-value">4.25% - 4.50%</p>
+                        <p class="text-sm text-slate-600 mt-2">(Held steady, May 7, 2025)</p>
+                        <p class="text-xs text-slate-500 mt-2">Fed cited increased risks from trade policy impacting inflation & unemployment.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">CPI Inflation Trends (YoY % Change)</h3>
+                        <p class="text-slate-600 mb-4">CPI-U showed slight deceleration in April, the smallest 12-month increase since Feb 2021. Core CPI also moderated.</p>
+                        <div class="chart-container">
+                            <canvas id="inflationCpiChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                     <div>
+                        <h4 class="text-lg font-medium text-slate-700 mb-2">Key CPI Components (April '25 MoM)</h4>
+                        <ul class="list-none space-y-2">
+                            <li class="flex justify-between p-2 bg-slate-50 rounded"><span>Energy Index:</span> <span class="font-semibold text-red-600">+0.7%</span></li>
+                            <li class="flex justify-between p-2 bg-slate-50 rounded"><span>Shelter Index:</span> <span class="font-semibold text-red-600">+0.3%</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-indigo-50 p-6 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold mb-3">PCE Price Index (March 2025, YoY)</h3>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium text-indigo-700">PCE All Items:</span>
+                                <span class="font-bold text-indigo-700 text-2xl">+2.3%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium text-indigo-700">Core PCE:</span>
+                                <span class="font-bold text-indigo-700 text-2xl">+2.6%</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-3">Note: April 2025 PCE data due May 30, 2025.</p>
+                         <p class="text-sm text-slate-600 mt-3">The Fed's caution persists due to trade policy inflation risks, despite disinflationary trends.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="labor-market" class="pt-16 -mt-16 mb-12">
+            <div class="section-card">
+                <h2 class="text-3xl font-bold mb-6">U.S. Labor Market: Steady & Normalizing</h2>
+                <p class="text-lg text-slate-600 mb-6">Delve into the U.S. labor market's April 2025 status. We cover nonfarm payroll growth, unemployment rates, wage trends, and participation, painting a picture of a healthy, albeit normalizing, job environment.</p>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-center">
+                    <div class="bg-teal-50 p-3 rounded-lg shadow"><p class="stat-label">Nonfarm Payrolls</p><p class="stat-value" style="color:#0f766e;">+177k</p></div>
+                    <div class="bg-teal-50 p-3 rounded-lg shadow"><p class="stat-label">Unemployment Rate</p><p class="stat-value" style="color:#0f766e;">4.2%</p></div>
+                    <div class="bg-teal-50 p-3 rounded-lg shadow"><p class="stat-label">Avg. Hourly Earnings (YoY)</p><p class="stat-value" style="color:#0f766e;">+3.8%</p></div>
+                    <div class="bg-teal-50 p-3 rounded-lg shadow"><p class="stat-label">Participation Rate</p><p class="stat-value" style="color:#0f766e;">62.6%</p></div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">Nonfarm Payroll: Consistent Growth</h3>
+                        <p class="text-slate-600 mb-4">Job growth aligned with the prior 12-month average, indicating a steady pace. Health Care and Transportation & Warehousing led gains.</p>
+                        <div class="chart-container">
+                            <canvas id="nonfarmPayrollChart"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">Unemployment Rate Trend</h3>
+                        <p class="text-slate-600 mb-4">The rate held steady for the third month. The broader U-6 rate decreased slightly to 7.8%.</p>
+                        <div class="chart-container">
+                            <canvas id="unemploymentRateChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-500 mt-6">Overall, the labor market appears robust enough to generate jobs without significant inflationary overheating, supporting the Fed's cautious stance.</p>
+            </div>
+        </section>
+
+        <section id="corporate-earnings" class="pt-16 -mt-16 mb-12">
+            <div class="section-card">
+                <h2 class="text-3xl font-bold mb-6">Q1 2025 Corporate Earnings Spotlight</h2>
+                <p class="text-lg text-slate-600 mb-6">This section highlights Q1 2025 financial performance for Tesla, Apple, Microsoft, and Amazon, covering revenues, net income, EPS, and key drivers/challenges, including tariff impacts. Fiscal quarter alignments are noted.</p>
+                
+                <div class="space-y-8">
+                    <div class="p-6 bg-slate-50 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-semibold mb-1">Tesla (TSLA) <span class="text-sm font-normal text-slate-500">- Reported Apr 22</span></h3>
+                        <p class="text-sm text-red-600 font-medium mb-3">Faced notable declines: lower deliveries, reduced ASP, Model Y changeover, R&D costs. Tariff vulnerability cited.</p>
+                        <div class="grid md:grid-cols-3 gap-4 mb-4 text-center">
+                            <div><p class="stat-label">Total Revenue</p><p class="stat-value text-red-500">$19.3B <span class="text-base text-red-400">(-9% YoY)</span></p></div>
+                            <div><p class="stat-label">Operating Income</p><p class="stat-value text-red-500">$0.4B <span class="text-base text-red-400">(-66% YoY)</span></p></div>
+                            <div><p class="stat-label">Non-GAAP EPS</p><p class="stat-value text-red-500">$0.27</p></div>
+                        </div>
+                        <div class="chart-container h-60 sm:h-72">
+                            <canvas id="tslaEarningsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-slate-50 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-semibold mb-1">Apple (AAPL) <span class="text-sm font-normal text-slate-500">- Reported May 1 (Fiscal Q2)</span></h3>
+                        <p class="text-sm text-green-600 font-medium mb-3">Solid growth driven by Services and new products. Limited Q2 tariff impact, but $900M negative impact projected for Q3.</p>
+                         <div class="grid md:grid-cols-3 gap-4 mb-4 text-center">
+                            <div><p class="stat-label">Total Revenue</p><p class="stat-value text-green-500">$95.4B <span class="text-base text-green-400">(+5.1% YoY)</span></p></div>
+                            <div><p class="stat-label">Net Income</p><p class="stat-value text-green-500">$24.8B <span class="text-base text-green-400">(+4.8% YoY)</span></p></div>
+                            <div><p class="stat-label">Diluted EPS</p><p class="stat-value text-green-500">$1.65 <span class="text-base text-green-400">(+7.8% YoY)</span></p></div>
+                        </div>
+                        <div class="chart-container h-60 sm:h-72">
+                            <canvas id="aaplEarningsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-slate-50 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-semibold mb-1">Microsoft (MSFT) <span class="text-sm font-normal text-slate-500">- Reported Apr 30 (Fiscal Q3)</span></h3>
+                        <p class="text-sm text-green-600 font-medium mb-3">Record quarter fueled by strong Cloud growth (Azure +33%, AI contributing 16 pts). Noted data center capacity constraints.</p>
+                        <div class="grid md:grid-cols-3 gap-4 mb-4 text-center">
+                            <div><p class="stat-label">Total Revenue</p><p class="stat-value text-green-500">$70.1B <span class="text-base text-green-400">(+13% YoY)</span></p></div>
+                            <div><p class="stat-label">Net Income</p><p class="stat-value text-green-500">$25.8B <span class="text-base text-green-400">(+18% YoY)</span></p></div>
+                            <div><p class="stat-label">Diluted EPS</p><p class="stat-value text-green-500">$3.46 <span class="text-base text-green-400">(+18% YoY)</span></p></div>
+                        </div>
+                        <div class="chart-container h-60 sm:h-72">
+                            <canvas id="msftEarningsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-slate-50 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-semibold mb-1">Amazon (AMZN) <span class="text-sm font-normal text-slate-500">- Reported Apr 30</span></h3>
+                        <p class="text-sm text-green-600 font-medium mb-3">Impressive results: strong retail, AWS (+17% driven by AI), and advertising. Minimal tariff impact observed so far.</p>
+                        <div class="grid md:grid-cols-3 gap-4 mb-4 text-center">
+                            <div><p class="stat-label">Net Sales</p><p class="stat-value text-green-500">$155.7B <span class="text-base text-green-400">(+9% YoY)</span></p></div>
+                            <div><p class="stat-label">Net Income</p><p class="stat-value text-green-500">$17.1B <span class="text-base text-green-400">(+64.2% YoY)</span></p></div>
+                            <div><p class="stat-label">Diluted EPS</p><p class="stat-value text-green-500">$1.59</p></div>
+                        </div>
+                        <div class="chart-container h-60 sm:h-72">
+                            <canvas id="amznEarningsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="conclusion" class="pt-16 -mt-16 mb-12">
+            <div class="section-card">
+                <h2 class="text-3xl font-bold mb-4">Market Conclusions: Navigating a Complex Landscape</h2>
+                <p class="text-lg text-slate-600 mb-3">April 2025 underscored the U.S. market's resilience against external shocks like trade policy shifts. The S&P 500's recovery, despite early-month volatility, points to strong underlying fundamentals, including generally robust corporate earnings. The Fed's cautious stance, influenced by trade uncertainties, highlights a delicate balancing act between managing inflation and employment risks. While inflation shows disinflationary signs, persistent components and trade policy risks temper expectations for immediate rate cuts. The labor market remains healthy but is normalizing.</p>
+                <p class="text-slate-600 leading-relaxed">Corporate earnings, especially from tech giants like Microsoft and Amazon driven by AI and cloud, were strong. However, company-specific issues and tariff vulnerabilities affected others like Tesla. This divergence emphasizes that individual fundamentals and exposure to macroeconomic factors are key differentiators. In summary, April 2025 showcased market dynamism and increasing susceptibility to external policy shocks, requiring careful monitoring by investors and policymakers.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="primary-bg text-slate-300 py-10 text-center">
+        <p>&copy; 2025 MarketWatch Infographics. Data from April 2025 U.S. Market Indicators Report.</p>
+        <p class="text-sm">This is a simulated infographic for illustrative purposes.</p>
+    </footer>
+
+<script>
+    const chartColors = {
+        darkBlue: '#003f5c',
+        purple: '#58508d',
+        magenta: '#bc5090',
+        coral: '#ff6361',
+        orange: '#ffa600',
+        lightBlue: '#77aaff', // Lighter shade for comparison bars
+        lightPurple: '#a095c8',
+        lightCoral: '#ff938a',
+        lightOrange: '#ffc966'
+    };
+
+    function formatLabel(str, maxWidth) {
+        if (typeof str !== 'string') return [String(str)];
+        const sections = [];
+        const words = str.split(' ');
+        let temp = "";
+        words.forEach((item, index) => {
+            if (temp.length > 0) {
+                temp += " " + item;
+            } else {
+                temp = item;
+            }
+            if (temp.length > maxWidth) {
+                sections.push(temp);
+                temp = "";
+            }
+            if (index === words.length - 1 && temp.length > 0) {
+                sections.push(temp);
+            }
+        });
+        return sections.length > 0 ? sections : [str]; // Ensure it always returns an array
+    }
+
+    const commonTooltipTitleCallback = function(tooltipItems) {
+        const item = tooltipItems[0];
+        let label = item.chart.data.labels[item.dataIndex];
+        if (Array.isArray(label)) {
+            return label.join(' ');
+        }
+        return label;
+    };
+    
+    const commonChartOptions = (yLabel = 'Value', xLabel = 'Category') => ({
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { 
+            y: { 
+                beginAtZero: true, 
+                title: { display: true, text: yLabel, color: chartColors.darkBlue },
+                ticks: { 
+                    color: chartColors.purple,
+                    callback: function(value) { 
+                        if (Math.abs(value) >= 1e9) return (value / 1e9).toFixed(1) + 'B'; 
+                        if (Math.abs(value) >= 1e6) return (value / 1e6).toFixed(1) + 'M'; 
+                        if (Math.abs(value) >= 1e3) return (value / 1e3).toFixed(1) + 'K';
+                        return value.toLocaleString(); 
+                    } 
+                } 
+            },
+            x: { 
+                title: { display: true, text: xLabel, color: chartColors.darkBlue },
+                ticks: { 
+                    color: chartColors.purple,
+                    callback: function(value) { 
+                        const label = this.getLabelForValue(value);
+                        return formatLabel(label, 16); // Apply label wrapping
+                    } 
+                } 
+            }
+        },
+        plugins: { 
+            legend: { 
+                position: 'bottom', 
+                labels: { color: chartColors.darkBlue }
+            }, 
+            tooltip: { 
+                backgroundColor: 'rgba(0,63,92,0.9)', // Dark Blue with opacity
+                titleColor: chartColors.orange,
+                bodyColor: 'white',
+                callbacks: { 
+                    title: commonTooltipTitleCallback,
+                    label: function(context) { 
+                        let label = context.dataset.label || ''; 
+                        if (label) { label += ': '; }
+                        let value = context.parsed.y;
+                        if (value === null || typeof value === 'undefined') return label + 'N/A';
+                        if (context.chart.config.type === 'bar' && (context.datasetIndex === 0 || context.datasetIndex === 1) && (context.chart.canvas.id === 'sp500LevelsChart' || context.chart.canvas.id.endsWith('EarningsChart'))) { // For currency values
+                             label += '$' + (Math.abs(value) >= 1e9 ? (value / 1e9).toFixed(2) + 'B' : (Math.abs(value) >= 1e6 ? (value / 1e6).toFixed(2) + 'M' : value.toLocaleString()));
+                        } else if (context.chart.canvas.id === 'sp500VolatilityChart') {
+                             label += value.toLocaleString();
+                        } else { // For percentages or other numbers
+                            label += value.toLocaleString() + (context.chart.canvas.id.includes('Growth') || context.chart.canvas.id.includes('Cpi') || context.chart.canvas.id.includes('Rate') ? '%' : '');
+                        }
+                        return label; 
+                    } 
+                } 
+            } 
+        }
+    });
+    
+    // S&P 500 Levels Chart
+    const sp500LevelsData = {
+        labels: ['April 2024', 'March 2025', 'April 2025'],
+        datasets: [{
+            label: 'S&P 500 Index Level',
+            data: [5035.69, 5611.85, 5569.06],
+            backgroundColor: [chartColors.purple, chartColors.coral, chartColors.orange],
+            borderColor: chartColors.darkBlue,
+            borderWidth: 1
+        }]
+    };
+    new Chart(document.getElementById('sp500LevelsChart'), { type: 'bar', data: sp500LevelsData, options: commonChartOptions('Index Level (USD)', 'Month') });
+
+    // S&P 500 Volatility Chart (April 2-10)
+    const sp500VolatilityData = {
+        labels: ['Apr 2 (Start)', 'Apr 3 (-4.84%)', 'Apr 4 (-5.97%)', 'Apr 8 (Low)', 'Apr 9 (+9.52%)', 'Apr 10 (Close)'],
+        datasets: [{
+            label: 'S&P 500 Index',
+            data: [5569.06 / (1-0.0076) * (1+0.0484) * (1+0.0597) / (1+0.0952) * 1.01 , // Estimate Apr 2 start by working back from Apr 10 close, rough
+                     5569.06 / (1-0.0076) * (1+0.0597) / (1+0.0952) * 1.01, 
+                     5569.06 / (1-0.0076) / (1+0.0952) * 1.01, 
+                     4982.77, 
+                     4982.77 * (1+0.0952), 
+                     5268.05],
+            borderColor: chartColors.coral,
+            backgroundColor: 'rgba(255, 99, 97, 0.2)', // Light coral fill
+            tension: 0.1,
+            fill: true
+        }]
+    };
+    new Chart(document.getElementById('sp500VolatilityChart'), { type: 'line', data: sp500VolatilityData, options: commonChartOptions('Index Level', 'Date (April 2025)') });
+
+    // S&P 500 Earnings Growth Chart
+    const sp500EarningsGrowthData = {
+        labels: [formatLabel('Blended S&P 500 Growth',16), formatLabel('Magnificent 7 Growth',16), formatLabel('S&P 493 Growth (Rest)',16)],
+        datasets: [{
+            label: 'Q1 2025 YoY Earnings Growth (%)',
+            data: [7.2, 14.8, 5.1],
+            backgroundColor: [chartColors.orange, chartColors.coral, chartColors.purple],
+            borderColor: chartColors.darkBlue,
+            borderWidth: 1
+        }]
+    };
+    new Chart(document.getElementById('sp500EarningsGrowthChart'), { type: 'bar', data: sp500EarningsGrowthData, options: commonChartOptions('YoY Growth (%)', 'Group') });
+    
+    // Inflation CPI Chart
+    const inflationCpiData = {
+        labels: [formatLabel('March 2025',16), formatLabel('April 2025',16)],
+        datasets: [
+            {
+                label: 'CPI-U All Items (YoY %)',
+                data: [2.4, 2.3],
+                borderColor: chartColors.coral,
+                backgroundColor: 'rgba(255,99,97,0.1)',
+                tension: 0.1,
+                fill: true
+            },
+            {
+                label: 'Core CPI (YoY %)',
+                data: [2.9, 2.8], // March Core CPI was not given, using 2.9 as per report text "following a 0.1% increase in March" vs 0.2% in April for core, and YoY for April is 2.8%.
+                borderColor: chartColors.purple,
+                backgroundColor: 'rgba(88,80,141,0.1)',
+                tension: 0.1,
+                fill: true
+            }
+        ]
+    };
+    new Chart(document.getElementById('inflationCpiChart'), { type: 'line', data: inflationCpiData, options: commonChartOptions('YoY Change (%)', 'Month') });
+
+    // Labor Market Charts
+    const nonfarmPayrollData = {
+        labels: [formatLabel('Prior 12-mo Average',16), formatLabel('April 2025',16)],
+        datasets: [{
+            label: 'Nonfarm Payroll Gain',
+            data: [152000, 177000],
+            backgroundColor: [chartColors.lightPurple, chartColors.purple],
+            borderColor: chartColors.darkBlue,
+            borderWidth: 1
+        }]
+    };
+    new Chart(document.getElementById('nonfarmPayrollChart'), { type: 'bar', data: nonfarmPayrollData, options: commonChartOptions('Jobs Added', 'Period') });
+
+    const unemploymentRateData = {
+        labels: [formatLabel('April 2024',16), formatLabel('March 2025',16), formatLabel('April 2025',16)],
+        datasets: [{
+            label: 'Unemployment Rate (%)',
+            data: [3.9, 4.2, 4.2],
+            borderColor: chartColors.orange,
+            backgroundColor: 'rgba(255,166,0,0.1)',
+            tension: 0.1,
+            fill: true
+        }]
+    };
+    new Chart(document.getElementById('unemploymentRateChart'), { type: 'line', data: unemploymentRateData, options: commonChartOptions('Rate (%)', 'Month')});
+    
+    // Corporate Earnings Charts
+    const createCompanyEarningsChart = (canvasId, companyName, q1_2024_revenue, q1_2025_revenue, q1_2024_net_income, q1_2025_net_income) => {
+        const data = {
+            labels: [formatLabel('Q1 2024 (est.)',16), formatLabel('Q1 2025',16)],
+            datasets: [
+                { label: 'Revenue', data: [q1_2024_revenue, q1_2025_revenue], backgroundColor: chartColors.purple, borderColor: chartColors.darkBlue, borderWidth: 1 },
+                { label: 'Net Income', data: [q1_2024_net_income, q1_2025_net_income], backgroundColor: chartColors.coral, borderColor: chartColors.darkBlue, borderWidth: 1 }
+            ]
+        };
+        new Chart(document.getElementById(canvasId), { type: 'bar', data: data, options: commonChartOptions('Amount (USD)', companyName + ' - Quarter') });
+    };
+
+    createCompanyEarningsChart('tslaEarningsChart', 'Tesla', 19.3e9 / (1-0.09), 19.3e9, 0.4e9 / (1-0.66), 0.4e9); // Q1'24 OpInc used as proxy for NI for YoY calc
+    createCompanyEarningsChart('aaplEarningsChart', 'Apple', 95.4e9 / 1.051, 95.4e9, 24.8e9 / 1.048, 24.8e9);
+    createCompanyEarningsChart('msftEarningsChart', 'Microsoft', 70.1e9 / 1.13, 70.1e9, 25.8e9 / 1.18, 25.8e9);
+    createCompanyEarningsChart('amznEarningsChart', 'Amazon', 155.7e9 / 1.09, 155.7e9, 17.1e9 / 1.642, 17.1e9);
+
+    // Mobile menu toggle
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const iconMenu = document.getElementById('icon-menu');
+    const iconClose = document.getElementById('icon-close');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    mobileMenuButton.addEventListener('click', () => {
+        const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true' || false;
+        mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+        mobileMenu.classList.toggle('hidden');
+        iconMenu.classList.toggle('hidden');
+        iconClose.classList.toggle('hidden');
+    });
+    
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (this.hash !== "" && document.querySelector(this.hash)) {
+                // e.preventDefault(); // Keep default for anchor jump
+                if (!mobileMenu.classList.contains('hidden')) {
+                     mobileMenuButton.click(); // Close mobile menu
+                }
+                // Highlight logic handled by scroll listener
+            }
+        });
+    });
+
+    // Active link highlighting on scroll
+    const sections = document.querySelectorAll('section');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 80) { // Adjusted offset for sticky nav
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    });
+    // Initial active link check
+    window.dispatchEvent(new Event('scroll'));
+
+</script>
+</body>
+</html>

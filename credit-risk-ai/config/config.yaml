@@ -1,0 +1,133 @@
+data:
+  text:
+    max_length: 512
+    batch_size: 32
+    num_workers: 4
+    sources:
+      - financial_reports
+      - news_articles
+      - social_media
+    bert_model: "finbert-base"
+    
+  market:
+    lookback_period: 252  # trading days
+    features:
+      - close_price
+      - volume
+      - volatility
+      - pe_ratio
+      - market_cap
+    technical_indicators:
+      - RSI
+      - MACD
+      - BB
+      - MA_50
+      - MA_200
+    
+  image:
+    size: [224, 224]
+    channels: 3
+    augmentation:
+      enabled: true
+      rotation_range: 10
+      zoom_range: 0.1
+      horizontal_flip: true
+      brightness_range: [0.8, 1.2]
+
+model:
+  architecture:
+    text_encoder:
+      type: "transformer"
+      hidden_size: 768
+      num_layers: 12
+      num_attention_heads: 12
+      dropout: 0.1
+      
+    market_encoder:
+      type: "lstm"
+      hidden_size: 256
+      num_layers: 2
+      dropout: 0.2
+      bidirectional: true
+      
+    image_encoder:
+      type: "resnet50"
+      pretrained: true
+      freeze_backbone: false
+      
+    fusion:
+      type: "attention"
+      hidden_size: 512
+      num_heads: 8
+      dropout: 0.1
+      
+    classifier:
+      hidden_layers: [512, 256, 128]
+      activation: "relu"
+      dropout: 0.3
+
+training:
+  epochs: 100
+  learning_rate: 0.0001
+  optimizer: "adam"
+  scheduler:
+    type: "cosine"
+    warmup_steps: 1000
+  gradient_clipping: 1.0
+  early_stopping:
+    patience: 10
+    min_delta: 0.001
+  loss_weights:
+    text: 0.4
+    market: 0.3
+    image: 0.3
+  mixed_precision: true
+  
+evaluation:
+  metrics:
+    - accuracy
+    - precision
+    - recall
+    - f1_score
+    - auc_roc
+    - confusion_matrix
+  cross_validation:
+    n_splits: 5
+    shuffle: true
+    
+visualization:
+  plots:
+    - learning_curves
+    - confusion_matrix
+    - feature_importance
+    - attention_maps
+  interactive: true
+  save_format: "png"
+  dpi: 300
+
+logging:
+  wandb:
+    enabled: true
+    project: "multimodal_credit_risk"
+    tags: ["production"]
+  tensorboard: true
+  log_frequency: 100
+  
+optimization:
+  hyperparameter_search:
+    method: "optuna"
+    n_trials: 100
+    timeout: 72000  # 20 hours
+    metric: "val_auc_roc"
+    direction: "maximize"
+    
+ensemble:
+  enabled: true
+  method: "weighted_average"
+  models:
+    - name: "base_model"
+      weight: 0.4
+    - name: "light_model"
+      weight: 0.3
+    - name: "heavy_model"
+      weight: 0.3 

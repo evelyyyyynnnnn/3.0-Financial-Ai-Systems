@@ -1,0 +1,2 @@
+{"algorithm": "PPO", "timestep": 2000, "timestamp": "2025-11-12T16:00:57.932677+00:00", "portfolio_value": 0.30795542456688346, "sharpe_ratio": 0.0, "sortino_ratio": 0.0, "calmar_ratio": 0.0, "var": 0.0}
+{"algorithm": "DQN", "timestep": 2000, "timestamp": "2025-11-12T16:05:46.598121+00:00", "portfolio_value": 0.7457591571862066, "sharpe_ratio": -0.50270877799712, "sortino_ratio": -0.6627569426893879, "calmar_ratio": -0.0545154517601386, "var": -0.007065014168204454}
