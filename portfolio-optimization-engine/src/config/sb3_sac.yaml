@@ -1,0 +1,81 @@
+market_environment:
+  trading_frequency: "daily"
+  transaction_cost: 0.001
+  risk_free_rate: 0.02
+  market_impact: 0.1
+  window_size: 30
+  assets:
+    - "SPY"
+    - "QQQ"
+    - "IWM"
+    - "GLD"
+    - "TLT"
+
+agent:
+  algorithm: "SAC"
+  policy: "MlpPolicy"
+  library: "sb3"
+  sb3_params:
+    verbose: 1
+    tensorboard_log: "results/tensorboard"
+    learning_rate: 0.0003
+    buffer_size: 50000
+    batch_size: 256
+    train_freq: 64
+    gradient_steps: 1
+    learning_starts: 1000
+  discrete_actions:
+    granularity: [0.0, 0.5, 1.0]
+    include_equal_weight: true
+
+training:
+  total_timesteps: 2000
+  validation_interval: 500
+  save_interval: 1000
+  eval_episodes: 10
+
+risk_management:
+  var_limit: 0.02
+  max_position_size: 0.3
+  min_position_size: -0.1
+  max_leverage: 1.5
+  stop_loss: 0.05
+  target_volatility: 0.15
+
+data:
+  start_date: "2010-01-01"
+  end_date: "2023-12-31"
+  train_test_split: 0.8
+  use_cache: true
+  cache_path: "data/market_data.pkl"
+  features:
+    - "Close"
+    - "Volume"
+    - "High"
+    - "Low"
+    - "Open"
+  technical_indicators:
+    - name: "RSI"
+      params:
+        window: 14
+    - name: "MACD"
+      params:
+        fast: 12
+        slow: 26
+        signal: 9
+    - name: "BB"
+      params:
+        window: 20
+        num_std: 2
+
+visualization:
+  update_interval: 1000
+  metrics:
+    - "returns"
+    - "sharpe_ratio"
+    - "max_drawdown"
+    - "var"
+    - "portfolio_weights"
+  plot_style: "dark"
+  interactive: true
+

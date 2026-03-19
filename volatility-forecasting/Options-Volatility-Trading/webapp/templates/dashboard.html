@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketWatcher - Options Volatility Trading Monitor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin: 20px auto;
+            padding: 30px;
+        }
+        .status-card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .status-card:hover {
+            transform: translateY(-5px);
+        }
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .status-running {
+            background-color: #28a745;
+            animation: pulse 2s infinite;
+        }
+        .status-stopped {
+            background-color: #dc3545;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .opportunity-card {
+            border-left: 5px solid;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .opportunity-card:hover {
+            transform: translateX(5px);
+        }
+        .long-straddle {
+            border-left-color: #ff6b6b;
+            background: linear-gradient(90deg, rgba(255,107,107,0.1) 0%, rgba(255,255,255,0.9) 100%);
+        }
+        .short-straddle {
+            border-left-color: #4ecdc4;
+            background: linear-gradient(90deg, rgba(78,205,196,0.1) 0%, rgba(255,255,255,0.9) 100%);
+        }
+        .market-data-table {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .refresh-btn {
+            border-radius: 25px;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+        }
+        .refresh-btn:hover {
+            transform: scale(1.05);
+        }
+        .control-btn {
+            border-radius: 25px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="main-container">
+            <!-- Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="display-4 mb-0">
+                                <i class="fas fa-chart-line text-primary"></i>
+                                MarketWatcher
+                            </h1>
+                            <p class="lead text-muted">Options Volatility Trading Monitor System</p>
+                        </div>
+                        <div class="text-end">
+                            <div id="connection-status" class="badge bg-success fs-6">
+                                <i class="fas fa-wifi"></i> Connected
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">Last Update: <span id="last-update">--</span></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card status-card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">
+                                <span id="system-status-indicator" class="status-indicator status-running"></span>
+                                System Status
+                            </h5>
+                            <p class="card-text" id="system-status">Running</p>
+                            <div class="mt-3">
+                                <button id="control-btn" class="btn btn-danger control-btn" onclick="toggleSystem()">
+                                    <i class="fas fa-stop"></i> Stop System
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card status-card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">
+                                <i class="fas fa-chart-bar text-info"></i>
+                                Monitored Stocks
+                            </h5>
+                            <h3 class="text-info" id="total-stocks">0</h3>
+                            <p class="card-text">stocks</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card status-card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">
+                                <i class="fas fa-arrow-up text-danger"></i>
+                                Long Straddle
+                            </h5>
+                            <h3 class="text-danger" id="long-opportunities">0</h3>
+                            <p class="card-text">opportunities</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card status-card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">
+                                <i class="fas fa-arrow-down text-success"></i>
+                                Short Straddle
+                            </h5>
+                            <h3 class="text-success" id="short-opportunities">0</h3>
+                            <p class="card-text">opportunities</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Investment Opportunities -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card status-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-bullseye text-warning"></i>
+                                Investment Opportunities
+                            </h5>
+                            <button class="btn btn-outline-primary refresh-btn" onclick="refreshData()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="opportunities-container">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                    <p class="mt-2">Analyzing market signals...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trading Signals -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card status-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-signal text-success"></i>
+                                Trading Signals
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="signals-container">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                    <p class="mt-2">Loading trading signals...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Data -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card status-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-line text-primary"></i>
+                                Market Data (Top 20 Stocks)
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0 market-data-table">
+                                    <thead class="table-dark">
+                                        <tr>
+                                        <th>Stock Code</th>
+                                        <th>Change %</th>
+                                        <th>Direction</th>
+                                        <th>Strategy</th>
+                                        <th>Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="market-data-table">
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">
+                                                <i class="fas fa-spinner fa-spin"></i> Loading data...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trading Logic Explanation Section -->
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-gradient-primary text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <div class="bg-white bg-opacity-20 rounded-circle p-3">
+                                    <i class="fas fa-brain fa-2x"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="mb-0 fw-bold">Quantitative Trading System Logic</h4>
+                                <p class="mb-0 opacity-75">Advanced volatility-based options trading strategy</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-4">
+                            <div class="col-lg-6">
+                                <!-- System Overview -->
+                                <div class="mb-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                            <i class="fas fa-cog text-primary"></i>
+                                        </div>
+                                        <h5 class="mb-0 text-dark fw-bold">System Overview</h5>
+                                    </div>
+                                    <div class="ms-5">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-primary rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Strategy Type:</strong>
+                                                        <span class="text-muted">Volatility-based Options Trading</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-primary rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Data Source:</strong>
+                                                        <span class="text-muted">Yahoo Finance API (Real-time)</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-primary rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Update Frequency:</strong>
+                                                        <span class="text-muted">Every 5 minutes</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-primary rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Monitoring Scope:</strong>
+                                                        <span class="text-muted">100 pre-selected stocks</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-primary rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Trading Instruments:</strong>
+                                                        <span class="text-muted">Long Straddle & Short Straddle Options</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Stock Classification Process -->
+                                <div class="mb-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-info bg-opacity-10 rounded-circle p-2 me-3">
+                                            <i class="fas fa-chart-bar text-info"></i>
+                                        </div>
+                                        <h5 class="mb-0 text-dark fw-bold">Stock Classification Process</h5>
+                                    </div>
+                                    <div class="ms-5">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-info rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Historical Analysis:</strong>
+                                                        <span class="text-muted">Russell 3000 Index screening</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-info rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Volatility Calculation:</strong>
+                                                        <span class="text-muted">Weighted historical volatility</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-info rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Formula:</strong>
+                                                        <span class="text-muted">0.5 × 1-week + 0.3 × 2-week + 0.2 × 1-month</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-danger rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">High Volatility:</strong>
+                                                        <span class="text-muted">Top 50 stocks → Long Straddle candidates</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-success rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Low Volatility:</strong>
+                                                        <span class="text-muted">Bottom 50 stocks → Short Straddle candidates</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-6">
+                                <!-- Long Straddle Strategy -->
+                                <div class="mb-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-danger bg-opacity-10 rounded-circle p-2 me-3">
+                                            <i class="fas fa-arrow-up text-danger"></i>
+                                        </div>
+                                        <h5 class="mb-0 text-dark fw-bold">Long Straddle Strategy</h5>
+                                    </div>
+                                    <div class="ms-5">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-danger rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Target Stocks:</strong>
+                                                        <span class="text-muted">High volatility stocks</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-danger rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Trigger Condition:</strong>
+                                                        <span class="text-muted">Daily P&L > 5% (absolute value)</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-danger rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Action:</strong>
+                                                        <span class="text-muted">Buy both Call and Put options</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-danger rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Profit Logic:</strong>
+                                                        <span class="text-muted">Profit from large price movements in either direction</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-danger rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Risk:</strong>
+                                                        <span class="text-muted">Limited to premium paid</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-danger rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Example:</strong>
+                                                        <span class="text-muted">Stock moves ±10% → Both options gain value</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Short Straddle Strategy -->
+                                <div class="mb-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                            <i class="fas fa-arrow-down text-success"></i>
+                                        </div>
+                                        <h5 class="mb-0 text-dark fw-bold">Short Straddle Strategy</h5>
+                                    </div>
+                                    <div class="ms-5">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-success rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Target Stocks:</strong>
+                                                        <span class="text-muted">Low volatility stocks</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-success rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Trigger Condition:</strong>
+                                                        <span class="text-muted">Daily P&L < 0.5% (absolute value)</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-success rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Action:</strong>
+                                                        <span class="text-muted">Sell both Call and Put options</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-success rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Profit Logic:</strong>
+                                                        <span class="text-muted">Collect premium when stock remains stable</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-success rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Risk:</strong>
+                                                        <span class="text-muted">Unlimited if stock moves significantly</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="bg-success rounded-circle p-1 me-3 mt-1" style="width: 8px; height: 8px;"></div>
+                                                    <div>
+                                                        <strong class="text-dark">Example:</strong>
+                                                        <span class="text-muted">Stock stays flat → Options expire worthless, keep premium</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="row mt-5">
+                            <div class="col-12">
+                                <div class="d-flex align-items-center mb-4">
+                                    <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="fas fa-route text-warning"></i>
+                                    </div>
+                                    <h5 class="mb-0 text-dark fw-bold">System Workflow</h5>
+                                </div>
+                                <div class="row g-4">
+                                    <div class="col-lg-3 col-md-6">
+                                        <div class="text-center h-100">
+                                            <div class="bg-light rounded-3 p-4 h-100 border-0 shadow-sm">
+                                                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                                    <i class="fas fa-download fa-2x text-primary"></i>
+                                                </div>
+                                                <h6 class="fw-bold text-dark mb-2">Data Collection</h6>
+                                                <p class="text-muted small mb-0">Fetch real-time stock prices, volumes, and historical data from Yahoo Finance</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6">
+                                        <div class="text-center h-100">
+                                            <div class="bg-light rounded-3 p-4 h-100 border-0 shadow-sm">
+                                                <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                                    <i class="fas fa-calculator fa-2x text-info"></i>
+                                                </div>
+                                                <h6 class="fw-bold text-dark mb-2">Analysis</h6>
+                                                <p class="text-muted small mb-0">Calculate daily P&L percentages and compare against trading thresholds</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6">
+                                        <div class="text-center h-100">
+                                            <div class="bg-light rounded-3 p-4 h-100 border-0 shadow-sm">
+                                                <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                                    <i class="fas fa-bullseye fa-2x text-warning"></i>
+                                                </div>
+                                                <h6 class="fw-bold text-dark mb-2">Signal Generation</h6>
+                                                <p class="text-muted small mb-0">Generate buy/sell signals based on volatility thresholds and stock classification</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6">
+                                        <div class="text-center h-100">
+                                            <div class="bg-light rounded-3 p-4 h-100 border-0 shadow-sm">
+                                                <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                                    <i class="fas fa-chart-line fa-2x text-success"></i>
+                                                </div>
+                                                <h6 class="fw-bold text-dark mb-2">Execution</h6>
+                                                <p class="text-muted small mb-0">Display opportunities and signals on dashboard for manual or automated trading</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        // Initialize Socket.IO connection
+        const socket = io();
+        
+        // Connection status
+        socket.on('connect', function() {
+            document.getElementById('connection-status').innerHTML = '<i class="fas fa-wifi"></i> Connected';
+            document.getElementById('connection-status').className = 'badge bg-success fs-6';
+        });
+        
+        socket.on('disconnect', function() {
+            document.getElementById('connection-status').innerHTML = '<i class="fas fa-wifi"></i> Disconnected';
+            document.getElementById('connection-status').className = 'badge bg-danger fs-6';
+        });
+        
+        // Real-time market updates
+        socket.on('market_update', function(data) {
+            updateDashboard(data);
+        });
+        
+        // Initial data load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSystemStatus();
+            loadOpportunities();
+            loadTradingSignals();
+            loadMarketData();
+            
+            // Refresh data every 30 seconds
+            setInterval(() => {
+                loadSystemStatus();
+                loadOpportunities();
+                loadMarketData();
+            }, 30000);
+        });
+        
+        function loadSystemStatus() {
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    updateSystemStatus(data);
+                })
+                .catch(error => console.error('Error loading system status:', error));
+        }
+        
+        function loadOpportunities() {
+            fetch('/api/opportunities')
+                .then(response => response.json())
+                .then(data => {
+                    updateOpportunities(data.opportunities);
+                })
+                .catch(error => console.error('Error loading opportunities:', error));
+        }
+        
+        function loadTradingSignals() {
+            fetch('/api/trading-signals')
+                .then(response => response.json())
+                .then(data => {
+                    updateTradingSignals(data.signals);
+                })
+                .catch(error => console.error('Error loading trading signals:', error));
+        }
+        
+        function loadMarketData() {
+            fetch('/api/market-data')
+                .then(response => response.json())
+                .then(data => {
+                    updateMarketData(data.data);
+                })
+                .catch(error => console.error('Error loading market data:', error));
+        }
+        
+        function updateSystemStatus(data) {
+            const indicator = document.getElementById('system-status-indicator');
+            const status = document.getElementById('system-status');
+            const controlBtn = document.getElementById('control-btn');
+            
+            if (data.system_running) {
+                indicator.className = 'status-indicator status-running';
+                status.textContent = 'Running';
+                controlBtn.innerHTML = '<i class="fas fa-stop"></i> Stop System';
+                controlBtn.className = 'btn btn-danger control-btn';
+            } else {
+                indicator.className = 'status-indicator status-stopped';
+                status.textContent = 'Stopped';
+                controlBtn.innerHTML = '<i class="fas fa-play"></i> Start System';
+                controlBtn.className = 'btn btn-success control-btn';
+            }
+            
+            document.getElementById('total-stocks').textContent = data.stats.total_stocks || 0;
+            document.getElementById('long-opportunities').textContent = data.stats.long_opportunities || 0;
+            document.getElementById('short-opportunities').textContent = data.stats.short_opportunities || 0;
+            document.getElementById('total-signals').textContent = data.stats.total_signals || 0;
+            
+            if (data.last_update) {
+                const date = new Date(data.last_update);
+                document.getElementById('last-update').textContent = date.toLocaleTimeString();
+            }
+        }
+        
+        function updateOpportunities(opportunities) {
+            const container = document.getElementById('opportunities-container');
+            
+            // Convert opportunities object to arrays
+            const longOpportunities = opportunities['long straddle'] || [];
+            const shortOpportunities = opportunities['short straddle'] || [];
+            
+            if (longOpportunities.length === 0 && shortOpportunities.length === 0) {
+               container.innerHTML = `
+                   <div class="alert alert-light">
+                       <h6 class="alert-heading text-dark"><i class="fas fa-info-circle"></i> Market Analysis Summary</h6>
+                       <p class="mb-0 text-dark">Currently no significant volatility signals detected. The market appears stable with minimal price movements that meet our trading criteria.</p>
+                   </div>
+               `;
+                return;
+            }
+            
+            // Generate summary text
+            let summaryHtml = '<div class="alert alert-light">';
+            summaryHtml += '<h6 class="alert-heading text-dark"><i class="fas fa-chart-line"></i> Market Analysis Summary</h6>';
+            
+            if (longOpportunities.length > 0) {
+                const avgChange = (longOpportunities.reduce((sum, opp) => sum + Math.abs(opp.change_percent), 0) / longOpportunities.length).toFixed(1);
+                const upCount = longOpportunities.filter(opp => opp.direction === 'UP').length;
+                const downCount = longOpportunities.filter(opp => opp.direction === 'DOWN').length;
+                
+                summaryHtml += `<p class="mb-2 text-dark"><strong>High Volatility Detected:</strong> ${longOpportunities.length} stocks showing significant price movements (avg: ${avgChange}%).`;
+                summaryHtml += ` Market direction: ${upCount} rising, ${downCount} falling.</p>`;
+            }
+            
+            if (shortOpportunities.length > 0) {
+                const avgChange = (shortOpportunities.reduce((sum, opp) => sum + Math.abs(opp.change_percent), 0) / shortOpportunities.length).toFixed(1);
+                summaryHtml += `<p class="mb-2 text-dark"><strong>Low Volatility Detected:</strong> ${shortOpportunities.length} stocks showing minimal price movements (avg: ${avgChange}%).`;
+                summaryHtml += ` These stocks remain relatively stable.</p>`;
+            }
+            
+            // Add strategy recommendations
+            summaryHtml += '<hr>';
+            summaryHtml += '<h6 class="mb-2 text-dark"><i class="fas fa-lightbulb"></i> Trading Recommendations:</h6>';
+            
+            if (longOpportunities.length > 0) {
+                summaryHtml += `<p class="mb-1"><i class="fas fa-arrow-up text-danger"></i> <strong>Long Straddle Strategy:</strong> Consider buying both call and put options on high-volatility stocks to profit from large price movements.</p>`;
+            }
+            
+            if (shortOpportunities.length > 0) {
+                summaryHtml += `<p class="mb-0"><i class="fas fa-arrow-down text-success"></i> <strong>Short Straddle Strategy:</strong> Consider selling both call and put options on low-volatility stocks to collect premium from stable prices.</p>`;
+            }
+            
+            summaryHtml += '</div>';
+            
+            container.innerHTML = summaryHtml;
+        }
+        
+        function updateMarketData(data) {
+            const tbody = document.getElementById('market-data-table');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No market data available</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            data.forEach(stock => {
+                const directionIcon = stock.direction === 'UP' ? 'fas fa-arrow-up text-success' : 'fas fa-arrow-down text-danger';
+                const strategy = Math.abs(stock.change_percent) > 5 ? 'Long Straddle' : 
+                               Math.abs(stock.change_percent) < 0.5 ? 'Short Straddle' : '--';
+                const strategyBadge = strategy === 'Long Straddle' ? 'bg-danger' : 
+                                    strategy === 'Short Straddle' ? 'bg-success' : 'bg-secondary';
+                
+                html += `
+                    <tr>
+                        <td><strong>${stock.ticker}</strong></td>
+                        <td>
+                            <span class="${stock.change_percent > 0 ? 'text-success' : 'text-danger'}">
+                                ${stock.change_percent.toFixed(2)}%
+                            </span>
+                        </td>
+                        <td><i class="${directionIcon}"></i></td>
+                        <td><span class="badge ${strategyBadge}">${strategy}</span></td>
+                        <td><small class="text-muted">${new Date().toLocaleTimeString()}</small></td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        function updateDashboard(data) {
+            updateOpportunities(data.opportunities);
+            
+            if (data.signals) {
+                updateTradingSignals(data.signals);
+            }
+            
+            document.getElementById('total-stocks').textContent = data.stats.total_stocks || 0;
+            document.getElementById('long-opportunities').textContent = data.stats.long_opportunities || 0;
+            document.getElementById('short-opportunities').textContent = data.stats.short_opportunities || 0;
+            document.getElementById('total-signals').textContent = data.stats.total_signals || 0;
+            
+            if (data.timestamp) {
+                const date = new Date(data.timestamp);
+                document.getElementById('last-update').textContent = date.toLocaleTimeString();
+            }
+        }
+        
+        function toggleSystem() {
+            const isRunning = document.getElementById('system-status').textContent === 'Running';
+            const action = isRunning ? 'stop' : 'start';
+            
+            fetch('/api/control', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: action })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    setTimeout(() => {
+                        loadSystemStatus();
+                    }, 1000);
+                } else {
+                    alert('Operation failed: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Operation failed, please try again');
+            });
+        }
+        
+        function refreshData() {
+            loadSystemStatus();
+            loadOpportunities();
+            loadTradingSignals();
+            loadMarketData();
+        }
+        
+        function updateTradingSignals(signals) {
+            const container = document.getElementById('signals-container');
+            
+            if (signals.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted"><i class="fas fa-info-circle"></i><p class="mt-2">No trading signals available</p></div>';
+                return;
+            }
+            
+            let html = '';
+            signals.forEach(signal => {
+                const actionClass = signal.action === 'BUY_CALL_PUT' ? 'success' : 'warning';
+                const actionText = signal.action === 'BUY_CALL_PUT' ? 'Buy' : 'Sell';
+                const actionIcon = signal.action === 'BUY_CALL_PUT' ? 'fa-arrow-up' : 'fa-arrow-down';
+                const direction = signal.direction === 'UP' ? 'success' : 'danger';
+                
+                html += `
+                    <div class="card signal-card border-${actionClass} mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    <h5 class="mb-0">${signal.ticker}</h5>
+                                    <small class="text-muted">${signal.type}</small>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="badge bg-${actionClass} fs-6">${actionText}</span>
+                                </div>
+                                <div class="col-md-2">
+                                    <h4 class="mb-0 text-${direction}">
+                                        ${Math.abs(signal.change_percent).toFixed(2)}%
+                                    </h4>
+                                </div>
+                                <div class="col-md-2">
+                                    <i class="fas ${actionIcon} fa-2x text-${actionClass}"></i>
+                                </div>
+                                <div class="col-md-4">
+                                    <small class="text-muted">Price: $${signal.current_price?.toFixed(2) || 'N/A'}</small><br>
+                                    <small class="text-muted">${signal.reason}</small><br>
+                                    <small class="text-muted">${new Date(signal.timestamp).toLocaleTimeString()}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+    </script>
+
+    <!-- System Architecture and Strategy Diagrams -->
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <div class="col-12">
+                <!-- System Architecture Diagram -->
+                <div class="card mb-5">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-sitemap"></i>
+                            System Architecture & Workflow
+                        </h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <img src="{{ url_for('static', filename='img/trading-workflow.png') }}" alt="System Architecture & Workflow" class="img-fluid rounded" style="max-width: 100%; height: auto;">
+                    </div>
+                </div>
+
+                <!-- Trading Strategy Diagrams -->
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-chart-line"></i>
+                            Options Trading Strategy Payoff Diagrams
+                        </h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <img src="{{ url_for('static', filename='img/option-strategy.png') }}" alt="Options Trading Strategy Payoff Diagrams" class="img-fluid rounded" style="max-width: 100%; height: auto;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

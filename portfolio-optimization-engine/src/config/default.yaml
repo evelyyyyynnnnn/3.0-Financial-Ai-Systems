@@ -1,0 +1,94 @@
+market_environment:
+  trading_frequency: "daily"  # daily, hourly, minute
+  transaction_cost: 0.001    # 10 basis points
+  risk_free_rate: 0.02      # annual risk-free rate
+  market_impact: 0.1        # market impact factor
+  window_size: 30           # historical window size for state
+  assets:
+    - "SPY"    # S&P 500 ETF
+    - "QQQ"    # NASDAQ ETF
+    - "IWM"    # Russell 2000 ETF
+    - "GLD"    # Gold ETF
+    - "TLT"    # 20+ Year Treasury Bond ETF
+
+agent:
+  algorithm: "PPO"  # PPO, DQN, SAC
+  policy: "MlpPolicy"
+  library: "custom"  # custom, sb3
+  learning_rate: 0.0003
+  gamma: 0.99       # discount factor
+  gae_lambda: 0.95  # GAE parameter
+  clip_range: 0.2   # PPO clip range
+  ent_coef: 0.01   # entropy coefficient
+  vf_coef: 0.5     # value function coefficient
+  max_grad_norm: 0.5
+  n_epochs: 10
+  network:
+    hidden_sizes: [256, 128, 64]
+    activation: "tanh"  # tanh, relu, elu
+  memory:
+    buffer_size: 100000
+    batch_size: 64
+  sb3_params:
+    verbose: 1
+    tensorboard_log: "results/tensorboard"
+  discrete_actions:
+    granularity: [0.0, 0.5, 1.0]
+    include_equal_weight: true
+
+training:
+  total_timesteps: 2000
+  n_epochs: 10
+  n_steps: 2048
+  learning_starts: 1000
+  train_freq: 4
+  gradient_steps: 1
+  target_update_interval: 1000
+  validation_interval: 500
+  save_interval: 1000
+  eval_episodes: 10
+
+risk_management:
+  var_limit: 0.02          # 2% VaR limit
+  max_position_size: 0.3   # maximum 30% in single asset
+  min_position_size: -0.1  # maximum 10% short position
+  max_leverage: 1.5        # maximum 150% leverage
+  stop_loss: 0.05         # 5% stop loss
+  target_volatility: 0.15  # target annual volatility
+
+data:
+  start_date: "2010-01-01"
+  end_date: "2023-12-31"
+  train_test_split: 0.8
+  use_cache: true
+  cache_path: "data/market_data.pkl"
+  features:
+    - "Close"
+    - "Volume"
+    - "High"
+    - "Low"
+    - "Open"
+  technical_indicators:
+    - name: "RSI"
+      params:
+        window: 14
+    - name: "MACD"
+      params:
+        fast: 12
+        slow: 26
+        signal: 9
+    - name: "BB"
+      params:
+        window: 20
+        num_std: 2
+
+visualization:
+  update_interval: 1000    # update plots every 1000 steps
+  metrics:
+    - "returns"
+    - "sharpe_ratio"
+    - "max_drawdown"
+    - "var"
+    - "portfolio_weights"
+  plot_style: "dark"      # dark, light
+  interactive: true       # use interactive plotly charts 
