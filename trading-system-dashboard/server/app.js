@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 
 // 配置
 const CONFIG = {
-    GOOGLE_AI_API_KEY: 'AIzaSyAWlsEVOzyf7J0dyxWItfQfdLhH7qEkIjI',
+    GOOGLE_AI_API_KEY: 'xxxxxx',
     GOOGLE_AI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
     CACHE_TIMEOUT: 300000, // 5分钟缓存
     UPDATE_INTERVAL: 300000 // 5分钟更新间隔
