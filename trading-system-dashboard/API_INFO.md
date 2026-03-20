@@ -261,7 +261,7 @@ const detailedAnalysis = await generateInvestmentAdvice(marketData, 'gemini-2.5-
 ### Mistral API配置
 ```javascript
 const CONFIG = {
-    MISTRAL_API_KEY: 'f3cilbbMMNvqEry3Tt87Ci32630BaVYD',
+    MISTRAL_API_KEY: 'xxxxxx',
     MISTRAL_API_URL: 'https://api.mistral.ai/v1/chat/completions'
 };
 ```
