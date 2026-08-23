@@ -1,4 +1,5 @@
 # Giant Portfolio Tracker — setup
+The website can be found [here](https://giant-portfolio.vercel.app/)
 
 ## One-time setup
 
