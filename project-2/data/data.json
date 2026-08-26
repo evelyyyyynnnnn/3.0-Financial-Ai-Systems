@@ -1,0 +1,246 @@
+{
+ "generated_at": "2026-08-26T21:32:25Z",
+ "source": "Synthetic sample",
+ "source_note": "Sample data with fictional issuers, produced by pipeline/make_sample.py so the site renders before a live pull. Not SEC data. Run pipeline/build_dataset.py to replace it with real filings.",
+ "is_sample": true,
+ "diff_items": [
+  {
+   "item": "1A",
+   "title": "Risk Factors"
+  },
+  {
+   "item": "7",
+   "title": "Management's Discussion and Analysis"
+  }
+ ],
+ "failed": [],
+ "companies": [
+  {
+   "ticker": "NRTH",
+   "company": "Northwind Instruments Inc. (fictional)",
+   "cik": 9900001,
+   "current": {
+    "form": "10-K",
+    "filed": "2025-02-18",
+    "period": "2024-12-31",
+    "url": null
+   },
+   "prior": {
+    "form": "10-K",
+    "filed": "2024-02-20",
+    "period": "2023-12-31",
+    "url": null
+   },
+   "coverage": [
+    {
+     "item": "1A",
+     "title": "Risk Factors",
+     "current_chars": 756,
+     "prior_chars": 413,
+     "compared": true
+    },
+    {
+     "item": "7",
+     "title": "Management's Discussion and Analysis",
+     "current_chars": 242,
+     "prior_chars": 175,
+     "compared": true
+    }
+   ],
+   "counts": {
+    "escalated": 2,
+    "added": 2,
+    "removed": 0
+   },
+   "findings": [
+    {
+     "kind": "escalated",
+     "item": "1A",
+     "item_title": "Risk Factors",
+     "text": "Our manufacturing depends on a limited number of contract suppliers located in a single region, and during the period we experienced supply chain disruption that had a material adverse impact on shipment volumes.",
+     "signals": [
+      "material adverse language",
+      "supply-chain disruption"
+     ],
+     "similarity": 1.0,
+     "prior_text": "Our manufacturing depends on a limited number of contract suppliers located in a single region.",
+     "fingerprint": "54871acd9f94"
+    },
+    {
+     "kind": "escalated",
+     "item": "1A",
+     "item_title": "Risk Factors",
+     "text": "We are subject to periodic examination by regulatory authorities in the ordinary course of business, and in the fourth quarter we received a subpoena from a state authority relating to our distributor agreements.",
+     "signals": [
+      "regulatory action"
+     ],
+     "similarity": 1.0,
+     "prior_text": "We are subject to periodic examination by regulatory authorities in the ordinary course of business.",
+     "fingerprint": "6602bede9346"
+    },
+    {
+     "kind": "added",
+     "item": "1A",
+     "item_title": "Risk Factors",
+     "text": "We identified a cybersecurity incident affecting a subset of customer records maintained by a third-party vendor.",
+     "signals": [
+      "cybersecurity incident"
+     ],
+     "similarity": null,
+     "prior_text": null,
+     "fingerprint": "334371fc131d"
+    },
+    {
+     "kind": "added",
+     "item": "7",
+     "item_title": "Management's Discussion and Analysis",
+     "text": "Gross margin declined to 36%, and we recorded an impairment of certain manufacturing assets.",
+     "signals": [
+      "impairment reference"
+     ],
+     "similarity": null,
+     "prior_text": null,
+     "fingerprint": "693cc1a67cfd"
+    }
+   ]
+  },
+  {
+   "ticker": "CDLT",
+   "company": "Cedar Lattice Holdings Corp. (fictional)",
+   "cik": 9900002,
+   "current": {
+    "form": "10-K",
+    "filed": "2025-02-18",
+    "period": "2024-12-31",
+    "url": null
+   },
+   "prior": {
+    "form": "10-K",
+    "filed": "2024-02-20",
+    "period": "2023-12-31",
+    "url": null
+   },
+   "coverage": [
+    {
+     "item": "1A",
+     "title": "Risk Factors",
+     "current_chars": 558,
+     "prior_chars": 294,
+     "compared": true
+    },
+    {
+     "item": "7",
+     "title": "Management's Discussion and Analysis",
+     "current_chars": 235,
+     "prior_chars": 122,
+     "compared": true
+    }
+   ],
+   "counts": {
+    "escalated": 2,
+    "added": 2,
+    "removed": 0
+   },
+   "findings": [
+    {
+     "kind": "escalated",
+     "item": "1A",
+     "item_title": "Risk Factors",
+     "text": "Our credit facility contains financial covenants that we must satisfy quarterly, and we were not in compliance with the fixed charge coverage covenant as of the period end, resulting in a covenant breach for which we obtained a waiver.",
+     "signals": [
+      "covenant breach"
+     ],
+     "similarity": 1.0,
+     "prior_text": "Our credit facility contains financial covenants that we must satisfy quarterly.",
+     "fingerprint": "51d218f3b90f"
+    },
+    {
+     "kind": "escalated",
+     "item": "1A",
+     "item_title": "Risk Factors",
+     "text": "We depend on three customers for a significant portion of consolidated revenue, and during the period we experienced the loss of a major customer representing approximately 14% of revenue.",
+     "signals": [
+      "customer concentration loss"
+     ],
+     "similarity": 1.0,
+     "prior_text": "We depend on three customers for a significant portion of consolidated revenue.",
+     "fingerprint": "2e7ad1b3bedb"
+    },
+    {
+     "kind": "added",
+     "item": "7",
+     "item_title": "Management's Discussion and Analysis",
+     "text": "Segment margins compressed in the industrial unit, and management concluded there is substantial doubt about our ability to continue as a going concern absent refinancing.",
+     "signals": [
+      "going-concern reference"
+     ],
+     "similarity": null,
+     "prior_text": null,
+     "fingerprint": "806b817bdc94"
+    },
+    {
+     "kind": "added",
+     "item": "7",
+     "item_title": "Management's Discussion and Analysis",
+     "text": "Operating cash flow was negative for the first time since 2019.",
+     "signals": [],
+     "similarity": null,
+     "prior_text": null,
+     "fingerprint": "65aaa215c31d"
+    }
+   ]
+  },
+  {
+   "ticker": "MRDN",
+   "company": "Meridian Grid Systems Ltd. (fictional)",
+   "cik": 9900003,
+   "current": {
+    "form": "10-K",
+    "filed": "2025-02-18",
+    "period": "2024-12-31",
+    "url": null
+   },
+   "prior": {
+    "form": "10-K",
+    "filed": "2024-02-20",
+    "period": "2023-12-31",
+    "url": null
+   },
+   "coverage": [
+    {
+     "item": "1A",
+     "title": "Risk Factors",
+     "current_chars": 340,
+     "prior_chars": 224,
+     "compared": true
+    },
+    {
+     "item": "7",
+     "title": "Management's Discussion and Analysis",
+     "current_chars": 96,
+     "prior_chars": 96,
+     "compared": true
+    }
+   ],
+   "counts": {
+    "escalated": 0,
+    "added": 1,
+    "removed": 0
+   },
+   "findings": [
+    {
+     "kind": "added",
+     "item": "1A",
+     "item_title": "Risk Factors",
+     "text": "Our common stock may be subject to delisting if we do not regain compliance with the minimum bid price requirement.",
+     "signals": [
+      "delisting reference"
+     ],
+     "similarity": null,
+     "prior_text": null,
+     "fingerprint": "525f5873db0f"
+    }
+   ]
+  }
+ ]
+}
