@@ -96,13 +96,13 @@ PROJECTS = [
     {
         "slug": "volatility-forecasting",
         "name": "Volatility Forecasting",
-        "zh": "波动率预测与期权波动率交易",
+        "zh": "深度学习波动率预测",
         "pillar": "fin",
-        "tagline": "Deep-learning volatility forecasting, plus an options volatility monitor.",
-        "summary": "Two separate efforts under one folder. LSTM-Volatility-Prediction is original "
-                   "work: LSTM and Transformer forecasters with Optuna tuning and a full training "
-                   "pipeline. Options-Volatility-Trading is a third-party MIT-licensed project "
-                   "retained as reference — see the attribution note below.",
+        "tagline": "Deep-learning volatility forecasting with LSTM and Transformer models.",
+        "summary": "LSTM and Transformer forecasters for market volatility, with data ingestion, "
+                   "technical-indicator engineering, a training pipeline with early stopping, "
+                   "and Optuna hyperparameter search. All original work — the third-party "
+                   "options project that used to sit beside it now lives under reference/.",
         "modules": [
             ("LSTM-Volatility-Prediction/models/lstm_model.py", "LSTM 回归预测器"),
             ("LSTM-Volatility-Prediction/models/transformer_model.py", "Transformer 回归预测器"),
@@ -117,14 +117,11 @@ PROJECTS = [
                "python main.py",
         "artifacts": [],
         "notes": [
-            ("warn", "Attribution", 
-             "<code class='path'>Options-Volatility-Trading/</code> is not original work. It is "
-             "MIT-licensed software, <em>Copyright (c) 2021 MCF Long Short</em>, from "
-             "<code class='path'>mcf-long-short/ibkr-options-volatility-trading</code> — a group "
-             "project for a Financial Derivatives course at Union University's Masters in "
-             "Computational Finance. Its <code class='path'>src/market_watcher/ib_client/</code> "
-             "is Interactive Brokers' official Python TWS API. Keep it clearly labelled as a "
-             "third-party reference wherever this portfolio is presented."),
+            ("mute", "Third-party code moved out",
+             "此前与本项目并列的 <code class='path'>Options-Volatility-Trading/</code> 并非原创，"
+             "已移至 <code class='path'>project-1/reference/options-volatility-trading/</code>。"
+             "它是 MIT 许可软件，<em>Copyright (c) 2021 MCF Long Short</em>，来自 Union University "
+             "计算金融硕士课程的小组作业。本目录下现在只有原创工作。"),
         ],
         "relevance": "Volatility is the uncertainty term in every risk model; the LSTM/Transformer "
                      "work is the calibration-and-uncertainty thread the petition emphasises.",

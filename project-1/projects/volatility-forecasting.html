@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Volatility Forecasting — 3.0 Financial AI Systems</title>
-<meta name="description" content="Deep-learning volatility forecasting, plus an options volatility monitor.">
+<meta name="description" content="Deep-learning volatility forecasting with LSTM and Transformer models.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%273%27 fill=%27%231a5fb4%27/%3E%3Cpath d=%27M3 11.5l3.2-3.4 2.4 2 4.4-5%27 stroke=%27%23fff%27 stroke-width=%271.7%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../assets/site.css">
 </head>
@@ -22,16 +22,16 @@
 <div class="hero">
   <p class="eyebrow">Financial Stability</p>
   <h1>Volatility Forecasting</h1>
-  <p class="lead">波动率预测与期权波动率交易 — Deep-learning volatility forecasting, plus an options volatility monitor.</p>
+  <p class="lead">深度学习波动率预测 — Deep-learning volatility forecasting with LSTM and Transformer models.</p>
 </div>
 </div>
 <div class="wrap">
 
 <section>
   <h2>做什么</h2>
-  <p class="sec-note">Two separate efforts under one folder. LSTM-Volatility-Prediction is original work: LSTM and Transformer forecasters with Optuna tuning and a full training pipeline. Options-Volatility-Trading is a third-party MIT-licensed project retained as reference — see the attribution note below.</p>
+  <p class="sec-note">LSTM and Transformer forecasters for market volatility, with data ingestion, technical-indicator engineering, a training pipeline with early stopping, and Optuna hyperparameter search. All original work — the third-party options project that used to sit beside it now lives under reference/.</p>
   <div class="chips"><span class="b acc">Python</span><span class="b acc">PyTorch</span><span class="b acc">Transformer</span><span class="b acc">LSTM</span><span class="b acc">Optuna</span><span class="b acc">Weights &amp; Biases</span><span class="b acc">Docker</span></div>
-  <p class="note warn"><strong>Attribution.</strong> <code class='path'>Options-Volatility-Trading/</code> is not original work. It is MIT-licensed software, <em>Copyright (c) 2021 MCF Long Short</em>, from <code class='path'>mcf-long-short/ibkr-options-volatility-trading</code> — a group project for a Financial Derivatives course at Union University's Masters in Computational Finance. Its <code class='path'>src/market_watcher/ib_client/</code> is Interactive Brokers' official Python TWS API. Keep it clearly labelled as a third-party reference wherever this portfolio is presented.</p>
+  <p class="note"><strong>Third-party code moved out.</strong> 此前与本项目并列的 <code class='path'>Options-Volatility-Trading/</code> 并非原创，已移至 <code class='path'>project-1/reference/options-volatility-trading/</code>。它是 MIT 许可软件，<em>Copyright (c) 2021 MCF Long Short</em>，来自 Union University 计算金融硕士课程的小组作业。本目录下现在只有原创工作。</p>
 </section>
 
 <section>
