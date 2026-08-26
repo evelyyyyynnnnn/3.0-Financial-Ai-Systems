@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Simulation Platform — 3.0 Financial AI Systems</title>
+<meta name="description" content="Quantitative trading dashboard with a strategy backtesting engine.">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="bar"><div class="wrap">
+<a class="home" href="../index.html">3.0 Financial AI Systems</a>
+<nav>
+  <a href="../index.html#endeavor">Endeavor</a>
+  <a href="../index.html#projects">Projects</a>
+  <a href="../index.html#pages">Pages</a>
+  <a href="../index.html#gaps">Gap analysis</a>
+</nav>
+</div></div>
+<div class="wrap">
+<div class="hero">
+  <p class="eyebrow">Financial Stability</p>
+  <h1>Trading Simulation Platform</h1>
+  <p class="lead">量化交易模拟与回测平台 — Quantitative trading dashboard with a strategy backtesting engine.</p>
+</div>
+</div>
+<div class="wrap">
+
+<section>
+  <h2>做什么</h2>
+  <p class="sec-note">A second-generation platform: Express plus Socket.IO for real-time updates, with dedicated services for market data, portfolio state, instrument reference data, and backtesting.</p>
+  <div class="chips"><span class="b acc">Node.js</span><span class="b acc">Express</span><span class="b acc">Socket.IO</span><span class="b acc">Chart.js</span><span class="b acc">Jest</span><span class="b acc">webpack</span></div>
+  <p class="note"><strong>Repo hygiene.</strong> 该项目的 <code class='path'>node_modules/</code> 被提交进了版本库（12,979 个文件）。已加入 <code class='path'>.gitignore</code> 防止继续增长，但历史文件仍在跟踪中。</p>
+</section>
+
+<section>
+  <h2>核心模块</h2>
+  <p class="sec-note">路径相对于 <code class="path">project-1/trading-system-dashboard-2/</code>。</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>模块</th><th>职责</th></tr></thead>
+    <tbody>
+    <tr><td><code>server.js</code></td><td>Express + Socket.IO 服务入口</td></tr><tr><td><code>services/BacktestService.js</code></td><td>策略回测引擎</td></tr><tr><td><code>services/MarketDataService.js</code></td><td>行情数据服务</td></tr><tr><td><code>services/PortfolioService.js</code></td><td>组合状态管理</td></tr><tr><td><code>services/InstrumentService.js</code></td><td>金融工具参考数据</td></tr><tr><td><code>routes/</code></td><td>backtest / marketData / portfolio / strategy / trading 五组路由</td></tr>
+    </tbody>
+  </table></div>
+</section>
+<section>
+  <h2>如何运行</h2>
+  <p class="sec-note">入口文件：<code class="path">server.js</code></p>
+  <pre class="run">cd project-1/trading-system-dashboard-2
+npm install &amp;&amp; npm start
+# http://localhost:3000</pre>
+</section>
+<section>
+  <h2>可查看的产出</h2>
+  <p class="sec-note">页面、报告、论文与 notebook。</p>
+  <ul class="linklist"><li><a href="../project-1/trading-system-dashboard-2/public/index.html">Trading Simulation Platform</a><span class="b warn">需启动服务</span><span class="meta">project-1/trading-system-dashboard-2/public/index.html</span></li><li><a href="../project-1/trading-system-dashboard-2/public/instruments.html">金融工具分析平台</a><span class="b ok">可直接打开</span><span class="meta">project-1/trading-system-dashboard-2/public/instruments.html</span></li></ul>
+</section>
+<section>
+  <h2>与 endeavor 的关系</h2>
+  <p class="sec-note">Backtesting is the verification step the petition names as missing from most AI systems — a claim is only trustworthy once it survives out-of-sample.</p>
+</section>
+
+<footer>
+  <a href="../index.html">← 返回全景</a> ·
+  源码位于 <code>project-1/trading-system-dashboard-2/</code>
+</footer>
+</div>
+</body>
+</html>

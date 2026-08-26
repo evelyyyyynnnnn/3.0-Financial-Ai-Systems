@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giant Portfolio Tracker — 3.0 Financial AI Systems</title>
+<meta name="description" content="Institutional 13F holdings, refreshed from Notion on a monthly schedule.">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="bar"><div class="wrap">
+<a class="home" href="../index.html">3.0 Financial AI Systems</a>
+<nav>
+  <a href="../index.html#endeavor">Endeavor</a>
+  <a href="../index.html#projects">Projects</a>
+  <a href="../index.html#pages">Pages</a>
+  <a href="../index.html#gaps">Gap analysis</a>
+</nav>
+</div></div>
+<div class="wrap">
+<div class="hero">
+  <p class="eyebrow">Financial Stability</p>
+  <h1>Giant Portfolio Tracker</h1>
+  <p class="lead">机构持仓（13F）追踪器 — Institutional 13F holdings, refreshed from Notion on a monthly schedule.</p>
+</div>
+</div>
+<div class="wrap">
+
+<section>
+  <h2>做什么</h2>
+  <p class="sec-note">A live, deployed site tracking 13F holdings across major investors and institutions — searchable by fund, manager, and fund type. Data is pulled from two Notion databases by a scheduled GitHub Action and committed back as data.json, which triggers a Vercel redeploy.</p>
+  <div class="chips"><span class="b acc">Static HTML</span><span class="b acc">Notion API</span><span class="b acc">GitHub Actions</span><span class="b acc">Python</span><span class="b acc">Vercel</span></div>
+  <p class="note warn"><strong>Fixed: the scheduled refresh had never run.</strong> workflow 此前位于 <code class='path'>1-Giant-Portfolio/.github/workflows/</code>。GitHub Actions 只读取<strong>仓库根目录</strong>的 <code class='path'>.github/workflows/</code>，因此该定时任务从未执行过。现已移至根目录，并将频率从每周改为<strong>每月 1 日</strong>。</p>
+</section>
+
+<section>
+  <h2>核心模块</h2>
+  <p class="sec-note">路径相对于 <code class="path">project-1/giant-portfolio/</code>。</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>模块</th><th>职责</th></tr></thead>
+    <tbody>
+    <tr><td><code>giant-portfolio/index.html</code></td><td>站点本身，数据变更时无需修改</td></tr><tr><td><code>giant-portfolio/data.json</code></td><td>持仓数据，由刷新脚本重写</td></tr><tr><td><code>scripts/refresh_data.py</code></td><td>拉取 Notion 两个数据库并重写 data.json</td></tr><tr><td><code>.github/workflows/refresh-data.yml</code></td><td>每月 1 日 09:00 UTC 定时任务</td></tr>
+    </tbody>
+  </table></div>
+</section>
+<section>
+  <h2>如何运行</h2>
+  <p class="sec-note">入口文件：<code class="path">giant-portfolio/index.html</code></p>
+  <pre class="run">export NOTION_TOKEN=ntn_xxxxxxxxxxxx
+pip install requests
+python scripts/refresh_data.py    # 重写 giant-portfolio/data.json</pre>
+</section>
+<section>
+  <h2>可查看的产出</h2>
+  <p class="sec-note">页面、报告、论文与 notebook。</p>
+  <ul class="linklist"><li><a href="../giant-portfolio/index.html">Giant Portfolio Tracker</a><span class="b ok">可直接打开</span><span class="meta">giant-portfolio/index.html</span></li></ul>
+</section>
+<section>
+  <h2>与 endeavor 的关系</h2>
+  <p class="sec-note">Market transparency in the most literal sense: making institutional positioning legible and current, on an automated cadence.</p>
+</section>
+
+<footer>
+  <a href="../index.html">← 返回全景</a> ·
+  源码位于 <code>project-1/giant-portfolio/</code>
+</footer>
+</div>
+</body>
+</html>
