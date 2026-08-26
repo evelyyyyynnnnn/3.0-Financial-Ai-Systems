@@ -1,0 +1,52 @@
+# Must stay at the repository root — GitHub Actions only reads workflows here.
+name: Refresh filing intelligence
+
+on:
+  schedule:
+    # 10:00 UTC on the 3rd of each month. 10-K/10-Q filings land on quarterly
+    # and annual cycles, so monthly is already ahead of the source.
+    - cron: "0 10 3 * *"
+  workflow_dispatch:
+    inputs:
+      tickers:
+        description: "Space-separated tickers (blank = refresh the existing universe)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Pull filings and rebuild dataset
+        working-directory: project-2
+        env:
+          # SEC requires a contact string on every request. Set SEC_USER_AGENT
+          # as a repository secret, e.g. "Jane Doe jane@example.com".
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+        run: |
+          if [ -n "${{ inputs.tickers }}" ]; then
+            python pipeline/build_dataset.py --tickers ${{ inputs.tickers }}
+          else
+            python pipeline/build_dataset.py
+          fi
+
+      - name: Commit if the dataset changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- project-2/data/data.json; then
+            echo "No change to data.json — nothing to commit."
+          else
+            git add project-2/data/data.json
+            git commit -m "chore: refresh filing intelligence $(date -u +'%Y-%m-%d')"
+            git push
+          fi
