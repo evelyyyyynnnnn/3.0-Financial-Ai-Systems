@@ -78,4 +78,6 @@ forecast. The site says all three on the page rather than only here.
 
 ## Deploying
 
-Static. Point Vercel's root directory at `project-3/`.
+This is one page of the Trustworthy Systems site. Deploy the whole site by
+pointing Vercel's root directory at `project-2/`; this page is served at
+`/contagion/`.

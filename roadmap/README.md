@@ -2,7 +2,7 @@
 
 Planned projects. **Nothing here is implemented** — these are scoping documents
 that state the problem, the intended scope, and why the problem is worth
-solving. They are kept separate from `project-1/` … `project-4/` precisely so
+solving. They are kept separate from `project-1/` and `project-2/` precisely so
 that distinction is visible from the directory tree rather than only from a
 status line at the bottom of a README.
 

@@ -1,87 +1,68 @@
-# Regulatory Filing Intelligence
+# Trustworthy Systems
 
-Reads a company's SEC 10-K / 10-Q filings and reports **what changed** in the
-risk disclosures since the prior period — not a summary of the filing, but a
-diff of it, with every finding quoted from the source.
+Three systems for high-stakes financial decisions, deployed as **one site** with
+a page each. Point Vercel's root directory at `project-2/` — no build step.
 
-Three kinds of finding:
+| Page | Question it answers | Section |
+|---|---|---|
+| [Filing Intelligence](filing-intelligence/README.md) | What changed in a company's SEC risk disclosures since the prior filing | `filing-intelligence/` |
+| [Contagion Observatory](contagion/README.md) | Which cross-market links actually transmit stress, and what a shock does | `contagion/` |
+| [Contract Audit](contract-audit/README.md) | Whether a Solidity contract has a known bug class, reported so it can be checked | `contract-audit/` |
 
-| Kind | Meaning |
-|---|---|
-| **Escalated** | A prior sentence still survives inside this one, but the new wording carries risk language the old one did not. The disclosure got worse without being rewritten — these are the ones worth reading first. |
-| **Added** | No prior sentence survives inside it. A genuinely new disclosure. |
-| **Removed** | Carried risk language and is gone since the prior filing. |
+## The shared constraint
 
-## Why containment, not similarity
+Each answers a question where being wrong is expensive, so each is built so that
+**a person can verify the answer** rather than take it on trust:
 
-The obvious approach is `difflib.SequenceMatcher.ratio()`. It fails on the
-case that matters most: a company keeps a risk factor word-for-word and
-*extends* it with a new admission. Because `ratio()` is symmetric, the longer
-new sentence scores low against the shorter old one, and the escalation is
-misfiled as a brand-new disclosure — losing the very comparison that makes it
-interesting.
+- Filing Intelligence quotes the filing verbatim and shows the prior sentence
+  beside an escalation, so the change is checkable without opening the document.
+- Contagion Observatory names its estimator for every number on the page, and
+  says plainly that tail dependence is co-movement, not a proven causal channel.
+- Contract Audit states, per finding, the conditions under which that detector
+  is wrong — a tool that hides its failure modes costs more review time than it
+  saves.
 
-So `analyze.py` scores by **containment**: how much of the *prior* sentence
-still survives inside the current one. An extended disclosure scores near 1.0
-and is correctly recognised as the same disclosure, escalated, with the prior
-text carried alongside it so the change is checkable on the page.
+## Shape
 
-## Running it
+All three follow the same architecture:
 
-The site reads a pre-computed `data/data.json`. That is deliberate: a browser
-cannot call EDGAR directly (CORS, and SEC's rate limits apply per-client), so
-the pipeline runs ahead of time and the site is pure static.
-
-**Sample data** ships in the repo so the site renders immediately. Its issuers
-are fictional — attaching invented risk language to a real ticker would produce
-something that reads like an SEC disclosure and is not one. The payload carries
-`is_sample: true` and the site shows a banner saying so.
-
-```bash
-python pipeline/make_sample.py            # regenerate the sample
+```
+pipeline (Python, stdlib only)  →  data/data.json  →  static page
 ```
 
-**Real filings** need only a contact string, which SEC requires of all API
-clients:
+Precomputation is not a shortcut. A browser cannot call SEC EDGAR or the market
+APIs directly — CORS, and per-client rate limits apply — so the pipeline runs
+ahead of time and the page renders whatever it last wrote.
 
-```bash
-export SEC_USER_AGENT="Your Name you@example.com"
-python pipeline/build_dataset.py --tickers AAPL MSFT NVDA
-```
-
-With no `--tickers`, it refreshes whatever universe is already in
-`data/data.json`, which is what the scheduled workflow does.
-
-Or run it without any local setup: repo → Actions → **Refresh filing
-intelligence** → Run workflow. GitHub's runners can reach EDGAR, and the job
-commits the new `data.json`, which redeploys the site.
+Filing Intelligence and Contagion ship **labelled sample data** so both render
+before any live pull: fictional issuers in one, simulated series in the other.
+Both set `is_sample` and say so in a banner on the page, not just in a README.
+Each section's README has the one command that replaces it with real data.
 
 ## Layout
 
 ```
-index.html              the site
-assets/app.js           renders data/data.json (no framework, no build)
-assets/app.css          styles, light and dark
-data/data.json          the dataset — this is what gets refreshed
-pipeline/
-  edgar_client.py       SEC EDGAR client (User-Agent + rate limit enforced)
-  sections.py           flatten filing HTML, cut into Regulation S-K Items
-  analyze.py            sentence diff, containment scoring, escalation signals
-  build_dataset.py      orchestrates a live pull → data.json
-  make_sample.py        the labelled fictional sample
+index.html              the landing page
+assets/shell.css        palette, typography, top bar, footer — shared by all four pages
+assets/home.css         landing page only
+filing-intelligence/    index.html · assets/ · data/ · pipeline/
+contagion/              index.html · assets/ · data/ · pipeline/
+contract-audit/         index.html · assets/ · data/ · analyzer/ · contracts/
+vercel.json             no-build static deploy
 ```
 
-No dependencies beyond the Python standard library.
+`shell.css` owns the neutrals and the chrome; each section's `app.css` owns only
+its own components and inherits `--accent` from `body[data-section]`. Section
+stylesheets still declare their own semantic colours — finding kinds, market
+classes, severity levels — because those mean nothing outside their section.
+Every one is declared for both themes.
 
-## Deploying
+## Refresh
 
-Static. Point Vercel's root directory at `project-2/`; `vercel.json` pins a
-no-build deploy.
+`.github/workflows/refresh-filings.yml`, at the repository root, rebuilds
+`filing-intelligence/data/data.json` from SEC EDGAR on the 3rd of each month, or
+on demand from the Actions tab with an optional ticker list. It needs a
+`SEC_USER_AGENT` secret — SEC requires a contact string on every API request.
 
-## Escalation signals
-
-`analyze.py` flags language that marks a materially different disclosure
-rather than an edit: material adverse language, going concern, restatement,
-impairment, regulatory action, cybersecurity incident, supply-chain
-disruption, covenant breach, delisting, and loss of a major customer. The list
-lives in one table at the top of the module and is meant to be extended.
+Contagion can be refreshed the same way by running its pipeline; Contract Audit
+reads Solidity from disk and needs no network at all.

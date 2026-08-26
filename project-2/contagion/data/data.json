@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-08-26T21:46:59Z",
+ "generated_at": "2026-08-26T23:06:24Z",
  "is_sample": true,
  "source_note": "Simulated series, not real prices, produced by pipeline/make_sample.py so the site renders before a live pull. A factor model with a planted tail-only channel between BTC and XLF. Run pipeline/build_dataset.py to replace it with real market data.",
  "window": {
