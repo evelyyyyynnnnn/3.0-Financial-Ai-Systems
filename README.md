@@ -5,63 +5,70 @@ the design and implementation of **optimization-driven, system-level decision
 frameworks** — integrating operations research, mathematical optimization, and
 applied AI — for domains where a wrong decision carries systemic consequences.
 
-**[Open the site](index.html)** for the full overview: three pillars, nine
-project pages, a page index, and a petition-to-repository gap analysis.
+Four independently deployable projects. Point Vercel's root directory at any
+one of them; each carries its own `vercel.json` and needs no build step.
 
-## Structure
+| | Project | What it does | Deploy root |
+|---|---|---|---|
+| 1 | **Portfolio** | The existing body of work — eight projects, a two-level site, and the live 13F tracker | `project-1/` |
+| 2 | **Filing Intelligence** | What changed in a company's SEC risk disclosures since the prior filing | `project-2/` |
+| 3 | **Contagion Observatory** | Directional risk transmission between crypto and US equities | `project-3/` |
+| 4 | **Contract Audit** | Static vulnerability analysis for Solidity, with checkable findings | `project-4/` |
 
-```
-index.html            top-level overview (Vercel serves this)
-projects/*.html       one detail page per project
-assets/site.css       shared stylesheet
-giant-portfolio/      live 13F tracker (index.html + data.json)
-project-1/            source for the eight portfolio projects
-scripts/
-  build_site.py       regenerates index.html and projects/*.html
-  refresh_data.py     pulls Notion → giant-portfolio/data.json
-.github/workflows/
-  refresh-data.yml    monthly data refresh (must stay at the repo root)
-```
+Each project has its own README with the method, the run instructions, and an
+explicit statement of what it does *not* establish.
 
-## Deploying
+## Coverage against the petition
 
-The site is static. Import the repository into Vercel and leave the root
-directory at the repository root — `vercel.json` pins it to a no-build static
-deploy, and `.vercelignore` keeps `node_modules/` and model checkpoints out of
-the bundle.
+| Pillar | Status |
+|---|---|
+| Financial stability | `project-1`, `project-2`, `project-3` |
+| Secure digital infrastructure | `project-4` |
+| Healthcare safety | **No code in this repository.** It does not belong under "Financial AI Systems" — it wants a separate repository rather than being folded in here. |
 
-## Refreshing the portfolio data
+## Data, and where it comes from
 
-`.github/workflows/refresh-data.yml` runs on the 1st of each month, re-pulls the
-two Notion databases, and commits `giant-portfolio/data.json` if anything
-changed — which triggers a Vercel redeploy. To run it now: repo → Actions →
-"Refresh portfolio data" → Run workflow. Locally:
+Projects 2–4 follow the same shape as the 13F tracker, which has been running
+this way for a while: **a pipeline produces `data.json`, and the site is pure
+static**. Browsers cannot call SEC EDGAR or market APIs directly (CORS, and
+per-client rate limits), so precomputation is not a shortcut — it is the only
+workable architecture for a static deploy.
 
-```bash
-export NOTION_TOKEN=ntn_xxxxxxxxxxxx
-pip install requests
-python scripts/refresh_data.py
-```
+Projects 2 and 3 ship **sample data so the site renders before any live pull**,
+and both label it in the payload and on the page:
 
-Setup details, including the Notion integration and the `NOTION_TOKEN` secret,
-are in [`giant-portfolio/SETUP.md`](giant-portfolio/SETUP.md).
+- `project-2` uses **fictional issuers**. Attaching invented risk-factor
+  language to a real ticker would produce something that reads like an SEC
+  disclosure without being one.
+- `project-3` uses **simulated series**, built from a factor model with planted
+  structure so the estimators can be checked against a known answer.
 
-## Rebuilding the site
+Replace either with real data in one command — see each README.
 
-Project descriptions live in one table at the top of `scripts/build_site.py`.
-Edit that table, then:
+## Automation
 
-```bash
-python scripts/build_site.py
-```
+`.github/workflows/` must stay at the repository root; GitHub Actions reads
+workflows from nowhere else.
 
-It rewrites `index.html` and every page under `projects/`.
+| Workflow | Schedule | Refreshes |
+|---|---|---|
+| `refresh-data.yml` | 1st of each month | `project-1/giant-portfolio/data.json` from Notion |
+| `refresh-filings.yml` | 3rd of each month | `project-2/data/data.json` from SEC EDGAR |
+
+Both also run on demand from the Actions tab, and both commit only when the
+data actually changed — which redeploys the affected site.
+
+Secrets: `NOTION_TOKEN` for the tracker, `SEC_USER_AGENT` for filings (SEC
+requires a contact string on every API request, e.g. `Jane Doe jane@example.com`).
 
 ## Attribution
 
-`project-1/volatility-forecasting/Options-Volatility-Trading/` is **not original
-work**. It is MIT-licensed software, Copyright (c) 2021 MCF Long Short, from
-`mcf-long-short/ibkr-options-volatility-trading` — a course group project at
-Union University's Masters in Computational Finance. Its `ib_client/` directory
-is Interactive Brokers' official Python TWS API. It is retained as a reference
-implementation and labelled as third-party throughout the site.
+`project-1/volatility-forecasting/Options-Volatility-Trading/` is **not
+original work**. It is MIT-licensed software, Copyright (c) 2021 MCF Long
+Short, from `mcf-long-short/ibkr-options-volatility-trading` — a course group
+project at Union University's Masters in Computational Finance. Its
+`ib_client/` directory is Interactive Brokers' official Python TWS API. It is
+retained as a reference implementation and labelled third-party throughout.
+
+Projects 2, 3, and 4 were built as portfolio work; their commit dates reflect
+when they were written.

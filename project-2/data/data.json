@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-08-26T21:32:25Z",
+ "generated_at": "2026-08-26T21:46:59Z",
  "source": "Synthetic sample",
  "source_note": "Sample data with fictional issuers, produced by pipeline/make_sample.py so the site renders before a live pull. Not SEC data. Run pipeline/build_dataset.py to replace it with real filings.",
  "is_sample": true,
