@@ -1,0 +1,6 @@
+node_modules/
+portfolio-optimization-engine/models/
+portfolio-optimization-engine/data/
+portfolio-optimization-engine/results/tensorboard/
+**/__pycache__/
+*.pyc
