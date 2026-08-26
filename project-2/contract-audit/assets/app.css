@@ -1,51 +1,29 @@
+/* contract-audit — section styles.
+ * Palette, typography, and chrome come from ../assets/shell.css;
+ * --accent is already bound to this section's colour by
+ * body[data-section] there. Only components live here.
+ */
+/* Severity scale. Local to this section. */
 :root{
-  --bg:#f6f5f9; --panel:#fff; --ink:#171425; --body:#4d4860; --faint:#807a94;
-  --line:#e4e1ec; --line-soft:#f0eef5;
-  --accent:#6d28d9; --accent-wash:#f0eafc;
   --critical:#b91c1c; --critical-wash:#fdeaea;
   --high:#b45309; --high-wash:#fbf1e3;
   --medium:#2563eb; --medium-wash:#e9effc;
   --low:#4b5563; --low-wash:#eef0f3;
-  --ok:#15803d; --ok-wash:#e7f4ec;
-  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  --shadow:0 1px 2px rgba(20,15,35,.05),0 3px 12px rgba(20,15,35,.05);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#100e18; --panel:#191622; --ink:#eae7f3; --body:#aca6be; --faint:#7e7794;
-  --line:#2a2536; --line-soft:#201c2b;
-  --accent:#a78bfa; --accent-wash:#221a38;
   --critical:#f07070; --critical-wash:#2e1616;
   --high:#e0a45c; --high-wash:#2c2113;
   --medium:#7ea6f8; --medium-wash:#15203a;
   --low:#9ca3af; --low-wash:#22262e;
-  --ok:#4fb87a; --ok-wash:#12291c;
-  --shadow:0 1px 2px rgba(0,0,0,.4),0 3px 12px rgba(0,0,0,.3);
 }}
 :root[data-theme="dark"]{
-  --bg:#100e18; --panel:#191622; --ink:#eae7f3; --body:#aca6be; --faint:#7e7794;
-  --line:#2a2536; --line-soft:#201c2b;
-  --accent:#a78bfa; --accent-wash:#221a38;
   --critical:#f07070; --critical-wash:#2e1616;
   --high:#e0a45c; --high-wash:#2c2113;
   --medium:#7ea6f8; --medium-wash:#15203a;
   --low:#9ca3af; --low-wash:#22262e;
-  --ok:#4fb87a; --ok-wash:#12291c;
-  --shadow:0 1px 2px rgba(0,0,0,.4),0 3px 12px rgba(0,0,0,.3);
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--body);
-  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  -webkit-font-smoothing:antialiased}
-.wrap{max-width:1000px;margin:0 auto;padding:0 24px}
-a{color:var(--accent)}
 
-.bar{background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
-.bar .wrap{display:flex;align-items:center;gap:12px;height:54px}
-.brand{font-weight:650;color:var(--ink);letter-spacing:-.01em}
-.tag{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;
-  background:var(--accent-wash);color:var(--accent)}
-.spacer{flex:1}
-.stamp{font-family:var(--mono);font-size:12px;color:var(--faint)}
+a{color:var(--accent)}
 
 .hero{padding:46px 0 30px}
 h1{margin:0 0 14px;font-size:31px;line-height:1.2;letter-spacing:-.02em;color:var(--ink)}

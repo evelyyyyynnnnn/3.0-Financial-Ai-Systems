@@ -1,48 +1,30 @@
+/* contagion — section styles.
+ * Palette, typography, and chrome come from ../assets/shell.css;
+ * --accent is already bound to this section's colour by
+ * body[data-section] there. Only components live here.
+ */
+/* Market classes and the shock highlight. Local to this section. */
 :root{
-  --bg:#f4f7f7; --panel:#fff; --ink:#0f1c1c; --body:#46595a; --faint:#7a8c8d;
-  --line:#dee7e7; --line-soft:#eef3f3;
-  --accent:#0f766e; --accent-wash:#e4f1ef;
   --equity:#1d4ed8; --equity-wash:#e6ecfb;
   --crypto:#b45309; --crypto-wash:#fbf0e2;
   --hot:#b91c1c;
-  --warn-wash:#fdf7e6; --warn-ink:#87651a; --warn-line:#e2c77c;
-  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  --shadow:0 1px 2px rgba(10,25,25,.05),0 3px 12px rgba(10,25,25,.05);
+  --warn-ink:#87651a; --warn-line:#e2c77c;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0c1414; --panel:#141d1e; --ink:#e5f0ef; --body:#a8bcbc; --faint:#778d8d;
-  --line:#233030; --line-soft:#1a2424;
-  --accent:#4db6a8; --accent-wash:#0f2825;
   --equity:#6f9cf5; --equity-wash:#15203a;
   --crypto:#e0a45c; --crypto-wash:#2c2113;
   --hot:#f07070;
-  --warn-wash:#2a2413; --warn-ink:#dcbb6b; --warn-line:#6b5722;
-  --shadow:0 1px 2px rgba(0,0,0,.4),0 3px 12px rgba(0,0,0,.3);
+  --warn-ink:#dcbb6b; --warn-line:#6b5722;
 }}
 :root[data-theme="dark"]{
-  --bg:#0c1414; --panel:#141d1e; --ink:#e5f0ef; --body:#a8bcbc; --faint:#778d8d;
-  --line:#233030; --line-soft:#1a2424;
-  --accent:#4db6a8; --accent-wash:#0f2825;
   --equity:#6f9cf5; --equity-wash:#15203a;
   --crypto:#e0a45c; --crypto-wash:#2c2113;
   --hot:#f07070;
-  --warn-wash:#2a2413; --warn-ink:#dcbb6b; --warn-line:#6b5722;
-  --shadow:0 1px 2px rgba(0,0,0,.4),0 3px 12px rgba(0,0,0,.3);
+  --warn-ink:#dcbb6b; --warn-line:#6b5722;
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--body);
-  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  -webkit-font-smoothing:antialiased}
-.wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+
 a{color:var(--accent)}
 
-.bar{background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
-.bar .wrap{display:flex;align-items:center;gap:12px;height:54px}
-.brand{font-weight:650;color:var(--ink);letter-spacing:-.01em}
-.tag{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;
-  background:var(--accent-wash);color:var(--accent)}
-.spacer{flex:1}
-.stamp{font-family:var(--mono);font-size:12px;color:var(--faint)}
 .banner{background:var(--warn-wash);border-bottom:1px solid var(--warn-line);
   color:var(--warn-ink);padding:11px 24px;font-size:14px;text-align:center}
 
