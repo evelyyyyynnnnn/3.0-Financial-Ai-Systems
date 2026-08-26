@@ -32,7 +32,8 @@ long redemption actually takes in practice rather than in the prospectus.
 Shares the fixed-income domain with the credit-risk and network-risk projects
 under `project-1/`. On-chain data is a new source, not a new discipline — the
 analytics are conventional fixed-income analytics run against a different feed.
-Contract-level analysis of tokenized instruments is `project-4/`; this project
+Contract-level analysis of tokenized instruments is the Contract Audit page in
+`project-2/`; this project
 would cover the market questions, that one covers whether the contract holds.
 
 ## Status

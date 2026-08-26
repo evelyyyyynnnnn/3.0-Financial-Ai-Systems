@@ -6,15 +6,18 @@
 <title>Contract Audit</title>
 <meta name="description" content="Static vulnerability analysis for Solidity, with the triggering line and an explicit false-positive note on every finding.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%273%27 fill=%27%236d28d9%27/%3E%3Cpath d=%27M8 2.6l4.2 1.8v3.4c0 2.6-1.7 4.6-4.2 5.6-2.5-1-4.2-3-4.2-5.6V4.4z%27 fill=%27%23fff%27 opacity=%27.92%27/%3E%3Cpath d=%27M6.2 8.1l1.4 1.4 2.5-2.6%27 stroke=%27%236d28d9%27 stroke-width=%271.3%27 fill=%27none%27 stroke-linecap=%27round%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assets/shell.css">
 <link rel="stylesheet" href="assets/app.css">
 </head>
-<body>
+<body data-section="audit">
 
-<div class="bar"><div class="wrap">
-  <span class="brand">Contract Audit</span>
-  <span class="tag">Solidity static analysis</span>
-  <span class="spacer"></span>
-  <span id="stamp" class="stamp"></span>
+<div class="shellbar"><div class="wrap">
+  <a class="home" href="../index.html"><span class="mark"></span>Trustworthy Systems</a>
+  <nav class="shellnav">
+    <a class="filing" href="../filing-intelligence/">Filing Intelligence</a>
+    <a class="contagion" href="../contagion/">Contagion</a>
+    <a class="audit" href="../contract-audit/" aria-current="page">Contract Audit</a>
+  </nav>
 </div></div>
 
 <div class="wrap">
@@ -54,6 +57,12 @@
       certificate; it means these detectors found nothing.</p>
   </footer>
 </div>
+
+<div class="shellfoot"><div class="wrap">
+  <a href="../index.html">← All three systems</a>
+  <a href="../contract-audit/README.md">Method &amp; source</a>
+  <span class="sep">Contract Audit · <span id="stamp"></span></span>
+</div></div>
 
 <script src="assets/app.js"></script>
 </body>

@@ -27,7 +27,7 @@ jobs:
           python-version: "3.12"
 
       - name: Pull filings and rebuild dataset
-        working-directory: project-2
+        working-directory: project-2/filing-intelligence
         env:
           # SEC requires a contact string on every request. Set SEC_USER_AGENT
           # as a repository secret, e.g. "Jane Doe jane@example.com".
@@ -43,10 +43,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- project-2/data/data.json; then
+          if git diff --quiet -- project-2/filing-intelligence/data/data.json; then
             echo "No change to data.json — nothing to commit."
           else
-            git add project-2/data/data.json
+            git add project-2/filing-intelligence/data/data.json
             git commit -m "chore: refresh filing intelligence $(date -u +'%Y-%m-%d')"
             git push
           fi

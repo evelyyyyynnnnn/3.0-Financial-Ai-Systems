@@ -1,47 +1,27 @@
+/* filing-intelligence — section styles.
+ * Palette, typography, and chrome come from ../assets/shell.css;
+ * --accent is already bound to this section's colour by
+ * body[data-section] there. Only components live here.
+ */
+/* Finding kinds. Local to this section — meaningless elsewhere. */
 :root{
-  --bg:#f5f7f9; --panel:#fff; --ink:#141b24; --body:#48566a; --faint:#7b8a9c;
-  --line:#e0e6ec; --line-soft:#eef2f6;
-  --accent:#1c5f9e; --accent-wash:#e9f1f8;
-  --esc:#9a3412; --esc-wash:#fdf0e7;   /* escalated */
-  --add:#1e5f45; --add-wash:#e6f2ec;   /* added */
-  --rem:#5b5570; --rem-wash:#efedf4;   /* removed */
-  --warn-wash:#fdf6e3; --warn-ink:#8a6516; --warn-line:#e0c477;
-  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  --shadow:0 1px 2px rgba(15,23,32,.05),0 3px 12px rgba(15,23,32,.05);
+  --esc:#9a3412; --esc-wash:#fdf0e7;
+  --add:#1e5f45; --add-wash:#e6f2ec;
+  --rem:#5b5570; --rem-wash:#efedf4;
+  --warn-ink:#8a6516; --warn-line:#e0c477;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0e141b; --panel:#161e28; --ink:#e7eef6; --body:#aebbc9; --faint:#7c8b9c;
-  --line:#252f3b; --line-soft:#1c242e;
-  --accent:#5fa0e0; --accent-wash:#142534;
   --esc:#e09a6a; --esc-wash:#2c1d13;
   --add:#57b98d; --add-wash:#12291f;
   --rem:#a99ec4; --rem-wash:#211d2c;
-  --warn-wash:#2b2413; --warn-ink:#dcbb6b; --warn-line:#6b5722;
-  --shadow:0 1px 2px rgba(0,0,0,.4),0 3px 12px rgba(0,0,0,.3);
+  --warn-ink:#dcbb6b; --warn-line:#6b5722;
 }}
 :root[data-theme="dark"]{
-  --bg:#0e141b; --panel:#161e28; --ink:#e7eef6; --body:#aebbc9; --faint:#7c8b9c;
-  --line:#252f3b; --line-soft:#1c242e;
-  --accent:#5fa0e0; --accent-wash:#142534;
   --esc:#e09a6a; --esc-wash:#2c1d13;
   --add:#57b98d; --add-wash:#12291f;
   --rem:#a99ec4; --rem-wash:#211d2c;
-  --warn-wash:#2b2413; --warn-ink:#dcbb6b; --warn-line:#6b5722;
-  --shadow:0 1px 2px rgba(0,0,0,.4),0 3px 12px rgba(0,0,0,.3);
+  --warn-ink:#dcbb6b; --warn-line:#6b5722;
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--body);
-  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  -webkit-font-smoothing:antialiased}
-.wrap{max-width:1000px;margin:0 auto;padding:0 24px}
-
-.bar{background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
-.bar .wrap{display:flex;align-items:center;gap:12px;height:54px}
-.brand{font-weight:650;color:var(--ink);letter-spacing:-.01em}
-.tag{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;
-  background:var(--accent-wash);color:var(--accent)}
-.spacer{flex:1}
-.stamp{font-family:var(--mono);font-size:12px;color:var(--faint)}
 
 .banner{background:var(--warn-wash);border-bottom:1px solid var(--warn-line);
   color:var(--warn-ink);padding:11px 24px;font-size:14px;text-align:center}

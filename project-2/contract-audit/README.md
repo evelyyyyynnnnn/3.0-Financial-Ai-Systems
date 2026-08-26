@@ -87,4 +87,6 @@ certificate, and the site says so on the page.
 
 ## Deploying
 
-Static. Point Vercel's root directory at `project-4/`.
+This is one page of the Trustworthy Systems site. Deploy the whole site by
+pointing Vercel's root directory at `project-2/`; this page is served at
+`/contract-audit/`.
