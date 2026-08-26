@@ -14,10 +14,10 @@ investment-dashboard-expert/
 ├── server/
 │   └── app.js                # 🚀 后端服务
 ├── templates/                # 📋 原始静态页面模板
-│   ├── Investment Suggestion.html
-│   ├── Macro Overview.html
-│   ├── Portfolio Management.html
-│   └── Prediction.html
+│   ├── investment-suggestion.html
+│   ├── macro-overview.html
+│   ├── portfolio-management.html
+│   └── prediction.html
 ├── package.json              # 📦 项目依赖配置
 ├── start.sh                  # 🐧 Linux/Mac启动脚本
 ├── start.bat                 # 🪟 Windows启动脚本
@@ -151,10 +151,10 @@ npm test
 ## 📋 原始模板
 
 项目包含4个原始静态页面模板，位于 `templates/` 目录：
-- `Investment Suggestion.html` - 投资建议页面
-- `Macro Overview.html` - 宏观概览页面
-- `Portfolio Management.html` - 投资组合管理页面
-- `Prediction.html` - 预测页面
+- `investment-suggestion.html` - 投资建议页面
+- `macro-overview.html` - 宏观概览页面
+- `portfolio-management.html` - 投资组合管理页面
+- `prediction.html` - 预测页面
 
 这些模板作为参考，展示了原始的设计思路和内容结构。
 
