@@ -14,10 +14,10 @@ investment-dashboard-expert/
 ├── 🚀 后端文件
 │   └── server/app.js              # 后端服务（12KB）
 ├── 📋 原始模板（参考用）
-│   ├── templates/Investment Suggestion.html
-│   ├── templates/Macro Overview.html
-│   ├── templates/Portfolio Management.html
-│   └── templates/Prediction.html
+│   ├── templates/investment-suggestion.html
+│   ├── templates/macro-overview.html
+│   ├── templates/portfolio-management.html
+│   └── templates/prediction.html
 ├── 🔧 配置文件
 │   ├── package.json               # 项目依赖配置
 │   ├── start.sh                   # Linux/Mac启动脚本

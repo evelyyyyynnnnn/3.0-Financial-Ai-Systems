@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Draft Website Pages — Index</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --ink:#12161c; --muted:#5b6673;
+    --line:#e3e7ec; --accent:#1f6feb; --accent-ink:#ffffff;
+    --ok-bg:#e7f5ed; --ok-ink:#1a7f43;
+    --warn-bg:#fdf1e3; --warn-ink:#9a5b12;
+    --info-bg:#eaf1fd; --info-ink:#1f5bb8;
+    --mute-bg:#eef0f3; --mute-ink:#5b6673;
+    --shadow:0 1px 2px rgba(16,24,40,.06),0 4px 14px rgba(16,24,40,.05);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#0e1116; --panel:#161b22; --ink:#e6edf3; --muted:#9aa7b4;
+      --line:#262d36; --accent:#4c8dff; --accent-ink:#07101f;
+      --ok-bg:#13301f; --ok-ink:#5fd18c;
+      --warn-bg:#33240f; --warn-ink:#e8b071;
+      --info-bg:#12233f; --info-ink:#84b3ff;
+      --mute-bg:#20262e; --mute-ink:#9aa7b4;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e1116; --panel:#161b22; --ink:#e6edf3; --muted:#9aa7b4;
+    --line:#262d36; --accent:#4c8dff; --accent-ink:#07101f;
+    --ok-bg:#13301f; --ok-ink:#5fd18c;
+    --warn-bg:#33240f; --warn-ink:#e8b071;
+    --info-bg:#12233f; --info-ink:#84b3ff;
+    --mute-bg:#20262e; --mute-ink:#9aa7b4;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.3);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",
+         "Noto Sans SC","PingFang SC","Microsoft YaHei",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:48px 24px 72px}
+  header.top{border-bottom:1px solid var(--line);padding-bottom:28px;margin-bottom:36px}
+  h1{margin:0 0 10px;font-size:30px;letter-spacing:-.02em}
+  .sub{margin:0;color:var(--muted);max-width:62ch}
+  .counts{display:flex;flex-wrap:wrap;gap:20px;margin-top:20px}
+  .count b{display:block;font-size:22px;line-height:1.2}
+  .count span{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+  section{margin:0 0 40px}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);
+     margin:0 0 4px;font-weight:600}
+  .sec-note{margin:0 0 16px;color:var(--muted);font-size:14px}
+
+  .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:18px 18px 16px;box-shadow:var(--shadow);
+    display:flex;flex-direction:column;gap:9px;
+  }
+  .card h3{margin:0;font-size:16.5px;letter-spacing:-.01em}
+  .card h3 a{color:var(--ink);text-decoration:none}
+  .card h3 a:hover{color:var(--accent);text-decoration:underline}
+  .desc{margin:0;font-size:14px;color:var(--muted)}
+  .meta{margin-top:auto;padding-top:6px;font-size:12.5px;color:var(--muted);
+        font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;word-break:break-all}
+  .badges{display:flex;flex-wrap:wrap;gap:6px}
+  .b{font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:999px;
+     letter-spacing:.02em;white-space:nowrap}
+  .b.ok{background:var(--ok-bg);color:var(--ok-ink)}
+  .b.warn{background:var(--warn-bg);color:var(--warn-ink)}
+  .b.info{background:var(--info-bg);color:var(--info-ink)}
+  .b.mute{background:var(--mute-bg);color:var(--mute-ink)}
+  .run{
+    margin:2px 0 0;background:var(--mute-bg);border-radius:7px;padding:8px 10px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12.5px;color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7;
+  }
+  footer{border-top:1px solid var(--line);padding-top:20px;margin-top:8px;
+         color:var(--muted);font-size:13.5px}
+  footer code{background:var(--mute-bg);padding:1.5px 5px;border-radius:4px;font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>Draft — Website Pages</h1>
+  <p class="sub">
+    Every browser-facing page across the eight prototype projects in <code>Draft/</code>,
+    grouped by how you open it. Links are relative, so this file works straight from
+    disk or from any static server rooted at the repository.
+  </p>
+  <div class="counts">
+    <div class="count"><b>12</b><span>Pages</span></div>
+    <div class="count"><b>4</b><span>Projects</span></div>
+    <div class="count"><b>5</b><span>Open directly</span></div>
+    <div class="count"><b>3</b><span>Need a server</span></div>
+  </div>
+</header>
+
+<section>
+  <h2>Standalone Research Pages</h2>
+  <p class="sec-note">Self-contained HTML. Double-click to open — no build, no backend.
+    Chart libraries load from CDN, so keep a network connection for the charted pages.</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="badges"><span class="b ok">Opens directly</span><span class="b info">Chart.js</span><span class="b mute">EN</span></div>
+      <h3><a href="../trading-system-dashboard/templates/macro-overview.html">U.S. Stock Market Indicators</a></h3>
+      <p class="desc">Macro infographic for April 2025 — S&amp;P levels and volatility, Q1 earnings
+        growth, Fed policy rate, CPI/PCE inflation, and labor-market statistics.</p>
+      <p class="meta">trading-system-dashboard/templates/macro-overview.html</p>
+    </div>
+
+    <div class="card">
+      <div class="badges"><span class="b ok">Opens directly</span><span class="b info">Chart.js</span><span class="b mute">中文</span></div>
+      <h3><a href="../trading-system-dashboard/templates/prediction.html">2025 投资展望 · Investment Outlook</a></h3>
+      <p class="desc">Interactive forward-looking dashboard covering asset-class outlooks and
+        scenario projections for 2025.</p>
+      <p class="meta">trading-system-dashboard/templates/prediction.html</p>
+    </div>
+
+    <div class="card">
+      <div class="badges"><span class="b ok">Opens directly</span><span class="b info">Chart.js</span><span class="b mute">中文</span></div>
+      <h3><a href="../trading-system-dashboard/templates/portfolio-management.html">投资分析与市场展望 · Portfolio Analysis</a></h3>
+      <p class="desc">Interactive investment-analysis dashboard pairing portfolio breakdowns
+        with market-outlook commentary.</p>
+      <p class="meta">trading-system-dashboard/templates/portfolio-management.html</p>
+    </div>
+
+    <div class="card">
+      <div class="badges"><span class="b ok">Opens directly</span><span class="b info">Chart.js</span><span class="b mute">EN</span></div>
+      <h3><a href="../trading-system-dashboard/templates/investment-suggestion.html">Balanced Long-Term Portfolio</a></h3>
+      <p class="desc">June 2025 model allocation for a long-term balanced portfolio, with the
+        reasoning behind each sleeve.</p>
+      <p class="meta">trading-system-dashboard/templates/investment-suggestion.html</p>
+    </div>
+
+    <div class="card">
+      <div class="badges"><span class="b ok">Opens directly</span><span class="b ok">No dependencies</span><span class="b mute">中文</span></div>
+      <h3><a href="../trading-system-dashboard-2/public/instruments.html">金融工具分析平台 · Instruments Analysis</a></h3>
+      <p class="desc">Reference catalogue of tradable instruments and their analytics. Fully
+        self-contained — styles are inline and it makes no network calls.</p>
+      <p class="meta">trading-system-dashboard-2/public/instruments.html</p>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h2>Live Dashboards</h2>
+  <p class="sec-note">Application front-ends. These fetch from their own backend, so start the
+    server first — opening the file directly renders the shell without data.</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="badges"><span class="b warn">Needs server</span><span class="b info">Express</span><span class="b mute">中文</span></div>
+      <h3><a href="../trading-system-dashboard/index.html">智能投资分析专家仪表板</a></h3>
+      <p class="desc">Investment-analysis dashboard driven by live market data and AI commentary.
+        Express serves the project root, so the research pages above are reachable under
+        <code>/templates/</code> once it is running.</p>
+      <p class="run">cd Draft/trading-system-dashboard
+npm install &amp;&amp; npm start   # http://localhost:3000</p>
+      <p class="meta">trading-system-dashboard/index.html</p>
+    </div>
+
+    <div class="card">
+      <div class="badges"><span class="b warn">Needs server</span><span class="b info">Express + Socket.IO</span><span class="b mute">EN</span></div>
+      <h3><a href="../trading-system-dashboard-2/public/index.html">Trading Simulation Platform</a></h3>
+      <p class="desc">Quantitative trading dashboard with a strategy backtesting engine and
+        real-time updates over Socket.IO. Needs the server for both its API and the
+        Socket.IO client script.</p>
+      <p class="run">cd Draft/trading-system-dashboard-2
+npm install &amp;&amp; npm start   # http://localhost:3000</p>
+      <p class="meta">trading-system-dashboard-2/public/index.html</p>
+    </div>
+
+    <div class="card">
+      <div class="badges"><span class="b warn">Needs server</span><span class="b info">Flask (Jinja)</span><span class="b mute">EN</span></div>
+      <h3><a href="../volatility-forecasting/Options-Volatility-Trading/webapp/templates/dashboard.html">MarketWatcher — Options Volatility Monitor</a></h3>
+      <p class="desc">Monitors straddle opportunities across a watchlist. This is a Jinja
+        template rather than a plain page — it must be rendered by Flask, not opened from disk.</p>
+      <p class="run">cd Draft/volatility-forecasting/Options-Volatility-Trading
+pip install -r webapp/requirements.txt
+python webapp/app.py        # http://localhost:8080</p>
+      <p class="meta">volatility-forecasting/…/webapp/templates/dashboard.html</p>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h2>Generated Reports</h2>
+  <p class="sec-note">Plotly artifacts written by evaluation runs of the reinforcement-learning
+    portfolio agents. Self-contained but large (~5&nbsp;MB each) — expect a slow first paint.</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="badges"><span class="b ok">Opens directly</span><span class="b info">Plotly</span><span class="b warn">~5 MB</span></div>
+      <h3><a href="../portfolio-optimization-engine/visualizations/drawdown_eval.html">Drawdown Evaluation</a></h3>
+      <p class="desc">Drawdown curve over the evaluation period for the trained agent.</p>
+      <p class="meta">portfolio-optimization-engine/visualizations/drawdown_eval.html</p>
+    </div>
+
+    <div class="card">
+      <div class="badges"><span class="b ok">Opens directly</span><span class="b info">Plotly</span><span class="b warn">~5 MB</span></div>
+      <h3><a href="../portfolio-optimization-engine/visualizations/portfolio_weights_eval.html">Portfolio Weights Evaluation</a></h3>
+      <p class="desc">Allocation weights per asset as they evolve across the evaluation episode.</p>
+      <p class="meta">portfolio-optimization-engine/visualizations/portfolio_weights_eval.html</p>
+    </div>
+
+    <div class="card">
+      <div class="badges"><span class="b ok">Opens directly</span><span class="b info">Plotly</span><span class="b warn">~5 MB</span></div>
+      <h3><a href="../portfolio-optimization-engine/visualizations/risk_metrics_eval.html">Risk Metrics Evaluation</a></h3>
+      <p class="desc">Risk statistics — volatility, Sharpe and related measures — for the agent's
+        evaluation run.</p>
+      <p class="meta">portfolio-optimization-engine/visualizations/risk_metrics_eval.html</p>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h2>Archived</h2>
+  <p class="sec-note">Superseded, kept for reference. Nothing links to these.</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="badges"><span class="b mute">Superseded</span><span class="b info">Flask (Jinja)</span></div>
+      <h3><a href="../volatility-forecasting/Options-Volatility-Trading/webapp/templates/dashboard_backup.html">MarketWatcher Dashboard (backup)</a></h3>
+      <p class="desc">Earlier revision of the MarketWatcher dashboard. Not referenced by
+        <code>app.py</code>; safe to delete once the current version is settled.</p>
+      <p class="meta">volatility-forecasting/…/webapp/templates/dashboard_backup.html</p>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  Projects in <code>Draft/</code> without a browser page — <code>credit-risk-ai</code>,
+  <code>financial-network-risk</code>, <code>high-frequency-strategy</code>,
+  <code>live-trading-engine</code> — are library and research code. See
+  <code>Draft/README.md</code> for the full folder guide.
+</footer>
+
+</div>
+</body>
+</html>
