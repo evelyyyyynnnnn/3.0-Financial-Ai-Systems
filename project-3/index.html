@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contagion Observatory</title>
+<meta name="description" content="Directional risk transmission between crypto assets and US equities, measured by tail dependence rather than correlation.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%273%27 fill=%27%230f766e%27/%3E%3Cg fill=%27%23fff%27%3E%3Ccircle cx=%274%27 cy=%274%27 r=%271.6%27/%3E%3Ccircle cx=%2712%27 cy=%276%27 r=%271.6%27/%3E%3Ccircle cx=%277%27 cy=%2712%27 r=%271.6%27/%3E%3C/g%3E%3Cg stroke=%27%23fff%27 stroke-width=%27.9%27 opacity=%27.75%27%3E%3Cpath d=%27M4 4l8 2M12 6l-5 6M4 4l3 8%27/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+
+<div class="bar"><div class="wrap">
+  <span class="brand">Contagion Observatory</span>
+  <span class="tag">crypto ↔ US equities</span>
+  <span class="spacer"></span>
+  <span id="window" class="stamp"></span>
+</div></div>
+
+<div id="sampleBanner" class="banner" hidden>
+  <strong>Simulated data.</strong> <span id="sampleNote"></span>
+</div>
+
+<div class="wrap">
+  <header class="hero">
+    <h1>Which links actually transmit</h1>
+    <p class="lead">Two assets can move together every day and transmit nothing —
+      they just share a factor. What matters for systemic risk is whether a pair
+      <em>fails together</em>. This estimates three things for every pair: ordinary
+      correlation, the lead-lag that orients the link, and tail dependence — how
+      often the target is in its own worst decile given the source is in its.
+      Edge strength is weighted toward the last one.</p>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Transmission network</h2>
+      <div class="legend">
+        <span><i class="dot equity"></i>equity</span>
+        <span><i class="dot crypto"></i>crypto</span>
+        <span class="hint">Click a node to shock it.</span>
+      </div>
+    </div>
+    <div class="graphwrap">
+      <svg id="graph" viewBox="0 0 720 460" role="img" aria-label="Transmission network"></svg>
+    </div>
+    <div id="scenario" class="scenario"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Edges</h2>
+      <div class="filters">
+        <button type="button" id="crossOnly" aria-pressed="false">Cross-market only</button>
+        <label class="sortlab">sort
+          <select id="sort">
+            <option value="strength">strength</option>
+            <option value="tail_dep">tail dependence</option>
+            <option value="corr">correlation</option>
+            <option value="gap">tail − |corr| gap</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    <div class="tablewrap"><table id="edges">
+      <thead><tr>
+        <th>Source</th><th>Target</th><th class="num">Corr</th>
+        <th class="num">Tail dep</th><th class="num">Lag</th><th class="num">Strength</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </section>
+
+  <footer>
+    <h3>Method</h3>
+    <dl id="method"></dl>
+    <p class="caveat"><strong>What this is not.</strong> Tail dependence is a statement
+      about co-movement in the tail, not proof of a causal channel. The lead-lag
+      orientation says which side moved first in this window, which is evidence of
+      direction but not of mechanism. Shock propagation is a decay model over the
+      estimated edges — it shows what the graph implies, not a forecast.</p>
+  </footer>
+</div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
