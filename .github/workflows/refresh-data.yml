@@ -1,11 +1,15 @@
+# NOTE: this file must stay at the repository root under .github/workflows/.
+# GitHub Actions only reads workflows from that path — a copy nested inside a
+# project subfolder is silently ignored and never runs.
+
 name: Refresh portfolio data
 
 on:
   schedule:
-    # Runs every Monday at 09:00 UTC. 13F filings only update quarterly,
-    # so weekly is already generous — tighten this if you edit the Notion
-    # database more often than that.
-    - cron: "0 9 * * 1"
+    # 09:00 UTC on the 1st of every month. 13F filings update quarterly, so
+    # monthly is already ahead of the source; tighten only if the Notion
+    # database is edited more often than that.
+    - cron: "0 9 1 * *"
   workflow_dispatch: {}   # lets you click "Run workflow" in the GitHub UI on demand
 
 permissions:
@@ -35,10 +39,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- giant-portfolio-tracker/data.json; then
+          if git diff --quiet -- giant-portfolio/data.json; then
             echo "No changes to data.json — nothing to commit."
           else
-            git add giant-portfolio-tracker/data.json
+            git add giant-portfolio/data.json
             git commit -m "chore: refresh portfolio data $(date -u +'%Y-%m-%d')"
             git push
           fi

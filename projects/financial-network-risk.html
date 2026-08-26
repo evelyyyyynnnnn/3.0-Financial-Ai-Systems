@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Network Risk — 3.0 Financial AI Systems</title>
+<meta name="description" content="Financial knowledge graph analysed with graph neural networks.">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="bar"><div class="wrap">
+<a class="home" href="../index.html">3.0 Financial AI Systems</a>
+<nav>
+  <a href="../index.html#endeavor">Endeavor</a>
+  <a href="../index.html#projects">Projects</a>
+  <a href="../index.html#pages">Pages</a>
+  <a href="../index.html#gaps">Gap analysis</a>
+</nav>
+</div></div>
+<div class="wrap">
+<div class="hero">
+  <p class="eyebrow">Financial Stability</p>
+  <h1>Financial Network Risk</h1>
+  <p class="lead">金融知识图谱与图神经网络风险传导 — Financial knowledge graph analysed with graph neural networks.</p>
+</div>
+</div>
+<div class="wrap">
+
+<section>
+  <h2>做什么</h2>
+  <p class="sec-note">Builds a graph over financial entities and their relationships, then trains GNN architectures over it to surface patterns and propagation paths that pairwise correlation analysis misses.</p>
+  <div class="chips"><span class="b acc">Python</span><span class="b acc">PyTorch</span><span class="b acc">GNN</span><span class="b acc">NetworkX</span><span class="b acc">pandas</span></div>
+  
+</section>
+
+<section>
+  <h2>核心模块</h2>
+  <p class="sec-note">路径相对于 <code class="path">project-1/financial-network-risk/</code>。</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>模块</th><th>职责</th></tr></thead>
+    <tbody>
+    <tr><td><code>models/gnn_model.py</code></td><td>GNN 架构实现</td></tr><tr><td><code>data/data_processor.py</code></td><td>图构建与特征工程</td></tr><tr><td><code>visualization/visualizer.py</code></td><td>网络图与模型表现可视化</td></tr><tr><td><code>config/config.yaml</code></td><td>架构与训练超参数</td></tr><tr><td><code>notebooks/financial_graph_demo.ipynb</code></td><td>端到端演示 notebook</td></tr>
+    </tbody>
+  </table></div>
+</section>
+<section>
+  <h2>如何运行</h2>
+  <p class="sec-note">入口文件：<code class="path">main.py</code></p>
+  <pre class="run">cd project-1/financial-network-risk
+pip install -r requirements.txt
+python main.py</pre>
+</section>
+<section>
+  <h2>可查看的产出</h2>
+  <p class="sec-note">页面、报告、论文与 notebook。</p>
+  <ul class="linklist"><li><a href="../project-1/financial-network-risk/notebooks/financial_graph_demo.ipynb">financial_graph_demo.ipynb</a><span class="b acc">Notebook</span><span class="meta">图构建到 GNN 推理的完整演示</span></li></ul>
+</section>
+<section>
+  <h2>与 endeavor 的关系</h2>
+  <p class="sec-note">Closest existing work to the petition&#x27;s crypto-equity contagion modelling: contagion is a graph problem, and this is the graph machinery.</p>
+</section>
+
+<footer>
+  <a href="../index.html">← 返回全景</a> ·
+  源码位于 <code>project-1/financial-network-risk/</code>
+</footer>
+</div>
+</body>
+</html>
