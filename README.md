@@ -15,6 +15,9 @@ one of them; each carries its own `vercel.json` and needs no build step.
 | 3 | **Contagion Observatory** | Directional risk transmission between crypto and US equities | `project-3/` |
 | 4 | **Contract Audit** | Static vulnerability analysis for Solidity, with checkable findings | `project-4/` |
 
+Alongside them: `roadmap/` (planned, not built) and `project-1/reference/`
+(third-party code).
+
 Each project has its own README with the method, the run instructions, and an
 explicit statement of what it does *not* establish.
 
@@ -61,14 +64,22 @@ data actually changed — which redeploys the affected site.
 Secrets: `NOTION_TOKEN` for the tracker, `SEC_USER_AGENT` for filings (SEC
 requires a contact string on every API request, e.g. `Jane Doe jane@example.com`).
 
+## Roadmap
+
+`roadmap/` holds scoping documents for work that is planned but **not
+implemented**. It is a separate directory from the numbered projects so that
+distinction is visible from the tree, not just from a status line. A project
+graduates out of it when there is code.
+
 ## Attribution
 
-`project-1/volatility-forecasting/Options-Volatility-Trading/` is **not
-original work**. It is MIT-licensed software, Copyright (c) 2021 MCF Long
-Short, from `mcf-long-short/ibkr-options-volatility-trading` — a course group
+Third-party code lives in `project-1/reference/`, separated at the directory
+level rather than by a caveat. It currently holds
+`options-volatility-trading` — MIT-licensed, Copyright (c) 2021 MCF Long
+Short, from `mcf-long-short/ibkr-options-volatility-trading`, a course group
 project at Union University's Masters in Computational Finance. Its
-`ib_client/` directory is Interactive Brokers' official Python TWS API. It is
-retained as a reference implementation and labelled third-party throughout.
+`ib_client/` directory is Interactive Brokers' official Python TWS API.
+Everything under the numbered projects outside that directory is original work.
 
 Projects 2, 3, and 4 were built as portfolio work; their commit dates reflect
 when they were written.
