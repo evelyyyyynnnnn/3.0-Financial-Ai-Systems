@@ -10,10 +10,10 @@ investment-dashboard-expert/
 ├── 📁 server/
 │   └── 📄 app.js                # 后端服务
 ├── 📁 templates/                # 原始静态页面模板（参考用）
-│   ├── 📄 Investment Suggestion.html
-│   ├── 📄 Macro Overview.html
-│   ├── 📄 Portfolio Management.html
-│   └── 📄 Prediction.html
+│   ├── 📄 investment-suggestion.html
+│   ├── 📄 macro-overview.html
+│   ├── 📄 portfolio-management.html
+│   └── 📄 prediction.html
 ├── 📄 package.json              # 项目依赖配置
 ├── 📄 start.sh                  # Linux/Mac启动脚本
 ├── 📄 start.bat                 # Windows启动脚本
@@ -42,10 +42,10 @@ investment-dashboard-expert/
 ### 📋 模板文件（参考用）
 | 文件名 | 描述 | 功能 |
 |--------|------|------|
-| `templates/Investment Suggestion.html` | 投资建议页面 | 原始投资建议页面模板 |
-| `templates/Macro Overview.html` | 宏观概览页面 | 原始宏观概览页面模板 |
-| `templates/Portfolio Management.html` | 投资组合管理页面 | 原始投资组合管理页面模板 |
-| `templates/Prediction.html` | 预测页面 | 原始预测页面模板 |
+| `templates/investment-suggestion.html` | 投资建议页面 | 原始投资建议页面模板 |
+| `templates/macro-overview.html` | 宏观概览页面 | 原始宏观概览页面模板 |
+| `templates/portfolio-management.html` | 投资组合管理页面 | 原始投资组合管理页面模板 |
+| `templates/prediction.html` | 预测页面 | 原始预测页面模板 |
 
 ### 🔧 配置文件
 | 文件名 | 描述 | 功能 |

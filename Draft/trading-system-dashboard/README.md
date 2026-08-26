@@ -58,10 +58,10 @@ investment-dashboard-expert/
 ├── server/
 │   └── app.js                # 后端服务
 ├── templates/                # 原始静态页面模板
-│   ├── Investment Suggestion.html
-│   ├── Macro Overview.html
-│   ├── Portfolio Management.html
-│   └── Prediction.html
+│   ├── investment-suggestion.html
+│   ├── macro-overview.html
+│   ├── portfolio-management.html
+│   └── prediction.html
 ├── package.json              # 项目依赖
 └── README.md                 # 项目说明
 ```
