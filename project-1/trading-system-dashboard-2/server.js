@@ -13,6 +13,7 @@ const backtestRoutes = require('./routes/backtest');
 const portfolioRoutes = require('./routes/portfolio');
 const marketDataRoutes = require('./routes/marketData');
 const strategyRoutes = require('./routes/strategy');
+const advisoryRoutes = require('./routes/advisory');
 
 // Import services
 const MarketDataService = require('./services/MarketDataService');
@@ -54,6 +55,7 @@ app.use('/api/backtest', backtestRoutes);
 app.use('/api/portfolio', portfolioRoutes);
 app.use('/api/market-data', marketDataRoutes);
 app.use('/api/strategy', strategyRoutes);
+app.use('/api/advisory', advisoryRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

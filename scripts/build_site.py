@@ -11,7 +11,7 @@ import html
 import os
 import pathlib
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+ROOT = pathlib.Path(__file__).resolve().parent.parent / "project-1"
 
 # --- pillars, straight from the petition's three areas of substantial merit ---
 PILLARS = {
@@ -52,11 +52,11 @@ PROJECTS = [
                "pip install -r requirements.txt\n"
                "python src/main.py --mode train --config src/config/sb3_sac.yaml",
         "artifacts": [
-            ("Drawdown Evaluation", "../project-1/portfolio-optimization-engine/visualizations/drawdown_eval.html",
+            ("Drawdown Evaluation", "../portfolio-optimization-engine/visualizations/drawdown_eval.html",
              "评估期回撤曲线"),
-            ("Portfolio Weights Evaluation", "../project-1/portfolio-optimization-engine/visualizations/portfolio_weights_eval.html",
+            ("Portfolio Weights Evaluation", "../portfolio-optimization-engine/visualizations/portfolio_weights_eval.html",
              "各资产权重随时间演化"),
-            ("Risk Metrics Evaluation", "../project-1/portfolio-optimization-engine/visualizations/risk_metrics_eval.html",
+            ("Risk Metrics Evaluation", "../portfolio-optimization-engine/visualizations/risk_metrics_eval.html",
              "波动率、Sharpe 等风险统计"),
         ],
         "notes": [],
@@ -87,7 +87,7 @@ PROJECTS = [
                "python main.py",
         "artifacts": [],
         "notebook": ("financial_graph_demo.ipynb",
-                     "../project-1/financial-network-risk/notebooks/financial_graph_demo.ipynb",
+                     "../financial-network-risk/notebooks/financial_graph_demo.ipynb",
                      "图构建到 GNN 推理的完整演示"),
         "notes": [],
         "relevance": "Closest existing work to the petition's crypto-equity contagion modelling: "
@@ -176,7 +176,7 @@ PROJECTS = [
         "run": None,
         "artifacts": [],
         "paper": ("Eventized Microstructure Modeling with Large Language Models",
-                  "../project-1/high-frequency-strategy/Final Submission/Eventized Microstructure Modeling with Large Language Models.pdf",
+                  "../high-frequency-strategy/Final Submission/Eventized Microstructure Modeling with Large Language Models.pdf",
                   "完整论文 PDF"),
         "notes": [],
         "relevance": "The scholarly-output pillar: an original methodology contribution rather "
@@ -212,60 +212,44 @@ PROJECTS = [
                      "framework is only real once it executes under latency constraints.",
     },
     {
-        "slug": "trading-system-dashboard",
-        "name": "Investment Analysis Dashboard",
-        "zh": "智能投资分析专家仪表板",
-        "pillar": "fin",
-        "tagline": "Investment analysis dashboard with live market data and AI commentary.",
-        "summary": "An Express backend serving market summaries, sector performance, portfolio "
-                   "metrics by risk level, and generated investment advice, behind a Chart.js "
-                   "front end. Ships with four standalone research pages under templates/.",
-        "modules": [
-            ("server/app.js", "Express API：market-summary / sector-performance / generate-advice / portfolio-metrics"),
-            ("js/app.js", "前端交互与图表逻辑"),
-            ("index.html", "仪表板主界面"),
-            ("templates/", "四个独立研究页面（宏观、展望、组合、建议）"),
-        ],
-        "stack": ["Node.js", "Express", "Chart.js", "Tailwind CSS", "axios"],
-        "entry": "server/app.js",
-        "run": "cd project-1/trading-system-dashboard\nnpm install && npm start\n# http://localhost:3000",
-        "artifacts": [],
-        "pages": [
-            ("智能投资分析专家仪表板", "../project-1/trading-system-dashboard/index.html", "需启动服务", "warn"),
-            ("U.S. Stock Market Indicators", "../project-1/trading-system-dashboard/templates/macro-overview.html", "可直接打开", "ok"),
-            ("2025 投资展望", "../project-1/trading-system-dashboard/templates/prediction.html", "可直接打开", "ok"),
-            ("投资分析与市场展望", "../project-1/trading-system-dashboard/templates/portfolio-management.html", "可直接打开", "ok"),
-            ("Balanced Long-Term Portfolio", "../project-1/trading-system-dashboard/templates/investment-suggestion.html", "可直接打开", "ok"),
-        ],
-        "notes": [],
-        "relevance": "The delivery surface — where a model becomes a decision someone can act on.",
-    },
-    {
         "slug": "trading-system-dashboard-2",
         "name": "Trading Simulation Platform",
         "zh": "量化交易模拟与回测平台",
         "pillar": "fin",
         "tagline": "Quantitative trading dashboard with a strategy backtesting engine.",
-        "summary": "A second-generation platform: Express plus Socket.IO for real-time updates, "
-                   "with dedicated services for market data, portfolio state, instrument "
-                   "reference data, and backtesting.",
+        "summary": "A second-generation platform, and after the portfolio audit the single "
+                   "trading front end: Express plus Socket.IO for real-time updates, with "
+                   "dedicated services for market data, portfolio state, instrument reference "
+                   "data, backtesting, and — migrated from the retired Investment Analysis "
+                   "Dashboard — investment commentary and the four research pages.",
         "modules": [
             ("server.js", "Express + Socket.IO 服务入口"),
             ("services/BacktestService.js", "策略回测引擎"),
             ("services/MarketDataService.js", "行情数据服务"),
             ("services/PortfolioService.js", "组合状态管理"),
             ("services/InstrumentService.js", "金融工具参考数据"),
-            ("routes/", "backtest / marketData / portfolio / strategy / trading 五组路由"),
+            ("routes/", "backtest / marketData / portfolio / strategy / trading / advisory 六组路由"),
+            ("services/AdvisoryService.js", "投资建议生成（自已退役的 Dashboard 迁入）"),
+            ("public/research/", "四个独立研究页面（自 Dashboard 迁入）"),
         ],
         "stack": ["Node.js", "Express", "Socket.IO", "Chart.js", "Jest", "webpack"],
         "entry": "server.js",
         "run": "cd project-1/trading-system-dashboard-2\nnpm install && npm start\n# http://localhost:3000",
         "artifacts": [],
         "pages": [
-            ("Trading Simulation Platform", "../project-1/trading-system-dashboard-2/public/index.html", "需启动服务", "warn"),
-            ("金融工具分析平台", "../project-1/trading-system-dashboard-2/public/instruments.html", "可直接打开", "ok"),
+            ("Trading Simulation Platform", "../trading-system-dashboard-2/public/index.html", "需启动服务", "warn"),
+            ("金融工具分析平台", "../trading-system-dashboard-2/public/instruments.html", "可直接打开", "ok"),
+            ("U.S. Stock Market Indicators", "../trading-system-dashboard-2/public/research/macro-overview.html", "可直接打开", "ok"),
+            ("2025 投资展望", "../trading-system-dashboard-2/public/research/prediction.html", "可直接打开", "ok"),
+            ("投资分析与市场展望", "../trading-system-dashboard-2/public/research/portfolio-management.html", "可直接打开", "ok"),
+            ("Balanced Long-Term Portfolio", "../trading-system-dashboard-2/public/research/investment-suggestion.html", "可直接打开", "ok"),
         ],
         "notes": [
+            ("mute", "Consolidation",
+             "Investment Analysis Dashboard 已退役并移入 <code class='path'>archive/</code>。"
+             "其独有的投资建议生成迁入本项目的 <code class='path'>/api/advisory/*</code>，"
+             "四个研究页面迁入 <code class='path'>public/research/</code>。"
+             "迁移时把 Google AI 密钥从源码字面量改为读取 <code class='path'>GOOGLE_AI_API_KEY</code> 环境变量。"),
             ("mute", "Repo hygiene",
              "该项目的 <code class='path'>node_modules/</code> 被提交进了版本库（12,979 个文件）。"
              "已加入 <code class='path'>.gitignore</code> 防止继续增长，但历史文件仍在跟踪中。"),
@@ -465,7 +449,7 @@ PILLAR_CARDS = [
      "institutions and regulators before local failures become systemic ones.",
      ["portfolio-optimization-engine", "financial-network-risk", "volatility-forecasting",
       "credit-risk-ai", "high-frequency-strategy", "live-trading-engine",
-      "trading-system-dashboard", "trading-system-dashboard-2", "giant-portfolio"]),
+      "trading-system-dashboard-2", "giant-portfolio"]),
     ("hea", "Healthcare Safety", "医疗安全",
      "Calibrated, interpretable clinical decision support — early-warning models whose "
      "false-alarm behaviour is understood well enough to be trusted at the bedside.",

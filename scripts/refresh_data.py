@@ -29,7 +29,7 @@ HOLDINGS_DATA_SOURCE_ID = "d4057fe8-abca-447f-adc8-b1013d014c52"
 DIRECTORY_DATA_SOURCE_ID = "22fa9897-a214-44b7-8e2b-189e3e438580"
 NOTION_VERSION = "2025-09-03"
 OUTPUT_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "giant-portfolio", "data.json"
+    os.path.dirname(__file__), "..", "project-1", "giant-portfolio", "data.json"
 )
 PAGE_SIZE = 100
 
