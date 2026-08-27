@@ -62,6 +62,20 @@ data actually changed — which redeploys the affected site.
 Secrets: `NOTION_TOKEN` for the tracker, `SEC_USER_AGENT` for filings (SEC
 requires a contact string on every API request, e.g. `Jane Doe jane@example.com`).
 
+## Project inventory
+
+[`project-overview.xlsx`](project-overview.xlsx) lists every project here —
+built, research, retired, third-party, and planned — with its core idea, the
+non-obvious decision behind it, status, stack, and entry point. Regenerate it
+after adding or retiring a project:
+
+```bash
+python scripts/build_overview.py
+```
+
+The table at the top of that script is the source of truth; the Summary sheet
+counts by status with formulas rather than hardcoded totals.
+
 ## Roadmap
 
 `roadmap/` holds scoping documents for work that is planned but **not
