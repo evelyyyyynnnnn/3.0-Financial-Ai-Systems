@@ -49,7 +49,11 @@ class _Text(HTMLParser):
 
     def handle_data(self, data):
         if not self._skip:
-            self.parts.append(data)
+            # Source-file line wrapping inside a tag is not a paragraph break.
+            # Keeping those newlines splits single sentences into fragments,
+            # and every sentence-level operation downstream then works on half
+            # a sentence. Only tags may end a line.
+            self.parts.append(data.replace("\n", " ").replace("\r", " "))
 
 
 def html_to_text(raw: bytes | str) -> str:
