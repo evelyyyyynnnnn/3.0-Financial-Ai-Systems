@@ -140,9 +140,9 @@ svg.chart{display:block;width:100%;height:auto}
 <section>
   <h2>This run</h2>
   <div class="stack-lg">
-    <div class="metrics"><div class="metric"><span class="mk">Material changes found</span><span class="mv">6/6</span><span class="mn">100% of labelled changes</span></div><div class="metric"><span class="mk">False alarms</span><span class="mv">0</span><span class="mn">on the identical-filings pair</span></div><div class="metric"><span class="mk">Throughput</span><span class="mv">6,554,738</span><span class="mn">characters per second</span></div><div class="metric"><span class="mk">Filings from EDGAR</span><span class="mv">0</span><span class="mn">the client is unexercised</span></div></div>
+    <div class="metrics"><div class="metric"><span class="mk">Material changes found</span><span class="mv">6/6</span><span class="mn">100% of labelled changes</span></div><div class="metric"><span class="mk">False alarms</span><span class="mv">0</span><span class="mn">on the identical-filings pair</span></div><div class="metric"><span class="mk">Throughput</span><span class="mv">6,464,545</span><span class="mn">characters per second</span></div><div class="metric"><span class="mk">Filings from EDGAR</span><span class="mv">0</span><span class="mn">the client is unexercised</span></div></div>
     <p class="mono" style="color:var(--muted);font-size:12.5px">
-      generated 2026-08-31T21:15:10+00:00 &middot; 3 authored filing pairs with labelled changes (src/corpus.py)
+      generated 2026-08-31T21:50:23+00:00 &middot; 3 authored filing pairs with labelled changes (src/corpus.py)
     </p>
     <div class="tw"><table><thead><tr><th>Company</th><th>Periods</th><th>Added</th><th>Removed</th><th>Reworded</th><th>Unchanged</th><th>Tests</th></tr></thead><tbody><tr><td>Meridian Components</td><td>FY2023 → FY2024</td><td class="n">1</td><td class="n">1</td><td class="n">1</td><td class="n">1</td><td>One added, one removed, one materially reworded with a changed concentration figure, one untouched.</td></tr><tr><td>Harborline Bancorp</td><td>FY2023 → FY2024</td><td class="n">1</td><td class="n">0</td><td class="n">2</td><td class="n">1</td><td>Two rewordings, one addition, nothing removed. The interest-rate risk is byte-identical and must not be reported as changed.</td></tr><tr><td>Steadfast Services</td><td>FY2023 → FY2024</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">2</td><td>Identical filings. A change detector that reports anything here is producing noise, which is the failure mode that makes these tools ignored in practice.</td></tr></tbody></table></div>
   </div>
@@ -181,7 +181,7 @@ svg.chart{display:block;width:100%;height:auto}
 <section>
   <h2>Timing, and the number that is missing</h2>
   <div class="stack-lg">
-    <div class="tw"><table><thead><tr><th>Measure</th><th>Value</th></tr></thead><tbody><tr><td>Characters processed per second</td><td>6,554,738</td></tr><tr><td>Time for one pass over the corpus</td><td>0.6 ms</td></tr><tr><td>Human baseline measured</td><td>NO</td></tr></tbody></table></div>
+    <div class="tw"><table><thead><tr><th>Measure</th><th>Value</th></tr></thead><tbody><tr><td>Characters processed per second</td><td>6,464,545</td></tr><tr><td>Time for one pass over the corpus</td><td>0.6 ms</td></tr><tr><td>Human baseline measured</td><td>NO</td></tr></tbody></table></div>
     <div class="note">
       <h3>No time-saving percentage is claimed</h3>
       <p>Throughput is measured and reported above. A <em>reduction</em> figure needs
