@@ -1,0 +1,240 @@
+{
+  "generated_at": "2026-08-31T18:43:07+00:00",
+  "is_synthetic": true,
+  "data_source": "3 authored filing pairs with labelled changes (src/corpus.py)",
+  "edgar_configured": false,
+  "edgar_used_in_this_run": false,
+  "corpus": {
+    "n_pairs": 3,
+    "n_added": 2,
+    "n_removed": 1,
+    "n_reworded": 3,
+    "n_unchanged": 4
+  },
+  "scoring": {
+    "pairs": [
+      {
+        "company": "Meridian Components",
+        "periods": "FY2023 \u2192 FY2024",
+        "n_prior_risks": 3,
+        "n_current_risks": 3,
+        "counts": {
+          "added": 1,
+          "removed": 1,
+          "reworded": 1,
+          "unchanged": 1,
+          "total": 4,
+          "material": 3
+        },
+        "expected_material": 3,
+        "per_kind": {
+          "added": {
+            "expected": 1,
+            "found": 1,
+            "missed": []
+          },
+          "removed": {
+            "expected": 1,
+            "found": 1,
+            "missed": []
+          },
+          "reworded": {
+            "expected": 1,
+            "found": 1,
+            "missed": []
+          },
+          "unchanged": {
+            "expected": 1,
+            "found": 1,
+            "missed": []
+          }
+        },
+        "changes": [
+          {
+            "kind": "reworded",
+            "similarity": 0.6757,
+            "numbers_changed": [
+              "2024",
+              "42"
+            ],
+            "summary": "REWORDED: We depend on a limited number of suppliers for critical components. A single supplier\u2026 (figures changed: 2024, 42; 68% similar)",
+            "current": "We depend on a limited number of suppliers for critical components. A single supplier\naccounted for 42 percent of component purchases during fiscal 2024, compared with 31\npercent in fiscal 2023. This concentration has increased, and any interruption in supply\ncould materially affect our ability to meet customer demand and could require us to\nqualify alternative sources on an accelerated timeline.",
+            "prior": "We depend on a limited number of suppliers for critical components. A single supplier\naccounted for 31 percent of component purchases during fiscal 2023. Any interruption in\nsupply could materially affect our ability to meet customer demand."
+          },
+          {
+            "kind": "unchanged",
+            "similarity": 1.0,
+            "numbers_changed": [],
+            "summary": "unchanged: Our operating results may fluctuate significantly from quarter to quarter due to the timing\u2026",
+            "current": "Our operating results may fluctuate significantly from quarter to quarter due to the\ntiming of large orders, changes in customer mix, and the seasonality of demand in our\nprincipal end markets.",
+            "prior": "Our operating results may fluctuate significantly from quarter to quarter due to the\ntiming of large orders, changes in customer mix, and the seasonality of demand in our\nprincipal end markets."
+          },
+          {
+            "kind": "added",
+            "similarity": 0.0488,
+            "numbers_changed": [],
+            "summary": "NEW: We are subject to evolving data protection and artificial intelligence regulation in the jurisdictions\u2026",
+            "current": "We are subject to evolving data protection and artificial intelligence regulation in the\njurisdictions in which we operate. Compliance with new requirements may increase our\ncosts, and failure to comply could result in penalties or restrictions on our products.",
+            "prior": ""
+          },
+          {
+            "kind": "removed",
+            "similarity": 0.0,
+            "numbers_changed": [],
+            "summary": "REMOVED: We face intense competition in all of our markets. Some of our competitors have\u2026",
+            "current": "",
+            "prior": "We face intense competition in all of our markets. Some of our competitors have greater\nfinancial and technical resources than we do, and may be able to respond more quickly to\nnew technologies or customer requirements."
+          }
+        ],
+        "note": "One added, one removed, one materially reworded with a changed concentration figure, one untouched."
+      },
+      {
+        "company": "Harborline Bancorp",
+        "periods": "FY2023 \u2192 FY2024",
+        "n_prior_risks": 3,
+        "n_current_risks": 4,
+        "counts": {
+          "added": 1,
+          "removed": 0,
+          "reworded": 2,
+          "unchanged": 1,
+          "total": 4,
+          "material": 3
+        },
+        "expected_material": 3,
+        "per_kind": {
+          "added": {
+            "expected": 1,
+            "found": 1,
+            "missed": []
+          },
+          "removed": {
+            "expected": 0,
+            "found": 0,
+            "missed": []
+          },
+          "reworded": {
+            "expected": 2,
+            "found": 2,
+            "missed": []
+          },
+          "unchanged": {
+            "expected": 1,
+            "found": 1,
+            "missed": []
+          }
+        },
+        "changes": [
+          {
+            "kind": "unchanged",
+            "similarity": 1.0,
+            "numbers_changed": [],
+            "summary": "unchanged: Changes in interest rates may adversely affect our net interest margin. A sustained period\u2026",
+            "current": "Changes in interest rates may adversely affect our net interest margin. A sustained\nperiod of elevated rates could reduce loan demand and increase funding costs.",
+            "prior": "Changes in interest rates may adversely affect our net interest margin. A sustained\nperiod of elevated rates could reduce loan demand and increase funding costs."
+          },
+          {
+            "kind": "reworded",
+            "similarity": 0.4828,
+            "numbers_changed": [
+              "18",
+              "24"
+            ],
+            "summary": "REWORDED: We are exposed to credit risk in our commercial real estate portfolio, which represented\u2026 (figures changed: 18, 24; 48% similar)",
+            "current": "We are exposed to credit risk in our commercial real estate portfolio, which represented\n24 percent of total loans at year end. Office exposure within that portfolio has\nexperienced valuation declines, and we increased our allowance for credit losses\naccordingly during the period.",
+            "prior": "We are exposed to credit risk in our commercial real estate portfolio, which represented\n18 percent of total loans at year end."
+          },
+          {
+            "kind": "reworded",
+            "similarity": 0.6667,
+            "numbers_changed": [],
+            "summary": "REWORDED: Our business depends on the continued availability of deposits. A significant withdrawal of deposits\u2026 (67% similar)",
+            "current": "Our business depends on the continued availability of deposits. A significant withdrawal\nof deposits over a short period could require us to obtain funding on less favourable\nterms, and recent industry events have increased the speed at which deposits may move.",
+            "prior": "Our business depends on the continued availability of deposits. A significant withdrawal\nof deposits over a short period could require us to obtain funding on less favourable\nterms."
+          },
+          {
+            "kind": "added",
+            "similarity": 0.0,
+            "numbers_changed": [],
+            "summary": "NEW: We rely on third-party cloud infrastructure for core banking functions. A prolonged outage at\u2026",
+            "current": "We rely on third-party cloud infrastructure for core banking functions. A prolonged\noutage at a major provider could interrupt customer access to accounts.",
+            "prior": ""
+          }
+        ],
+        "note": "Two rewordings, one addition, nothing removed. The interest-rate risk is byte-identical and must not be reported as changed."
+      },
+      {
+        "company": "Steadfast Services",
+        "periods": "FY2023 \u2192 FY2024",
+        "n_prior_risks": 2,
+        "n_current_risks": 2,
+        "counts": {
+          "added": 0,
+          "removed": 0,
+          "reworded": 0,
+          "unchanged": 2,
+          "total": 2,
+          "material": 0
+        },
+        "expected_material": 0,
+        "per_kind": {
+          "added": {
+            "expected": 0,
+            "found": 0,
+            "missed": []
+          },
+          "removed": {
+            "expected": 0,
+            "found": 0,
+            "missed": []
+          },
+          "reworded": {
+            "expected": 0,
+            "found": 0,
+            "missed": []
+          },
+          "unchanged": {
+            "expected": 2,
+            "found": 2,
+            "missed": []
+          }
+        },
+        "changes": [
+          {
+            "kind": "unchanged",
+            "similarity": 1.0,
+            "numbers_changed": [],
+            "summary": "unchanged: Our results depend on general economic conditions in the markets we serve. A downturn\u2026",
+            "current": "Our results depend on general economic conditions in the markets we serve. A downturn\ncould reduce demand for our services and affect our results of operations.",
+            "prior": "Our results depend on general economic conditions in the markets we serve. A downturn\ncould reduce demand for our services and affect our results of operations."
+          },
+          {
+            "kind": "unchanged",
+            "similarity": 1.0,
+            "numbers_changed": [],
+            "summary": "unchanged: We may not realise the anticipated benefits of our acquisitions. Integration may take longer\u2026",
+            "current": "We may not realise the anticipated benefits of our acquisitions. Integration may take\nlonger or cost more than expected.",
+            "prior": "We may not realise the anticipated benefits of our acquisitions. Integration may take\nlonger or cost more than expected."
+          }
+        ],
+        "note": "Identical filings. A change detector that reports anything here is producing noise, which is the failure mode that makes these tools ignored in practice."
+      }
+    ],
+    "material_expected": 6,
+    "material_found": 6,
+    "recall": 1.0,
+    "false_alarms_on_unchanged_pairs": 0,
+    "n_quiet_pairs": 1
+  },
+  "timing": {
+    "seconds_per_corpus_pass": 0.00093,
+    "chars_processed": 3781,
+    "chars_per_second": 4052620,
+    "human_baseline_measured": false
+  },
+  "toc_check": {
+    "picked_the_body_not_the_toc": true,
+    "picked_len": 1405,
+    "n_occurrences": 2
+  }
+}

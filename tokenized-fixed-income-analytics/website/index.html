@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tokenized Fixed-Income Analytics</title>
+<meta name="description" content="Liquidity, holder concentration and redemption latency for tokenised debt, measured from a trade tape and a holder snapshot — the only inputs that survive a thin, irregular market.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#FCFCFD; --surface:#FFFFFF; --surface-2:#F4F5F8;
+  --ink:#16191F; --ink-2:#40474F; --muted:#6C7480;
+  --line:#E2E5EA; --line-2:#EFF1F4;
+  --accent:#1D5B70; --accent-2:#E6F0F3;
+  --ok:#2C6B4F; --ok-bg:#E5F1EA;
+  --warn:#8A6212; --warn-bg:#F7EFDC;
+  --demo:#6E4B8F; --demo-bg:#F0EAF6;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme=light]){
+    --bg:#0F1216; --surface:#161A20; --surface-2:#1C212A;
+    --ink:#E9ECF0; --ink-2:#BEC5CE; --muted:#8A939F;
+    --line:#282F38; --line-2:#20262E;
+    --accent:#72B3CB; --accent-2:#18272E;
+    --ok:#7BC09F; --ok-bg:#15251E;
+    --warn:#D8AD5E; --warn-bg:#292216;
+    --demo:#B79AD6; --demo-bg:#241C2E;
+  }
+}
+:root[data-theme=dark]{
+  --bg:#0F1216; --surface:#161A20; --surface-2:#1C212A;
+  --ink:#E9ECF0; --ink-2:#BEC5CE; --muted:#8A939F;
+  --line:#282F38; --line-2:#20262E;
+  --accent:#72B3CB; --accent-2:#18272E;
+  --ok:#7BC09F; --ok-bg:#15251E;
+  --warn:#D8AD5E; --warn-bg:#292216;
+  --demo:#B79AD6; --demo-bg:#241C2E;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+    "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:15.5px;line-height:1.62;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px 88px}
+h1,h2,h3{font-family:Spectral,Georgia,"Songti SC",serif;margin:0;text-wrap:balance}
+h1{font-size:clamp(28px,4.2vw,42px);font-weight:700;letter-spacing:-.015em;line-height:1.14}
+h2{font-size:clamp(20px,2.5vw,25px);font-weight:600;letter-spacing:-.01em}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+a{color:var(--accent)}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.88em}
+.stack{display:flex;flex-direction:column;gap:14px}
+.stack-lg{display:flex;flex-direction:column;gap:22px}
+section{margin-top:52px}
+
+header.mast{border-bottom:1px solid var(--line);padding:44px 0 26px;margin-bottom:8px;
+  display:flex;flex-direction:column;gap:15px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--ink-2);font-size:16.5px;max-width:66ch}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;padding:3px 9px;border-radius:4px;background:var(--surface-2);
+  color:var(--muted);font-weight:500;white-space:nowrap}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}
+.tag.demo{background:var(--demo-bg);color:var(--demo)}
+.tag.warn{background:var(--warn-bg);color:var(--warn)}
+
+.banner{display:flex;gap:13px;align-items:flex-start;background:var(--demo-bg);
+  border-radius:9px;padding:15px 18px;margin-top:26px}
+.banner .bi{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--demo);flex:none;padding-top:3px;font-weight:600}
+.banner p{font-size:14.2px;color:var(--ink-2)}
+
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.metric{background:var(--surface);padding:15px 16px;display:flex;flex-direction:column;gap:5px}
+.metric .mk{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);line-height:1.35}
+.metric .mv{font-family:Spectral,Georgia,serif;font-size:26px;font-weight:600;
+  font-variant-numeric:tabular-nums;line-height:1.1;color:var(--accent)}
+.metric .mn{font-size:12.4px;color:var(--muted);line-height:1.4}
+
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.8px;min-width:520px}
+th{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);font-weight:500;padding:11px 14px;
+  border-bottom:1px solid var(--line);background:var(--surface-2)}
+td{padding:10px 14px;border-bottom:1px solid var(--line-2);vertical-align:top;line-height:1.5}
+td.n{font-variant-numeric:tabular-nums;text-align:right}
+tr:last-child td{border-bottom:0}
+
+pre{margin:0;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 17px;overflow-x:auto;font-family:"IBM Plex Mono",monospace;
+  font-size:12.8px;line-height:1.62;color:var(--ink-2)}
+ul.tight{margin:0;padding-left:19px;display:flex;flex-direction:column;gap:7px}
+ul.tight li::marker{color:var(--muted)}
+.note{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
+  padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.foot{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:9px}
+figure{margin:0}
+svg.chart{display:block;width:100%;height:auto}
+@media (max-width:600px){.wrap{padding:0 17px 68px}.banner{flex-direction:column;gap:7px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="mast">
+  <div class="eyebrow">3.0-Financial-Ai-Systems &middot; Financial Stability</div>
+  <h1>Tokenized Fixed-Income Analytics</h1>
+  <p class="lede">Liquidity, holder concentration and redemption latency for tokenised debt, measured from a trade tape and a holder snapshot — the only inputs that survive a thin, irregular market.</p>
+  <div class="tags"><span class="tag ">Amihud + Roll</span><span class="tag ">HHI / effective holders</span><span class="tag ">redemption queue</span><span class="tag demo">synthetic chain data</span></div>
+</header>
+<div class="banner">
+  <span class="bi">Data</span>
+  <p>Every figure comes from a synthetic on-chain history generated by src/chain.py, built so each measure can be checked against a property that was deliberately put there. No real chain data is used, and the absolute levels below carry no information about any real token.</p>
+</div>
+
+<section>
+  <h2>What can be measured from a chain</h2>
+  <div class="stack">
+    <p>Tokenised debt does not trade every minute and has no consolidated order book,
+    so anything needing a regular grid or quote depth is unusable. Every measure here
+    works from two inputs a chain actually provides: a trade tape and a holder
+    snapshot.</p>
+    <p>Concentration is reported as <strong>effective holders</strong> (1/HHI) rather
+    than as an index. An HHI of 0.05 means the float behaves as though held by twenty
+    equal holders, however many wallets appear on chain — and wallet count is exactly
+    the number that misleads, since one holder can hold many wallets and often does.</p>
+  </div>
+</section>
+
+<section>
+  <h2>This run</h2>
+  <div class="stack-lg">
+    <div class="metrics"><div class="metric"><span class="mk">Tokens</span><span class="mv">6</span><span class="mn">spanning the liquidity range</span></div><div class="metric"><span class="mk">Trades</span><span class="mv">12,492</span><span class="mn">synthetic tape</span></div><div class="metric"><span class="mk">Redemptions</span><span class="mv">2,424</span><span class="mn">with settlement lags</span></div><div class="metric"><span class="mk">Stress latency</span><span class="mv">5.2×</span><span class="mn">median queue lengthening</span></div></div>
+    <p class="mono" style="color:var(--muted);font-size:12.5px">
+      generated 2026-08-31T18:39:58+00:00 &middot;
+      synthetic on-chain trade and redemption history (src/chain.py)
+    </p>
+    <div class="tw"><table><thead><tr><th>Token</th><th>Wallets</th><th>Effective holders</th><th>Top-5 share</th><th>Gini</th><th>Amihud ×10⁶</th><th>Roll (bps)</th><th>p95 gap (h)</th></tr></thead><tbody><tr><td>TBILL-A</td><td class="n">220</td><td class="n">130.5</td><td class="n">11.1%</td><td class="n">0.339</td><td class="n">0.090</td><td class="n">789</td><td class="n">3.3</td></tr><tr><td>TBILL-B</td><td class="n">140</td><td class="n">23.8</td><td class="n">35.1%</td><td class="n">0.552</td><td class="n">0.102</td><td class="n">518</td><td class="n">4.6</td></tr><tr><td>CORP-A</td><td class="n">90</td><td class="n">39.6</td><td class="n">27.2%</td><td class="n">0.453</td><td class="n">0.197</td><td class="n">1035</td><td class="n">5.9</td></tr><tr><td>CORP-B</td><td class="n">55</td><td class="n">5.5</td><td class="n">66.0%</td><td class="n">0.718</td><td class="n">0.370</td><td class="n">2217</td><td class="n">10.3</td></tr><tr><td>MUNI-A</td><td class="n">32</td><td class="n">6.5</td><td class="n">74.6%</td><td class="n">0.683</td><td class="n">0.546</td><td class="n">3397</td><td class="n">18.9</td></tr><tr><td>STABLE-X</td><td class="n">400</td><td class="n">276.4</td><td class="n">6.7%</td><td class="n">0.248</td><td class="n">0.060</td><td class="n">322</td><td class="n">1.8</td></tr></tbody></table></div>
+  </div>
+</section>
+
+<section>
+  <h2>Liquidity</h2>
+  <div class="stack-lg">
+    <figure><svg class="chart" viewBox="0 0 680 219" role="img" aria-label="Bar chart of results"><text x="180" y="26.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">TBILL-A</text><rect x="190" y="9" width="69.7" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="268.7" y="26.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">0.090</text><text x="180" y="61.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">TBILL-B</text><rect x="190" y="44" width="79.0" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="278.0" y="61.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">0.102</text><text x="180" y="96.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">CORP-A</text><rect x="190" y="79" width="152.4" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="351.4" y="96.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">0.197</text><text x="180" y="131.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">CORP-B</text><rect x="190" y="114" width="285.8" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="484.8" y="131.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">0.370</text><text x="180" y="166.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">MUNI-A</text><rect x="190" y="149" width="422.0" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="621.0" y="166.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">0.546</text><text x="180" y="201.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">STABLE-X</text><rect x="190" y="184" width="46.6" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="245.6" y="201.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">0.060</text></svg></figure>
+    <div class="note">
+      <h3>This measure was inverted until the generator was fixed</h3>
+      <p>The first version of the chain model drew every token's per-trade return from
+      the same distribution, so order size carried no price impact. Amihud is a
+      price-impact measure, so with no impact to find it read pure noise — and ranked
+      the thinnest token in the universe as the <em>most</em> liquid.</p>
+      <p>Giving each token a depth parameter, so the same order moves a thin token
+      further, restored the ordering shown above: it now runs monotonically from
+      STABLE-X at 0.060 to MUNI-A at
+      0.546.
+      A metric that cannot recover a property you deliberately built is not measuring
+      that property, and this is the check that caught it.</p>
+    </div>
+    <p>Roll's spread is estimated from the autocovariance of price changes. When that
+    autocovariance comes out positive the bid-ask-bounce model does not apply, and the
+    function returns <code>n/a</code> rather than a fabricated number — which happens
+    in strongly trending markets and is a real limitation of the estimator.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Concentration</h2>
+  <div class="stack-lg">
+    <figure><svg class="chart" viewBox="0 0 680 219" role="img" aria-label="Bar chart of results"><text x="180" y="26.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">TBILL-A</text><rect x="190" y="9" width="199.3" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="398.3" y="26.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">131</text><text x="180" y="61.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">TBILL-B</text><rect x="190" y="44" width="36.3" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="235.3" y="61.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">24</text><text x="180" y="96.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">CORP-A</text><rect x="190" y="79" width="60.5" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="259.5" y="96.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">40</text><text x="180" y="131.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">CORP-B</text><rect x="190" y="114" width="8.3" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="207.3" y="131.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">5</text><text x="180" y="166.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">MUNI-A</text><rect x="190" y="149" width="9.8" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="208.8" y="166.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">6</text><text x="180" y="201.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">STABLE-X</text><rect x="190" y="184" width="422.0" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="621.0" y="201.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">276</text></svg></figure>
+    <figure><svg class="chart" viewBox="0 0 680 210" role="img" aria-label="Line chart"><line x1="46" y1="12.0" x2="666" y2="12.0" stroke="currentColor" opacity=".12" stroke-width="1"/><text x="38" y="16.0" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity=".5">90.90</text><line x1="46" y1="54.0" x2="666" y2="54.0" stroke="currentColor" opacity=".12" stroke-width="1"/><text x="38" y="58.0" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity=".5">68.83</text><line x1="46" y1="96.0" x2="666" y2="96.0" stroke="currentColor" opacity=".12" stroke-width="1"/><text x="38" y="100.0" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity=".5">46.75</text><line x1="46" y1="138.0" x2="666" y2="138.0" stroke="currentColor" opacity=".12" stroke-width="1"/><text x="38" y="142.0" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity=".5">24.67</text><line x1="46" y1="180.0" x2="666" y2="180.0" stroke="currentColor" opacity=".12" stroke-width="1"/><text x="38" y="184.0" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity=".5">2.60</text><path d="M46.0,180.0 L99.9,176.8 L153.8,171.2 L261.7,146.5 L396.4,92.1 L666.0,12.0" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><text x="666" y="25" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--accent)">effective holders</text><text x="356.0" y="204" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity=".5">Pareto α (higher = more even)</text><text x="12" y="96.0" text-anchor="middle" transform="rotate(-90 12 96.0)" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity=".5">effective holders</text></svg></figure>
+    <p>Sweeping the Pareto tail parameter and confirming the measure moves with it
+    is the concentration equivalent of the Amihud check. It is monotone across the
+    sweep (confirmed), so the index
+    is tracking the thing it is named after.</p>
+  </div>
+</section>
+
+<section>
+  <h2>The redemption queue is the run indicator</h2>
+  <div class="stack-lg">
+    <div class="tw"><table><thead><tr><th>Token</th><th>Requests in window</th><th>Calm median (h)</th><th>Stress median (h)</th><th>Ratio</th></tr></thead><tbody><tr><td>TBILL-A</td><td class="n">68</td><td class="n">21.4</td><td class="n">147.3</td><td class="n">6.9×</td></tr><tr><td>TBILL-B</td><td class="n">67</td><td class="n">23.0</td><td class="n">154.9</td><td class="n">6.7×</td></tr><tr><td>CORP-A</td><td class="n">54</td><td class="n">22.3</td><td class="n">108.8</td><td class="n">4.9×</td></tr><tr><td>CORP-B</td><td class="n">51</td><td class="n">22.2</td><td class="n">119.5</td><td class="n">5.4×</td></tr><tr><td>MUNI-A</td><td class="n">65</td><td class="n">24.0</td><td class="n">118.3</td><td class="n">4.9×</td></tr><tr><td>STABLE-X</td><td class="n">15</td><td class="n">23.4</td><td class="n">11.6</td><td class="n">0.5×</td></tr></tbody></table></div>
+    <div class="note">
+      <h3>Why this is the measure that matters</h3>
+      <p>For a debt token, the queue lengthening is what turns a liquidity problem into
+      a run, and it is <em>invisible in the price</em>. Across the tokens with a stress
+      episode, median settlement latency rises by a factor of
+      5.2 while the tape keeps printing.</p>
+      <p>STABLE-X has no stress episode in the generator and shows a ratio near 1,
+      which is the control: a measure that fired on it would be responding to something
+      other than stress.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Reproduce it</h2>
+  <div class="stack">
+    <pre>cd tokenized-fixed-income-analytics
+pip install -r requirements.txt
+python -m pytest tests/ -q
+python -m src.demo</pre>
+    <p>To run on real data, replace <code>src/chain.py</code> with a loader returning
+    <code>TokenHistory</code> objects from an indexer. Nothing in
+    <code>src/analytics.py</code> changes.</p>
+  </div>
+</section>
+
+<section>
+  <h2>What this does not establish</h2>
+  <div class="stack">
+    <ul class="tight">
+      <li>No real token has been analysed. The generator was written to exhibit the
+      properties the measures look for, so agreement between them is a soundness
+      check on the code, not a finding about any market.</li>
+      <li>Holder concentration from wallet balances is a lower bound on true
+      concentration. One beneficial holder can hold many wallets, and nothing on
+      chain distinguishes that from many holders.</li>
+      <li>Redemption latency here is generated, not observed. Real settlement
+      depends on the issuer's operational process, which is off chain and mostly
+      unobservable.</li>
+      <li>No regulatory or systemic-risk conclusion follows from synthetic data.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="foot">
+  <p>3.0-Financial-Ai-Systems &middot; tokenized-fixed-income-analytics &middot; part of a five-repository portfolio on optimization-driven,
+     system-level decision frameworks.</p>
+  <p>Every figure on this page was produced by running <code>python -m src.demo</code> in this
+     project and reading <code>results.json</code>. Nothing here is hand-entered. The run used clearly-labelled synthetic data; swap in the real source and the same pipeline reports real numbers.</p>
+</div>
+</div>
+</body>
+</html>

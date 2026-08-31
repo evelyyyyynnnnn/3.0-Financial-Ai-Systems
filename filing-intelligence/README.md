@@ -1,69 +1,88 @@
 # Filing Intelligence
 
-> **Status: scaffold.** Structure only — no method, data or result is claimed
-> yet. Every "not yet measured" below is a real gap, not a placeholder to be
-> filled in with an estimate.
+> What CHANGED in a company's SEC risk disclosures since its prior filing — matched risk by risk, so reordering is not reported as change.
 
-**Repository:** `3.0-Financial-Ai-Systems`
-**NIW pillar (Dhanasar prong 1):** Financial Stability
-**Evidence value:** CORE — carries a scale claim that is currently unevidenced
+**Repository:** `3.0-Financial-Ai-Systems` &middot; **Pillar:** Financial Stability
 
-## Core idea
+## Status
 
-Report what CHANGED in a company's SEC risk disclosures since its prior filing, rather than summarising the filing.
+This is working code with a runnable demo and 0 tests. It is **not** a
+finished result.
 
-## Why it earns its place
+This run used three authored filing pairs with labelled changes, NOT filings from EDGAR. The EDGAR client in src/edgar.py is real and unexercised — running it against the live universe is the step that would turn this into evidence, and it has not been run. No scale claim and no time-saving percentage appears anywhere on this page.
 
-Carries two of the petition's scale claims. Simulated data underneath a real number is the sharpest RFE risk in the portfolio.
+Last run: `2026-08-31T18:43:07+00:00`
 
-## The petition claim it supports
+## Quick start
 
-> Automated analysis of 600+ U.S. corporate filings (10-K/10-Q); ~70% reduction in manual report-processing time.
-
-**What the portfolio shows today:** A real SEC EDGAR pipeline across 6 source files — but sample data ships with fictional issuers so the page renders before a live pull, and no timing measurement is recorded anywhere. Scale and measurement are both unevidenced.
-
-**Action required:** Run the real 600+ filings, quarantine the fictional sample, instrument a measured before/after on processing time, and publish the run log.
-
-Prior work to build on: `previous/project-2/filing-intelligence`.
-
-## Petition-grade checklist
-
-A project counts as petition-grade only when all five are true. None are yet.
-
-- [ ] Original work, authored here
-- [ ] A stated method (`docs/METHOD.md`)
-- [ ] Real data at a stated scale (`docs/DATA.md` — target: 600+ U.S. corporate filings (10-K / 10-Q))
-- [ ] A measured result (`results/README.md`)
-- [ ] A README a reviewer can follow, start to finish
-
-## Measured results
-
-Target scale: **600+ U.S. corporate filings (10-K / 10-Q)**
-
-| Metric | Baseline | Result | Out-of-sample |
-|---|---|---|---|
-| Filings processed (real, not sample) | _not yet measured_ | _not yet measured_ | _pending_ |
-| Manual report-processing time: before vs. after, measured | _not yet measured_ | _not yet measured_ | _pending_ |
-| Change-detection precision / recall | _not yet measured_ | _not yet measured_ | _pending_ |
-| Published run log | _not yet measured_ | _not yet measured_ | _pending_ |
-
-Populate this from `results/`. Do not cite any number in the petition that does
-not appear here with a run date behind it.
+```bash
+pip install -r requirements.txt
+python -m pytest tests/ -q     # 0 tests
+python -m src.demo             # runs everything, rewrites results/ and website/
+```
 
 ## Layout
 
 ```
-filing-intelligence/
-├── README.md        this file
-├── docs/
-│   ├── METHOD.md    what the method is and why it is non-obvious
-│   ├── DATA.md      source, scale, licence, and how to reproduce the pull
-│   └── EVIDENCE.md  the petition claim, the gap, and the exhibit it becomes
-├── src/             implementation
-├── data/            pointers and manifests — never raw licensed data
-├── results/         measured results, run logs, and the baseline comparison
-└── tests/           tests that establish the result is reproducible
+README.md
+data/
+  |-- README.md
+  |-- manifests/
+  |-- sample/
+docs/
+  |-- DATA.md
+  |-- EVIDENCE.md
+  |-- METHOD.md
+requirements.txt
+results/
+  |-- README.md
+  |-- latest.json
+src/
+  |-- .gitkeep
+  |-- __init__.py
+  |-- corpus.py
+  |-- demo.py
+  |-- diff.py
+  |-- edgar.py
+  |-- score.py
+  |-- sections.py
+  |-- site.py
+  |-- sitekit.py
+tests/
+  |-- .gitkeep
+  |-- test_filing.py
+website/
+  |-- README.md
+  |-- index.html
+  |-- results.json
+  |-- vercel.json
 ```
 
----
-Scaffold generated from `NIW_Project_Portfolio_and_Gap_Plan.xlsx` (sheets: Repo Build-Out Plan, Core Ideas at a Glance, NIW Claim vs Repo Evidence, Notion 创业 Alignment). Structure only — no results are claimed here yet.
+- `src/` &mdash; the implementation.
+- `tests/` &mdash; pytest suite. These guard behaviour, not just imports.
+- `results/latest.json` &mdash; the output of the last demo run. Every figure quoted
+  anywhere in this project traces back to this file.
+- `website/` &mdash; a self-contained static site, deployable to Vercel by copying the
+  folder into its own repository. See `website/README.md`.
+
+## The website
+
+`website/` has no build step. To deploy it independently:
+
+```bash
+cp -r website/ ../my-filing-intelligence-site && cd ../my-filing-intelligence-site
+git init && git add -A && git commit -m "site"
+vercel deploy --prod
+```
+
+The page is regenerated from `results.json` on every `python -m src.demo`, so the
+figures on the site and the figures the code produces cannot drift apart. Do not edit
+numbers on the page by hand.
+
+## Honesty note
+
+Everything in this project runs on clearly-labelled synthetic or authored data.
+Swap in the real source and the same pipeline reports real numbers &mdash; that is
+what the structure is for. Until that happens, nothing here should be cited as a
+measured result, and the site's closing section states explicitly what the project
+does not establish.

@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contagion Observatory</title>
+<meta name="description" content="Which crypto-equity links actually TRANSMIT stress, separated from the much larger set that merely move together — and what a shock to one asset does to the rest.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#FCFCFD; --surface:#FFFFFF; --surface-2:#F4F5F8;
+  --ink:#16191F; --ink-2:#40474F; --muted:#6C7480;
+  --line:#E2E5EA; --line-2:#EFF1F4;
+  --accent:#1D5B70; --accent-2:#E6F0F3;
+  --ok:#2C6B4F; --ok-bg:#E5F1EA;
+  --warn:#8A6212; --warn-bg:#F7EFDC;
+  --demo:#6E4B8F; --demo-bg:#F0EAF6;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme=light]){
+    --bg:#0F1216; --surface:#161A20; --surface-2:#1C212A;
+    --ink:#E9ECF0; --ink-2:#BEC5CE; --muted:#8A939F;
+    --line:#282F38; --line-2:#20262E;
+    --accent:#72B3CB; --accent-2:#18272E;
+    --ok:#7BC09F; --ok-bg:#15251E;
+    --warn:#D8AD5E; --warn-bg:#292216;
+    --demo:#B79AD6; --demo-bg:#241C2E;
+  }
+}
+:root[data-theme=dark]{
+  --bg:#0F1216; --surface:#161A20; --surface-2:#1C212A;
+  --ink:#E9ECF0; --ink-2:#BEC5CE; --muted:#8A939F;
+  --line:#282F38; --line-2:#20262E;
+  --accent:#72B3CB; --accent-2:#18272E;
+  --ok:#7BC09F; --ok-bg:#15251E;
+  --warn:#D8AD5E; --warn-bg:#292216;
+  --demo:#B79AD6; --demo-bg:#241C2E;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+    "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:15.5px;line-height:1.62;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px 88px}
+h1,h2,h3{font-family:Spectral,Georgia,"Songti SC",serif;margin:0;text-wrap:balance}
+h1{font-size:clamp(28px,4.2vw,42px);font-weight:700;letter-spacing:-.015em;line-height:1.14}
+h2{font-size:clamp(20px,2.5vw,25px);font-weight:600;letter-spacing:-.01em}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+a{color:var(--accent)}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.88em}
+.stack{display:flex;flex-direction:column;gap:14px}
+.stack-lg{display:flex;flex-direction:column;gap:22px}
+section{margin-top:52px}
+
+header.mast{border-bottom:1px solid var(--line);padding:44px 0 26px;margin-bottom:8px;
+  display:flex;flex-direction:column;gap:15px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--ink-2);font-size:16.5px;max-width:66ch}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;padding:3px 9px;border-radius:4px;background:var(--surface-2);
+  color:var(--muted);font-weight:500;white-space:nowrap}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}
+.tag.demo{background:var(--demo-bg);color:var(--demo)}
+.tag.warn{background:var(--warn-bg);color:var(--warn)}
+
+.banner{display:flex;gap:13px;align-items:flex-start;background:var(--demo-bg);
+  border-radius:9px;padding:15px 18px;margin-top:26px}
+.banner .bi{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--demo);flex:none;padding-top:3px;font-weight:600}
+.banner p{font-size:14.2px;color:var(--ink-2)}
+
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.metric{background:var(--surface);padding:15px 16px;display:flex;flex-direction:column;gap:5px}
+.metric .mk{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);line-height:1.35}
+.metric .mv{font-family:Spectral,Georgia,serif;font-size:26px;font-weight:600;
+  font-variant-numeric:tabular-nums;line-height:1.1;color:var(--accent)}
+.metric .mn{font-size:12.4px;color:var(--muted);line-height:1.4}
+
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.8px;min-width:520px}
+th{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);font-weight:500;padding:11px 14px;
+  border-bottom:1px solid var(--line);background:var(--surface-2)}
+td{padding:10px 14px;border-bottom:1px solid var(--line-2);vertical-align:top;line-height:1.5}
+td.n{font-variant-numeric:tabular-nums;text-align:right}
+tr:last-child td{border-bottom:0}
+
+pre{margin:0;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 17px;overflow-x:auto;font-family:"IBM Plex Mono",monospace;
+  font-size:12.8px;line-height:1.62;color:var(--ink-2)}
+ul.tight{margin:0;padding-left:19px;display:flex;flex-direction:column;gap:7px}
+ul.tight li::marker{color:var(--muted)}
+.note{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
+  padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.foot{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:9px}
+figure{margin:0}
+svg.chart{display:block;width:100%;height:auto}
+@media (max-width:600px){.wrap{padding:0 17px 68px}.banner{flex-direction:column;gap:7px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="mast">
+  <div class="eyebrow">3.0-Financial-Ai-Systems &middot; Financial Stability</div>
+  <h1>Contagion Observatory</h1>
+  <p class="lede">Which crypto-equity links actually TRANSMIT stress, separated from the much larger set that merely move together — and what a shock to one asset does to the rest.</p>
+  <div class="tags"><span class="tag ">tail dependence</span><span class="tag ">factor removal</span><span class="tag ">directed lead-lag</span><span class="tag demo">constructed ground truth</span></div>
+</header>
+<div class="banner">
+  <span class="bi">Data</span>
+  <p>The market here is synthetic, generated by src/market.py with a KNOWN set of transmitting edges. That is the point: correlation is everywhere in real market data and almost none of it is transmission, so a contagion method has to be tested where the true links are known. No real asset universe has been analysed.</p>
+</div>
+
+<section>
+  <h2>Correlation is not transmission</h2>
+  <div class="stack">
+    <p>A common factor makes every asset move together with no causal link at all, and
+    in a crypto-equity panel that factor is large. So a correlation-based edge set is
+    mostly false edges, and the whole problem is separating the two.</p>
+    <p>Two things do it. Removing the first principal component strips the shared
+    factor, leaving residual co-movement where a real link shows up. And using a
+    <em>lagged</em> correlation makes the measure directional, which a contemporaneous
+    correlation can never be.</p>
+  </div>
+</section>
+
+<section>
+  <h2>This run</h2>
+  <div class="stack-lg">
+    <div class="metrics"><div class="metric"><span class="mk">Assets</span><span class="mv">18</span><span class="mn">8 crypto / 10 equity</span></div><div class="metric"><span class="mk">Ordered pairs</span><span class="mv">306</span><span class="mn">7 truly linked</span></div><div class="metric"><span class="mk">Recall</span><span class="mv">100%</span><span class="mn">7 of 7 found</span></div><div class="metric"><span class="mk">Precision</span><span class="mv">0.16</span><span class="mn">37 false candidates</span></div></div>
+    <p class="mono" style="color:var(--muted);font-size:12.5px">
+      generated 2026-08-31T18:47:16+00:00 &middot; 1500 days &middot;
+      480 stress days (32%) &middot;
+      7 constructed edges
+    </p>
+    <div class="tw"><table><thead><tr><th>Source</th><th>Target</th><th>Strength</th><th>Active</th></tr></thead><tbody><tr><td>CRY1</td><td>CRY2</td><td class="n">0.45</td><td>always</td></tr><tr><td>CRY1</td><td>EQ1</td><td class="n">0.3</td><td>stress only</td></tr><tr><td>CRY2</td><td>EQ2</td><td class="n">0.26</td><td>stress only</td></tr><tr><td>EQ1</td><td>EQ3</td><td class="n">0.35</td><td>always</td></tr><tr><td>CRY3</td><td>CRY4</td><td class="n">0.4</td><td>always</td></tr><tr><td>EQ4</td><td>EQ5</td><td class="n">0.28</td><td>always</td></tr><tr><td>CRY1</td><td>EQ6</td><td class="n">0.22</td><td>stress only</td></tr></tbody></table></div>
+  </div>
+</section>
+
+<section>
+  <h2>Tail dependence measures the factor, not the link</h2>
+  <div class="stack-lg">
+    <div class="tw"><table><thead><tr><th>Pair</th><th>Link type</th><th>Tail lift — raw</th><th>Tail lift — residual</th></tr></thead><tbody><tr><td>CRY1-&gt;CRY2</td><td>always-on</td><td class="n">7.67</td><td class="n">0.13</td></tr><tr><td>CRY1-&gt;EQ1</td><td>stress-only</td><td class="n">6.07</td><td class="n">0.20</td></tr><tr><td>CRY2-&gt;EQ2</td><td>stress-only</td><td class="n">7.87</td><td class="n">5.73</td></tr><tr><td>EQ1-&gt;EQ3</td><td>always-on</td><td class="n">6.40</td><td class="n">5.13</td></tr><tr><td>CRY3-&gt;CRY4</td><td>always-on</td><td class="n">8.27</td><td class="n">0.00</td></tr><tr><td>EQ4-&gt;EQ5</td><td>always-on</td><td class="n">8.13</td><td class="n">0.53</td></tr><tr><td>CRY1-&gt;EQ6</td><td>stress-only</td><td class="n">7.40</td><td class="n">0.40</td></tr><tr><td>unlinked pairs (mean of 60)</td><td>none</td><td class="n">7.97</td><td class="n">1.29</td></tr></tbody></table></div>
+    <div class="note">
+      <h3>Read the last two columns against each other</h3>
+      <p>On <strong>raw returns</strong>, unlinked pairs show a tail lift of
+      7.97 —
+      <em>higher</em> than most of the genuinely linked pairs. Everything crashes
+      together because everything loads on the same factor, so tail dependence measured
+      on raw prices carries no information about transmission whatsoever.</p>
+      <p>On <strong>factor-removed residuals</strong>, unlinked pairs fall to
+      1.29 while real links survive at up
+      to 5.73. This is the
+      single most important number on the page: a tail-dependence figure quoted without
+      the factor removed is not evidence of contagion.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>The design that lost</h2>
+  <div class="stack-lg">
+    <div class="tw"><table><thead><tr><th>Scorer</th><th>Returns</th><th>Best F1</th><th>Precision</th><th>Recall</th><th>Median rank of true edges</th></tr></thead><tbody><tr><td>lagged_corr</td><td>factor removed</td><td class="n">0.275</td><td class="n">0.159</td><td class="n">1.000</td><td class="n">33</td></tr><tr><td>product</td><td>factor removed</td><td class="n">0.267</td><td class="n">0.250</td><td class="n">0.286</td><td class="n">118</td></tr><tr><td>product</td><td>raw</td><td class="n">0.222</td><td class="n">0.182</td><td class="n">0.286</td><td class="n">61</td></tr><tr><td>tail_lift</td><td>factor removed</td><td class="n">0.148</td><td class="n">0.100</td><td class="n">0.286</td><td class="n">169</td></tr><tr><td>lagged_corr</td><td>raw</td><td class="n">0.145</td><td class="n">0.083</td><td class="n">0.571</td><td class="n">46</td></tr><tr><td>tail_lift</td><td>raw</td><td class="n">0.024</td><td class="n">0.013</td><td class="n">0.286</td><td class="n">187</td></tr></tbody></table></div>
+    <div class="note">
+      <h3>Multiplying by tail lift was the original design, and it is worse</h3>
+      <p>Scoring each pair as |lagged correlation| × tail lift seemed obviously right:
+      combine a directional signal with a stress-specific one. It ranks the true edges
+      at a median position of
+      118
+      out of 306. Lagged correlation <em>alone</em> ranks them at
+      33.</p>
+      <p>The reason is visible in the table above: on residuals, several genuine links
+      have tail lift <em>below</em> 1, so the multiplier suppresses exactly the edges it
+      was added to surface. The whole grid is published rather than only the winning
+      row, because reporting the configuration that worked without the ones tried first
+      presents a searched result as a derived one.</p>
+    </div>
+    <figure><svg class="chart" viewBox="0 0 680 210" role="img" aria-label="Line chart"><line x1="46" y1="12.0" x2="666" y2="12.0" stroke="currentColor" opacity=".12" stroke-width="1"/><text x="38" y="16.0" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity=".5">1.00</text><line x1="46" y1="54.0" x2="666" y2="54.0" stroke="currentColor" opacity=".12" stroke-width="1"/><text x="38" y="58.0" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity=".5">0.76</text><line x1="46" y1="96.0" x2="666" y2="96.0" stroke="currentColor" opacity=".12" stroke-width="1"/><text x="38" y="100.0" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity=".5">0.52</text><line x1="46" y1="138.0" x2="666" y2="138.0" stroke="currentColor" opacity=".12" stroke-width="1"/><text x="38" y="142.0" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity=".5">0.28</text><line x1="46" y1="180.0" x2="666" y2="180.0" stroke="currentColor" opacity=".12" stroke-width="1"/><text x="38" y="184.0" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity=".5">0.05</text><path d="M46.0,180.0 L93.7,160.1 L141.4,164.3 L189.1,169.9 L236.8,172.7 L284.5,170.5 L332.2,176.3 L379.8,162.9 L427.5,162.9 L475.2,158.7 L522.9,144.0 L570.6,129.4 L618.3,100.0 L666.0,12.0" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><text x="666" y="25" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--accent)">precision</text><path d="M46.0,12.0 L93.7,12.0 L141.4,62.3 L189.1,112.6 L236.8,137.8 L284.5,137.8 L332.2,162.9 L379.8,162.9 L427.5,162.9 L475.2,162.9 L522.9,162.9 L570.6,162.9 L618.3,162.9 L666.0,162.9" fill="none" stroke="var(--warn)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><text x="666" y="40" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--warn)">recall</text><path d="M46.0,172.7 L93.7,139.7 L141.4,148.0 L189.1,158.7 L236.8,164.6 L284.5,162.0 L332.2,172.1 L379.8,162.9 L427.5,162.9 L475.2,161.0 L522.9,156.1 L570.6,152.9 L618.3,148.9 L666.0,144.0" fill="none" stroke="var(--ok)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><text x="666" y="55" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--ok)">F1</text><text x="356.0" y="204" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity=".5">threshold step (looser → stricter)</text><text x="12" y="96.0" text-anchor="middle" transform="rotate(-90 12 96.0)" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity=".5">score</text></svg></figure>
+  </div>
+</section>
+
+<section>
+  <h2>What the ranking actually looks like</h2>
+  <div class="stack-lg">
+    <div class="tw"><table><thead><tr><th>Rank</th><th>Source</th><th>Target</th><th>Lagged corr</th><th>Tail lift</th><th>Score</th><th>Real?</th></tr></thead><tbody><tr><td class="n">1</td><td>EQ1</td><td>EQ3</td><td class="n">0.7180</td><td class="n">5.13</td><td class="n">0.7180</td><td>yes</td></tr><tr><td class="n">2</td><td>EQ6</td><td>EQ3</td><td class="n">0.6790</td><td class="n">5.07</td><td class="n">0.6790</td><td>no</td></tr><tr><td class="n">3</td><td>EQ2</td><td>EQ3</td><td class="n">0.6028</td><td class="n">6.60</td><td class="n">0.6028</td><td>no</td></tr><tr><td class="n">4</td><td>CRY2</td><td>EQ3</td><td class="n">0.5663</td><td class="n">4.60</td><td class="n">0.5663</td><td>no</td></tr><tr><td class="n">5</td><td>CRY8</td><td>EQ3</td><td class="n">-0.5070</td><td class="n">0.53</td><td class="n">0.5070</td><td>no</td></tr><tr><td class="n">6</td><td>CRY4</td><td>EQ3</td><td class="n">0.4831</td><td class="n">4.00</td><td class="n">0.4831</td><td>no</td></tr><tr><td class="n">7</td><td>CRY6</td><td>EQ3</td><td class="n">-0.4752</td><td class="n">0.40</td><td class="n">0.4752</td><td>no</td></tr><tr><td class="n">8</td><td>EQ10</td><td>EQ3</td><td class="n">-0.3798</td><td class="n">0.27</td><td class="n">0.3798</td><td>no</td></tr><tr><td class="n">9</td><td>EQ5</td><td>EQ3</td><td class="n">0.3675</td><td class="n">2.67</td><td class="n">0.3675</td><td>no</td></tr><tr><td class="n">10</td><td>EQ8</td><td>EQ3</td><td class="n">-0.3670</td><td class="n">0.40</td><td class="n">0.3670</td><td>no</td></tr><tr><td class="n">11</td><td>CRY3</td><td>EQ3</td><td class="n">-0.3665</td><td class="n">0.33</td><td class="n">0.3665</td><td>no</td></tr><tr><td class="n">12</td><td>EQ1</td><td>EQ2</td><td class="n">0.3651</td><td class="n">7.80</td><td class="n">0.3651</td><td>no</td></tr><tr><td class="n">13</td><td>EQ6</td><td>EQ2</td><td class="n">0.3499</td><td class="n">7.40</td><td class="n">0.3499</td><td>no</td></tr><tr><td class="n">14</td><td>CRY5</td><td>EQ3</td><td class="n">-0.3474</td><td class="n">0.40</td><td class="n">0.3474</td><td>no</td></tr></tbody></table></div>
+    <p>At the best threshold the method finds <strong>7 of 7</strong>
+    real links and surfaces <strong>37</strong> false candidates alongside them.
+    That is a screening tool, not a detector: it takes 306 ordered
+    pairs down to roughly 44 worth a human look, and does not miss a real
+    link in doing so. Precision of 0.16 is the honest cost, and quoting
+    the recall without it would misdescribe what the method does.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Shock propagation</h2>
+  <div class="stack-lg">
+    <div class="tw"><table><thead><tr><th>Shocked asset</th><th>Assets reached</th><th>Total absolute impact</th><th>Path</th></tr></thead><tbody><tr><td>CRY1</td><td class="n">5</td><td class="n">0.2384</td><td>CRY2 → EQ1 → EQ6 → EQ2 → EQ3</td></tr><tr><td>CRY3</td><td class="n">1</td><td class="n">0.0800</td><td>CRY4</td></tr><tr><td>EQ4</td><td class="n">1</td><td class="n">0.0560</td><td>EQ5</td></tr><tr><td>EQ7</td><td class="n">0</td><td class="n">0.0000</td><td>nothing</td></tr></tbody></table></div>
+    <div class="note">
+      <h3>Two choices worth stating</h3>
+      <p>Shocks propagate through the <em>constructed</em> edge set, not the estimated
+      one. Pushing a shock through estimated edges compounds estimation error into a
+      confident-looking fan-out that is mostly artefact, and it conflates two separate
+      questions: can the network be recovered, and given a network, what does a shock do.</p>
+      <p>Only newly-received impact re-transmits. An earlier version carried each node's
+      accumulated total forward every round, so nodes re-emitted their whole balance and
+      a 20% shock produced 104% of total absolute impact — five times the energy that
+      entered the system. It now decays, as it must.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Reproduce it</h2>
+  <div class="stack">
+    <pre>cd contagion-observatory
+pip install -r requirements.txt
+python -m pytest tests/ -q
+python -m src.demo</pre>
+    <p>For real data, replace <code>src/market.py</code> with a loader returning a
+    returns matrix and asset classes. Everything in <code>src/contagion.py</code> is
+    unchanged — but note that a real panel has no ground-truth edge set, so the
+    recovery scores on this page have no real-data equivalent.</p>
+  </div>
+</section>
+
+<section>
+  <h2>What this does not establish</h2>
+  <div class="stack">
+    <ul class="tight">
+      <li>No real assets have been analysed. There is no 7,500-crypto or 6,000-equity
+      universe behind any figure here.</li>
+      <li>The generator was written by the same person as the method, and it embeds
+      the linear lagged structure the method looks for. Real transmission is not
+      linear and not one-day-lagged.</li>
+      <li>Recovery scores exist only because the edges were constructed. On real
+      data there is no ground truth, so the method can be validated only indirectly
+      — against known episodes, or out of sample.</li>
+      <li>Precision at best threshold is 0.16. This is a screening
+      tool that hands a human a shortlist, not something to act on unsupervised.</li>
+      <li>Propagation is a linear cascade with no capital constraints, no
+      liquidation dynamics and no feedback. It shows reachability, not loss.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="foot">
+  <p>3.0-Financial-Ai-Systems &middot; contagion-observatory &middot; part of a five-repository portfolio on optimization-driven,
+     system-level decision frameworks.</p>
+  <p>Every figure on this page was produced by running <code>python -m src.demo</code> in this
+     project and reading <code>results.json</code>. Nothing here is hand-entered. The run used clearly-labelled synthetic data; swap in the real source and the same pipeline reports real numbers.</p>
+</div>
+</div>
+</body>
+</html>
