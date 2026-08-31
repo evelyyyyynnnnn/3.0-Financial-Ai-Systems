@@ -4,6 +4,7 @@ import json, pathlib, sys
 from datetime import datetime, timezone
 import numpy as np
 from .chain import make_universe
+from . import analytics as an
 from .analytics import analyse, effective_holders, hhi
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -56,7 +57,106 @@ def run() -> dict:
     return results
 
 
+def run_real() -> dict:
+    """Measure concentration and activity on a real on-chain transfer tape.
+
+    Concentration is exact here in a way it never is for a conventional fund:
+    the chain is the register, so HHI and effective holders are counts, not
+    estimates from a survey.
+
+    The two price-based liquidity statistics are absent, and their absence is
+    the finding rather than a gap to be filled. A Transfer event has no price
+    in it. Substituting $1.00 for every transfer would produce a Roll spread of
+    exactly zero and an Amihud illiquidity of exactly zero, and both would be
+    artefacts of the placeholder rather than facts about the token.
+    """
+    import sys as _sys
+    _sys.path.insert(0, str(ROOT))
+    import numpy as _np
+    from data.load import load_tokens
+
+    tokens, meta = load_tokens(root=ROOT / "data")
+
+    rows = []
+    for tk, pv in zip(tokens, [p for p in meta["tokens"] if p["status"] == "ok"]):
+        held = tk.holders
+        sizes = tk.sizes()
+        times = tk.times()
+        supply = float(held.sum())
+        days = max(1.0, (float(times.max()) - float(times.min())) / 86400.0) \
+            if len(times) > 1 else 1.0
+
+        rows.append({
+            "symbol": tk.symbol,
+            "fund": pv["fund"],
+            "address": pv["address"],
+            "n_transfers": pv["n_transfers"],
+            "n_holders": int(len(held)),
+            "observed_supply": round(supply, 4),
+            "hhi": round(an.hhi(held), 6) if len(held) else None,
+            "effective_holders": round(an.effective_holders(held), 3)
+                                 if len(held) else None,
+            "top5_share": round(an.top_n_share(held, 5), 6) if len(held) else None,
+            "gini": round(an.gini(held), 6) if len(held) else None,
+            "turnover": round(an.turnover(sizes, supply, days), 6)
+                        if supply > 0 else None,
+            "gaps": an.trade_gap_stats(times) if len(times) > 1 else None,
+            "median_transfer": round(float(_np.median(sizes)), 4) if len(sizes) else None,
+            "amihud_illiquidity": None,
+            "roll_spread": None,
+        })
+    rows.sort(key=lambda r: -(r["n_transfers"] or 0))
+
+    results = {
+        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "is_synthetic": False,
+        "data_source": "Ethereum mainnet transfer logs, read through a public "
+                       "RPC endpoint; see data/MANIFEST.json for retrieval times",
+        "price_metrics_reported": False,
+        "price_metrics_withheld_because": meta["price_metrics_withheld_because"],
+        "holder_register_caveat": meta["holder_register_is_window_limited"],
+        "provenance": meta["tokens"],
+        "tokens": rows,
+    }
+    (ROOT / "results").mkdir(exist_ok=True)
+    (ROOT / "results" / "latest-real.json").write_text(
+        json.dumps(results, indent=2) + "\n", encoding="utf8")
+    return results
+
+
+def main_real() -> int:
+    from data.datakit import FetchError
+    try:
+        r = run_real()
+    except FetchError as exc:
+        print(f"cannot run on real data: {exc}", file=sys.stderr)
+        return 2
+    print(f"source: {r['data_source']}")
+    print(f"\n{'token':<8}{'transfers':>10}{'holders':>9}{'HHI':>10}"
+          f"{'eff.hold':>10}{'top5':>9}{'gini':>8}{'turnover':>10}")
+    for x in r["tokens"]:
+        def fmt(v, spec):
+            return format(v, spec) if v is not None else "-"
+        print(f"{x['symbol']:<8}{x['n_transfers']:>10}{x['n_holders']:>9}"
+              f"{fmt(x['hhi'], '>10.4f')}{fmt(x['effective_holders'], '>10.2f')}"
+              f"{fmt(x['top5_share'], '>9.2%')}{fmt(x['gini'], '>8.3f')}"
+              f"{fmt(x['turnover'], '>10.4f')}")
+    print("\nintervals between transfers:")
+    for x in r["tokens"]:
+        g = x["gaps"]
+        if g:
+            print(f"  {x['symbol']:<8} median {g.get('median_gap_s', 0)/3600:>8.2f} h, "
+                  f"longest {g.get('max_gap_s', 0)/86400:>6.2f} d")
+    print("\nAMIHUD ILLIQUIDITY AND ROLL SPREAD ARE NOT REPORTED: " +
+          r["price_metrics_withheld_because"])
+    print("\nholder register: " + r["holder_register_caveat"])
+    print("wrote results/latest-real.json")
+    return 0
+
+
 def main() -> int:
+    if "--real" in sys.argv[1:]:
+        return main_real()
     r = run()
     print(f"universe: {r['universe_size']} tokens, {r['total_trades']:,} trades, "
           f"{r['total_redemptions']:,} redemption requests")
