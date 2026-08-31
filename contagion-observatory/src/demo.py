@@ -110,7 +110,82 @@ def run() -> dict:
     return results
 
 
+def run_real() -> dict:
+    """Rank transmission links on the real tape, and shock the real names.
+
+    No recovery precision is reported. On the synthetic market the edge set is
+    known by construction, which is what makes precision meaningful there; on
+    the real tape it is the unknown being estimated. A precision number here
+    would be scored against a guess.
+    """
+    import sys as _sys
+    _sys.path.insert(0, str(ROOT))
+    from data.load import load_market
+
+    market, meta = load_market(root=ROOT / "data")
+    scores = edge_scores(market)
+
+    crypto = [n for n, c in market.classes.items() if c == "crypto"]
+    shocked = crypto[:2] + [n for n in ("spy.us", "xle.us") if n in market.names]
+    shocks = {n: propagate(market, n, magnitude=-0.20) for n in shocked}
+
+    results = {
+        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "is_synthetic": False,
+        "data_source": "real daily closes from Stooq (see data/MANIFEST.json for "
+                       "URLs, hashes and retrieval times)",
+        "universe": {
+            "n_assets": meta["n_assets"],
+            "n_crypto": sum(1 for v in market.classes.values() if v == "crypto"),
+            "n_equity": sum(1 for v in market.classes.values() if v == "equity"),
+            "n_days": meta["n_days"],
+            "first_date": meta["first_date"], "last_date": meta["last_date"],
+            "stress_days": int(market.stress_days.sum()),
+            "stress_share": round(float(market.stress_days.mean()), 4),
+            "n_candidate_pairs": len(scores),
+        },
+        "recovery_reported": False,
+        "recovery_withheld_because": meta["recovery_withheld_because"],
+        "provenance": meta["series"],
+        "top_edges": scores[:20],
+        "tail_raw": tail_vs_calm(market, remove_factor=False),
+        "tail_residual": tail_vs_calm(market, remove_factor=True),
+        "shocks": shocks,
+    }
+    (ROOT / "results").mkdir(exist_ok=True)
+    (ROOT / "results" / "latest-real.json").write_text(
+        json.dumps(results, indent=2) + "\n", encoding="utf8")
+    return results
+
+
+def main_real() -> int:
+    from data.datakit import FetchError
+    try:
+        r = run_real()
+    except FetchError as exc:
+        print(f"cannot run on real data: {exc}", file=sys.stderr)
+        return 2
+    u = r["universe"]
+    print(f"source: {r['data_source']}")
+    print(f"universe: {u['n_assets']} assets, {u['n_days']} common trading days "
+          f"({u['first_date']} .. {u['last_date']})")
+    print(f"stress days: {u['stress_days']} ({u['stress_share']:.1%})")
+    print("\ntop-ranked candidate links (NOT confirmed transmission):")
+    for e in r["top_edges"][:10]:
+        print(f"  {e['src']:>9} -> {e['dst']:<9} score {e['score']:+.4f} "
+              f"(lagged corr {e['lagged_corr']:+.4f})")
+    print("\nshock propagation, -20% to one asset:")
+    for name, sh in r["shocks"].items():
+        tot = sh.get("total_impact", sh.get("total", 0))
+        print(f"  {name:>9}: total absolute impact {tot:.4f}")
+    print("\nrecovery precision is NOT reported: " + r["recovery_withheld_because"])
+    print("wrote results/latest-real.json")
+    return 0
+
+
 def main() -> int:
+    if "--real" in sys.argv[1:]:
+        return main_real()
     r = run()
     u, b = r["universe"], r["best"]
     print(f"universe: {u['n_assets']} assets ({u['n_crypto']} crypto / "
