@@ -4,6 +4,7 @@ import json, pathlib, sys, time
 from datetime import datetime, timezone
 from .corpus import CORPUS, corpus_stats
 from .score import score_corpus
+from .diff import diff_risks, summarise
 from .sections import extract_risk_factors, find_item, split_risk_factors
 from .edgar import is_configured
 
@@ -62,7 +63,83 @@ def run() -> dict:
     return results
 
 
+def run_real() -> dict:
+    """Diff the real 10-K filings cached by `python -m data.fetch`.
+
+    What this can report and what it cannot are different questions. It can
+    report what changed, because the filings are real. It cannot report
+    precision or recall, because nobody has annotated which changes in a real
+    Apple 10-K are material -- there is no answer key. Reporting accuracy here
+    would mean inventing the denominator, so the field is absent rather than
+    zero.
+    """
+    import sys as _sys
+    _sys.path.insert(0, str(ROOT))
+    from data.load import load_pairs
+
+    pairs, prov = load_pairs(root=ROOT / "data")
+    reports = []
+    for pair in pairs:
+        prior = split_risk_factors(extract_risk_factors(pair.prior))
+        current = split_risk_factors(extract_risk_factors(pair.current))
+        changes = diff_risks(prior, current)
+        s = summarise(changes)
+        reports.append({
+            "company": pair.company,
+            "prior_period": pair.prior_period,
+            "current_period": pair.current_period,
+            "n_risks_prior": len(prior),
+            "n_risks_current": len(current),
+            "counts": s,
+            "examples": [{"kind": c.kind, "headline": (c.current or c.prior)[:180]}
+                         for c in changes if c.kind != "unchanged"][:5],
+        })
+
+    results = {
+        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "is_synthetic": False,
+        "data_source": "real 10-K filings retrieved from SEC EDGAR "
+                       "(see data/MANIFEST.json for URLs, hashes and retrieval times)",
+        "edgar_configured": is_configured(),
+        "edgar_used_in_this_run": True,
+        "accuracy_reported": False,
+        "accuracy_withheld_because": "real filing pairs carry no human-annotated "
+                                     "list of material changes, so there is no "
+                                     "denominator for precision or recall",
+        "provenance": prov,
+        "reports": reports,
+        "timing": timing(),
+    }
+    (ROOT / "results").mkdir(exist_ok=True)
+    (ROOT / "results" / "latest-real.json").write_text(
+        json.dumps(results, indent=2) + "\n", encoding="utf8")
+    return results
+
+
+def main_real() -> int:
+    from data.datakit import FetchError
+    try:
+        r = run_real()
+    except FetchError as exc:
+        print(f"cannot run on real data: {exc}", file=sys.stderr)
+        return 2
+    print(f"source: {r['data_source']}")
+    for rep in r["reports"]:
+        c = rep["counts"]
+        print(f"\n{rep['company']} {rep['prior_period']} -> {rep['current_period']}: "
+              f"{rep['n_risks_prior']} -> {rep['n_risks_current']} risk factors")
+        print(f"  {c.get('added', 0)} added, {c.get('removed', 0)} removed, "
+              f"{c.get('reworded', 0)} reworded, {c.get('unchanged', 0)} unchanged")
+        for ex in rep["examples"][:3]:
+            print(f"    [{ex['kind']}] {ex['headline'][:110]}")
+    print("\naccuracy is NOT reported: " + r["accuracy_withheld_because"])
+    print("wrote results/latest-real.json")
+    return 0
+
+
 def main() -> int:
+    if "--real" in sys.argv[1:]:
+        return main_real()
     r = run()
     c, s = r["corpus"], r["scoring"]
     print(f"corpus: {c['n_pairs']} filing pairs, "
