@@ -1,0 +1,924 @@
+{
+  "generated_at": "2026-08-31T18:47:16+00:00",
+  "is_synthetic": true,
+  "data_source": "synthetic multi-asset panel with a constructed edge set (src/market.py)",
+  "universe": {
+    "n_assets": 18,
+    "n_crypto": 8,
+    "n_equity": 10,
+    "n_days": 1500,
+    "stress_days": 480,
+    "stress_share": 0.32,
+    "n_true_edges": 7,
+    "n_candidate_pairs": 306
+  },
+  "best": {
+    "threshold": 0.0816,
+    "tp": 7,
+    "fp": 37,
+    "fn": 0,
+    "precision": 0.1591,
+    "recall": 1.0,
+    "f1": 0.2745,
+    "n_selected": 44,
+    "n_true": 7
+  },
+  "sweep": [
+    {
+      "threshold": 0.03156,
+      "tp": 7,
+      "fp": 146,
+      "fn": 0,
+      "precision": 0.0458,
+      "recall": 1.0,
+      "f1": 0.0875,
+      "n_selected": 153,
+      "n_true": 7
+    },
+    {
+      "threshold": 0.0816,
+      "tp": 7,
+      "fp": 37,
+      "fn": 0,
+      "precision": 0.1591,
+      "recall": 1.0,
+      "f1": 0.2745,
+      "n_selected": 44,
+      "n_true": 7
+    },
+    {
+      "threshold": 0.13164,
+      "tp": 5,
+      "fp": 32,
+      "fn": 2,
+      "precision": 0.1351,
+      "recall": 0.7143,
+      "f1": 0.2273,
+      "n_selected": 37,
+      "n_true": 7
+    },
+    {
+      "threshold": 0.18168,
+      "tp": 3,
+      "fp": 26,
+      "fn": 4,
+      "precision": 0.1034,
+      "recall": 0.4286,
+      "f1": 0.1667,
+      "n_selected": 29,
+      "n_true": 7
+    },
+    {
+      "threshold": 0.23171,
+      "tp": 2,
+      "fp": 21,
+      "fn": 5,
+      "precision": 0.087,
+      "recall": 0.2857,
+      "f1": 0.1333,
+      "n_selected": 23,
+      "n_true": 7
+    },
+    {
+      "threshold": 0.28175,
+      "tp": 2,
+      "fp": 18,
+      "fn": 5,
+      "precision": 0.1,
+      "recall": 0.2857,
+      "f1": 0.1481,
+      "n_selected": 20,
+      "n_true": 7
+    },
+    {
+      "threshold": 0.33179,
+      "tp": 1,
+      "fp": 14,
+      "fn": 6,
+      "precision": 0.0667,
+      "recall": 0.1429,
+      "f1": 0.0909,
+      "n_selected": 15,
+      "n_true": 7
+    },
+    {
+      "threshold": 0.38183,
+      "tp": 1,
+      "fp": 6,
+      "fn": 6,
+      "precision": 0.1429,
+      "recall": 0.1429,
+      "f1": 0.1429,
+      "n_selected": 7,
+      "n_true": 7
+    },
+    {
+      "threshold": 0.43187,
+      "tp": 1,
+      "fp": 6,
+      "fn": 6,
+      "precision": 0.1429,
+      "recall": 0.1429,
+      "f1": 0.1429,
+      "n_selected": 7,
+      "n_true": 7
+    },
+    {
+      "threshold": 0.48191,
+      "tp": 1,
+      "fp": 5,
+      "fn": 6,
+      "precision": 0.1667,
+      "recall": 0.1429,
+      "f1": 0.1538,
+      "n_selected": 6,
+      "n_true": 7
+    },
+    {
+      "threshold": 0.53195,
+      "tp": 1,
+      "fp": 3,
+      "fn": 6,
+      "precision": 0.25,
+      "recall": 0.1429,
+      "f1": 0.1818,
+      "n_selected": 4,
+      "n_true": 7
+    },
+    {
+      "threshold": 0.58198,
+      "tp": 1,
+      "fp": 2,
+      "fn": 6,
+      "precision": 0.3333,
+      "recall": 0.1429,
+      "f1": 0.2,
+      "n_selected": 3,
+      "n_true": 7
+    },
+    {
+      "threshold": 0.63202,
+      "tp": 1,
+      "fp": 1,
+      "fn": 6,
+      "precision": 0.5,
+      "recall": 0.1429,
+      "f1": 0.2222,
+      "n_selected": 2,
+      "n_true": 7
+    },
+    {
+      "threshold": 0.68206,
+      "tp": 1,
+      "fp": 0,
+      "fn": 6,
+      "precision": 1.0,
+      "recall": 0.1429,
+      "f1": 0.25,
+      "n_selected": 1,
+      "n_true": 7
+    }
+  ],
+  "top_edges": [
+    {
+      "src": "EQ1",
+      "dst": "EQ3",
+      "lagged_corr": 0.71796,
+      "tail_lift": 5.1333,
+      "score": 0.71796
+    },
+    {
+      "src": "EQ6",
+      "dst": "EQ3",
+      "lagged_corr": 0.67897,
+      "tail_lift": 5.0667,
+      "score": 0.67897
+    },
+    {
+      "src": "EQ2",
+      "dst": "EQ3",
+      "lagged_corr": 0.60277,
+      "tail_lift": 6.6,
+      "score": 0.60277
+    },
+    {
+      "src": "CRY2",
+      "dst": "EQ3",
+      "lagged_corr": 0.56631,
+      "tail_lift": 4.6,
+      "score": 0.56631
+    },
+    {
+      "src": "CRY8",
+      "dst": "EQ3",
+      "lagged_corr": -0.50695,
+      "tail_lift": 0.5333,
+      "score": 0.50695
+    },
+    {
+      "src": "CRY4",
+      "dst": "EQ3",
+      "lagged_corr": 0.48308,
+      "tail_lift": 4.0,
+      "score": 0.48308
+    },
+    {
+      "src": "CRY6",
+      "dst": "EQ3",
+      "lagged_corr": -0.47515,
+      "tail_lift": 0.4,
+      "score": 0.47515
+    },
+    {
+      "src": "EQ10",
+      "dst": "EQ3",
+      "lagged_corr": -0.37976,
+      "tail_lift": 0.2667,
+      "score": 0.37976
+    },
+    {
+      "src": "EQ5",
+      "dst": "EQ3",
+      "lagged_corr": 0.36748,
+      "tail_lift": 2.6667,
+      "score": 0.36748
+    },
+    {
+      "src": "EQ8",
+      "dst": "EQ3",
+      "lagged_corr": -0.36704,
+      "tail_lift": 0.4,
+      "score": 0.36704
+    },
+    {
+      "src": "CRY3",
+      "dst": "EQ3",
+      "lagged_corr": -0.36651,
+      "tail_lift": 0.3333,
+      "score": 0.36651
+    },
+    {
+      "src": "EQ1",
+      "dst": "EQ2",
+      "lagged_corr": 0.36511,
+      "tail_lift": 7.8,
+      "score": 0.36511
+    },
+    {
+      "src": "EQ6",
+      "dst": "EQ2",
+      "lagged_corr": 0.34986,
+      "tail_lift": 7.4,
+      "score": 0.34986
+    },
+    {
+      "src": "CRY5",
+      "dst": "EQ3",
+      "lagged_corr": -0.34744,
+      "tail_lift": 0.4,
+      "score": 0.34744
+    }
+  ],
+  "true_edges": [
+    {
+      "src": "CRY1",
+      "dst": "CRY2",
+      "strength": 0.45,
+      "stress_only": false
+    },
+    {
+      "src": "CRY1",
+      "dst": "EQ1",
+      "strength": 0.3,
+      "stress_only": true
+    },
+    {
+      "src": "CRY2",
+      "dst": "EQ2",
+      "strength": 0.26,
+      "stress_only": true
+    },
+    {
+      "src": "EQ1",
+      "dst": "EQ3",
+      "strength": 0.35,
+      "stress_only": false
+    },
+    {
+      "src": "CRY3",
+      "dst": "CRY4",
+      "strength": 0.4,
+      "stress_only": false
+    },
+    {
+      "src": "EQ4",
+      "dst": "EQ5",
+      "strength": 0.28,
+      "stress_only": false
+    },
+    {
+      "src": "CRY1",
+      "dst": "EQ6",
+      "strength": 0.22,
+      "stress_only": true
+    }
+  ],
+  "design_comparison": [
+    {
+      "scorer": "lagged_corr",
+      "returns": "factor removed",
+      "best_f1": 0.2745,
+      "precision": 0.1591,
+      "recall": 1.0,
+      "true_edge_ranks": [
+        1,
+        18,
+        26,
+        33,
+        36,
+        38,
+        39
+      ],
+      "median_rank": 33,
+      "n_pairs": 306
+    },
+    {
+      "scorer": "product",
+      "returns": "factor removed",
+      "best_f1": 0.2667,
+      "precision": 0.25,
+      "recall": 0.2857,
+      "true_edge_ranks": [
+        2,
+        8,
+        63,
+        118,
+        148,
+        149,
+        276
+      ],
+      "median_rank": 118,
+      "n_pairs": 306
+    },
+    {
+      "scorer": "product",
+      "returns": "raw",
+      "best_f1": 0.2222,
+      "precision": 0.1818,
+      "recall": 0.2857,
+      "true_edge_ranks": [
+        10,
+        11,
+        26,
+        61,
+        71,
+        91,
+        102
+      ],
+      "median_rank": 61,
+      "n_pairs": 306
+    },
+    {
+      "scorer": "tail_lift",
+      "returns": "factor removed",
+      "best_f1": 0.1481,
+      "precision": 0.1,
+      "recall": 0.2857,
+      "true_edge_ranks": [
+        13,
+        17,
+        160,
+        169,
+        206,
+        217,
+        276
+      ],
+      "median_rank": 169,
+      "n_pairs": 306
+    },
+    {
+      "scorer": "lagged_corr",
+      "returns": "raw",
+      "best_f1": 0.1455,
+      "precision": 0.0833,
+      "recall": 0.5714,
+      "true_edge_ranks": [
+        1,
+        19,
+        24,
+        46,
+        51,
+        86,
+        94
+      ],
+      "median_rank": 46,
+      "n_pairs": 306
+    },
+    {
+      "scorer": "tail_lift",
+      "returns": "raw",
+      "best_f1": 0.024,
+      "precision": 0.0125,
+      "recall": 0.2857,
+      "true_edge_ranks": [
+        135,
+        153,
+        175,
+        187,
+        225,
+        283,
+        285
+      ],
+      "median_rank": 187,
+      "n_pairs": 306
+    }
+  ],
+  "tail_raw": [
+    {
+      "pair": "CRY1->CRY2",
+      "kind": "always-on",
+      "strength": 0.45,
+      "tail_lift": 7.667,
+      "tail_dep": 0.767
+    },
+    {
+      "pair": "CRY1->EQ1",
+      "kind": "stress-only",
+      "strength": 0.3,
+      "tail_lift": 6.067,
+      "tail_dep": 0.607
+    },
+    {
+      "pair": "CRY2->EQ2",
+      "kind": "stress-only",
+      "strength": 0.26,
+      "tail_lift": 7.867,
+      "tail_dep": 0.787
+    },
+    {
+      "pair": "EQ1->EQ3",
+      "kind": "always-on",
+      "strength": 0.35,
+      "tail_lift": 6.4,
+      "tail_dep": 0.64
+    },
+    {
+      "pair": "CRY3->CRY4",
+      "kind": "always-on",
+      "strength": 0.4,
+      "tail_lift": 8.267,
+      "tail_dep": 0.827
+    },
+    {
+      "pair": "EQ4->EQ5",
+      "kind": "always-on",
+      "strength": 0.28,
+      "tail_lift": 8.133,
+      "tail_dep": 0.813
+    },
+    {
+      "pair": "CRY1->EQ6",
+      "kind": "stress-only",
+      "strength": 0.22,
+      "tail_lift": 7.4,
+      "tail_dep": 0.74
+    },
+    {
+      "pair": "unlinked pairs (mean of 60)",
+      "kind": "none",
+      "strength": 0.0,
+      "tail_lift": 7.969,
+      "tail_dep": 0.797
+    }
+  ],
+  "tail_residual": [
+    {
+      "pair": "CRY1->CRY2",
+      "kind": "always-on",
+      "strength": 0.45,
+      "tail_lift": 0.133,
+      "tail_dep": 0.013
+    },
+    {
+      "pair": "CRY1->EQ1",
+      "kind": "stress-only",
+      "strength": 0.3,
+      "tail_lift": 0.2,
+      "tail_dep": 0.02
+    },
+    {
+      "pair": "CRY2->EQ2",
+      "kind": "stress-only",
+      "strength": 0.26,
+      "tail_lift": 5.733,
+      "tail_dep": 0.573
+    },
+    {
+      "pair": "EQ1->EQ3",
+      "kind": "always-on",
+      "strength": 0.35,
+      "tail_lift": 5.133,
+      "tail_dep": 0.513
+    },
+    {
+      "pair": "CRY3->CRY4",
+      "kind": "always-on",
+      "strength": 0.4,
+      "tail_lift": 0.0,
+      "tail_dep": 0.0
+    },
+    {
+      "pair": "EQ4->EQ5",
+      "kind": "always-on",
+      "strength": 0.28,
+      "tail_lift": 0.533,
+      "tail_dep": 0.053
+    },
+    {
+      "pair": "CRY1->EQ6",
+      "kind": "stress-only",
+      "strength": 0.22,
+      "tail_lift": 0.4,
+      "tail_dep": 0.04
+    },
+    {
+      "pair": "unlinked pairs (mean of 60)",
+      "kind": "none",
+      "strength": 0.0,
+      "tail_lift": 1.293,
+      "tail_dep": 0.129
+    }
+  ],
+  "shocks": {
+    "CRY1": {
+      "shocked": "CRY1",
+      "magnitude": -0.2,
+      "rounds": 4,
+      "final": {
+        "CRY1": -0.2,
+        "CRY2": -0.09,
+        "CRY3": 0.0,
+        "CRY4": 0.0,
+        "CRY5": 0.0,
+        "CRY6": 0.0,
+        "CRY7": 0.0,
+        "CRY8": 0.0,
+        "EQ1": -0.06,
+        "EQ2": -0.0234,
+        "EQ3": -0.021,
+        "EQ4": 0.0,
+        "EQ5": 0.0,
+        "EQ6": -0.044,
+        "EQ7": 0.0,
+        "EQ8": 0.0,
+        "EQ9": 0.0,
+        "EQ10": 0.0
+      },
+      "n_reached": 5,
+      "reached": [
+        "CRY2",
+        "EQ1",
+        "EQ6",
+        "EQ2",
+        "EQ3"
+      ],
+      "total_absolute_impact": 0.2384,
+      "history": [
+        {
+          "CRY1": -0.2,
+          "CRY2": 0.0,
+          "CRY3": 0.0,
+          "CRY4": 0.0,
+          "CRY5": 0.0,
+          "CRY6": 0.0,
+          "CRY7": 0.0,
+          "CRY8": 0.0,
+          "EQ1": 0.0,
+          "EQ2": 0.0,
+          "EQ3": 0.0,
+          "EQ4": 0.0,
+          "EQ5": 0.0,
+          "EQ6": 0.0,
+          "EQ7": 0.0,
+          "EQ8": 0.0,
+          "EQ9": 0.0,
+          "EQ10": 0.0
+        },
+        {
+          "CRY1": -0.2,
+          "CRY2": -0.09,
+          "CRY3": 0.0,
+          "CRY4": 0.0,
+          "CRY5": 0.0,
+          "CRY6": 0.0,
+          "CRY7": 0.0,
+          "CRY8": 0.0,
+          "EQ1": -0.06,
+          "EQ2": 0.0,
+          "EQ3": 0.0,
+          "EQ4": 0.0,
+          "EQ5": 0.0,
+          "EQ6": -0.044,
+          "EQ7": 0.0,
+          "EQ8": 0.0,
+          "EQ9": 0.0,
+          "EQ10": 0.0
+        },
+        {
+          "CRY1": -0.2,
+          "CRY2": -0.09,
+          "CRY3": 0.0,
+          "CRY4": 0.0,
+          "CRY5": 0.0,
+          "CRY6": 0.0,
+          "CRY7": 0.0,
+          "CRY8": 0.0,
+          "EQ1": -0.06,
+          "EQ2": -0.0234,
+          "EQ3": -0.021,
+          "EQ4": 0.0,
+          "EQ5": 0.0,
+          "EQ6": -0.044,
+          "EQ7": 0.0,
+          "EQ8": 0.0,
+          "EQ9": 0.0,
+          "EQ10": 0.0
+        },
+        {
+          "CRY1": -0.2,
+          "CRY2": -0.09,
+          "CRY3": 0.0,
+          "CRY4": 0.0,
+          "CRY5": 0.0,
+          "CRY6": 0.0,
+          "CRY7": 0.0,
+          "CRY8": 0.0,
+          "EQ1": -0.06,
+          "EQ2": -0.0234,
+          "EQ3": -0.021,
+          "EQ4": 0.0,
+          "EQ5": 0.0,
+          "EQ6": -0.044,
+          "EQ7": 0.0,
+          "EQ8": 0.0,
+          "EQ9": 0.0,
+          "EQ10": 0.0
+        }
+      ]
+    },
+    "CRY3": {
+      "shocked": "CRY3",
+      "magnitude": -0.2,
+      "rounds": 4,
+      "final": {
+        "CRY1": 0.0,
+        "CRY2": 0.0,
+        "CRY3": -0.2,
+        "CRY4": -0.08,
+        "CRY5": 0.0,
+        "CRY6": 0.0,
+        "CRY7": 0.0,
+        "CRY8": 0.0,
+        "EQ1": 0.0,
+        "EQ2": 0.0,
+        "EQ3": 0.0,
+        "EQ4": 0.0,
+        "EQ5": 0.0,
+        "EQ6": 0.0,
+        "EQ7": 0.0,
+        "EQ8": 0.0,
+        "EQ9": 0.0,
+        "EQ10": 0.0
+      },
+      "n_reached": 1,
+      "reached": [
+        "CRY4"
+      ],
+      "total_absolute_impact": 0.08,
+      "history": [
+        {
+          "CRY1": 0.0,
+          "CRY2": 0.0,
+          "CRY3": -0.2,
+          "CRY4": 0.0,
+          "CRY5": 0.0,
+          "CRY6": 0.0,
+          "CRY7": 0.0,
+          "CRY8": 0.0,
+          "EQ1": 0.0,
+          "EQ2": 0.0,
+          "EQ3": 0.0,
+          "EQ4": 0.0,
+          "EQ5": 0.0,
+          "EQ6": 0.0,
+          "EQ7": 0.0,
+          "EQ8": 0.0,
+          "EQ9": 0.0,
+          "EQ10": 0.0
+        },
+        {
+          "CRY1": 0.0,
+          "CRY2": 0.0,
+          "CRY3": -0.2,
+          "CRY4": -0.08,
+          "CRY5": 0.0,
+          "CRY6": 0.0,
+          "CRY7": 0.0,
+          "CRY8": 0.0,
+          "EQ1": 0.0,
+          "EQ2": 0.0,
+          "EQ3": 0.0,
+          "EQ4": 0.0,
+          "EQ5": 0.0,
+          "EQ6": 0.0,
+          "EQ7": 0.0,
+          "EQ8": 0.0,
+          "EQ9": 0.0,
+          "EQ10": 0.0
+        },
+        {
+          "CRY1": 0.0,
+          "CRY2": 0.0,
+          "CRY3": -0.2,
+          "CRY4": -0.08,
+          "CRY5": 0.0,
+          "CRY6": 0.0,
+          "CRY7": 0.0,
+          "CRY8": 0.0,
+          "EQ1": 0.0,
+          "EQ2": 0.0,
+          "EQ3": 0.0,
+          "EQ4": 0.0,
+          "EQ5": 0.0,
+          "EQ6": 0.0,
+          "EQ7": 0.0,
+          "EQ8": 0.0,
+          "EQ9": 0.0,
+          "EQ10": 0.0
+        }
+      ]
+    },
+    "EQ4": {
+      "shocked": "EQ4",
+      "magnitude": -0.2,
+      "rounds": 4,
+      "final": {
+        "CRY1": 0.0,
+        "CRY2": 0.0,
+        "CRY3": 0.0,
+        "CRY4": 0.0,
+        "CRY5": 0.0,
+        "CRY6": 0.0,
+        "CRY7": 0.0,
+        "CRY8": 0.0,
+        "EQ1": 0.0,
+        "EQ2": 0.0,
+        "EQ3": 0.0,
+        "EQ4": -0.2,
+        "EQ5": -0.056,
+        "EQ6": 0.0,
+        "EQ7": 0.0,
+        "EQ8": 0.0,
+        "EQ9": 0.0,
+        "EQ10": 0.0
+      },
+      "n_reached": 1,
+      "reached": [
+        "EQ5"
+      ],
+      "total_absolute_impact": 0.056,
+      "history": [
+        {
+          "CRY1": 0.0,
+          "CRY2": 0.0,
+          "CRY3": 0.0,
+          "CRY4": 0.0,
+          "CRY5": 0.0,
+          "CRY6": 0.0,
+          "CRY7": 0.0,
+          "CRY8": 0.0,
+          "EQ1": 0.0,
+          "EQ2": 0.0,
+          "EQ3": 0.0,
+          "EQ4": -0.2,
+          "EQ5": 0.0,
+          "EQ6": 0.0,
+          "EQ7": 0.0,
+          "EQ8": 0.0,
+          "EQ9": 0.0,
+          "EQ10": 0.0
+        },
+        {
+          "CRY1": 0.0,
+          "CRY2": 0.0,
+          "CRY3": 0.0,
+          "CRY4": 0.0,
+          "CRY5": 0.0,
+          "CRY6": 0.0,
+          "CRY7": 0.0,
+          "CRY8": 0.0,
+          "EQ1": 0.0,
+          "EQ2": 0.0,
+          "EQ3": 0.0,
+          "EQ4": -0.2,
+          "EQ5": -0.056,
+          "EQ6": 0.0,
+          "EQ7": 0.0,
+          "EQ8": 0.0,
+          "EQ9": 0.0,
+          "EQ10": 0.0
+        },
+        {
+          "CRY1": 0.0,
+          "CRY2": 0.0,
+          "CRY3": 0.0,
+          "CRY4": 0.0,
+          "CRY5": 0.0,
+          "CRY6": 0.0,
+          "CRY7": 0.0,
+          "CRY8": 0.0,
+          "EQ1": 0.0,
+          "EQ2": 0.0,
+          "EQ3": 0.0,
+          "EQ4": -0.2,
+          "EQ5": -0.056,
+          "EQ6": 0.0,
+          "EQ7": 0.0,
+          "EQ8": 0.0,
+          "EQ9": 0.0,
+          "EQ10": 0.0
+        }
+      ]
+    },
+    "EQ7": {
+      "shocked": "EQ7",
+      "magnitude": -0.2,
+      "rounds": 4,
+      "final": {
+        "CRY1": 0.0,
+        "CRY2": 0.0,
+        "CRY3": 0.0,
+        "CRY4": 0.0,
+        "CRY5": 0.0,
+        "CRY6": 0.0,
+        "CRY7": 0.0,
+        "CRY8": 0.0,
+        "EQ1": 0.0,
+        "EQ2": 0.0,
+        "EQ3": 0.0,
+        "EQ4": 0.0,
+        "EQ5": 0.0,
+        "EQ6": 0.0,
+        "EQ7": -0.2,
+        "EQ8": 0.0,
+        "EQ9": 0.0,
+        "EQ10": 0.0
+      },
+      "n_reached": 0,
+      "reached": [],
+      "total_absolute_impact": 0.0,
+      "history": [
+        {
+          "CRY1": 0.0,
+          "CRY2": 0.0,
+          "CRY3": 0.0,
+          "CRY4": 0.0,
+          "CRY5": 0.0,
+          "CRY6": 0.0,
+          "CRY7": 0.0,
+          "CRY8": 0.0,
+          "EQ1": 0.0,
+          "EQ2": 0.0,
+          "EQ3": 0.0,
+          "EQ4": 0.0,
+          "EQ5": 0.0,
+          "EQ6": 0.0,
+          "EQ7": -0.2,
+          "EQ8": 0.0,
+          "EQ9": 0.0,
+          "EQ10": 0.0
+        },
+        {
+          "CRY1": 0.0,
+          "CRY2": 0.0,
+          "CRY3": 0.0,
+          "CRY4": 0.0,
+          "CRY5": 0.0,
+          "CRY6": 0.0,
+          "CRY7": 0.0,
+          "CRY8": 0.0,
+          "EQ1": 0.0,
+          "EQ2": 0.0,
+          "EQ3": 0.0,
+          "EQ4": 0.0,
+          "EQ5": 0.0,
+          "EQ6": 0.0,
+          "EQ7": -0.2,
+          "EQ8": 0.0,
+          "EQ9": 0.0,
+          "EQ10": 0.0
+        }
+      ]
+    }
+  }
+}
