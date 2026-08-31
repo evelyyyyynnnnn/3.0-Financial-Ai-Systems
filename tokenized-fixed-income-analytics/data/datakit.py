@@ -79,6 +79,9 @@ class Source:
     terms: str
     note: str = ""
     headers: dict = field(default_factory=dict)
+    # JSON-RPC endpoints (public Ethereum nodes, for instance) answer POST only.
+    # Set body to the request payload; it is sent as JSON.
+    body: object = None
 
 
 class Fetcher:
@@ -118,8 +121,12 @@ class Fetcher:
             time.sleep(self.min_interval - gap)
         self._last_request = time.monotonic()
 
-    def _open(self, url: str, headers: dict) -> bytes:
-        req = urllib.request.Request(url, headers={
+    def _open(self, url: str, headers: dict, body=None) -> bytes:
+        data = None
+        if body is not None:
+            data = json.dumps(body).encode()
+            headers = {"Content-Type": "application/json", **headers}
+        req = urllib.request.Request(url, data=data, headers={
             "User-Agent": self.user_agent,
             "Accept-Encoding": "gzip, deflate",
             **headers,
@@ -143,14 +150,15 @@ class Fetcher:
         rec = man["files"].get(src.dest)
 
         if dest.exists() and not refresh and rec:
-            if sha256_file(dest) == rec.get("sha256"):
-                return dest   # cached and intact
+            same_request = rec.get("request_fingerprint") == _fingerprint(src)
+            if same_request and sha256_file(dest) == rec.get("sha256"):
+                return dest   # cached, intact, and answering the same request
 
         host = src.url.split("/")[2] if "://" in src.url else src.url
         last: Exception | None = None
         for attempt in range(self.retries):
             try:
-                data = self._open(src.url, src.headers)
+                data = self._open(src.url, src.headers, src.body)
                 break
             except urllib.error.HTTPError as e:
                 last = e
@@ -189,6 +197,7 @@ class Fetcher:
             "sha256": hashlib.sha256(data).hexdigest(),
             "bytes": len(data),
             "retrieved_utc": utc_now(),
+            "request_fingerprint": _fingerprint(src),
         }
         self._write_manifest(man)
         return dest
@@ -227,6 +236,16 @@ class Fetcher:
                 "labelled as such and must not be presented as measurement."
             )
         return {n: (self.raw / n, man["files"].get(n, {})) for n in names}
+
+
+def _fingerprint(src) -> str:
+    """Identify the request, not just the URL.
+
+    Two JSON-RPC calls to the same node differ only in their POST body, so a
+    URL-keyed cache would serve the first answer for every later question.
+    """
+    payload = json.dumps({"url": src.url, "body": src.body}, sort_keys=True)
+    return hashlib.sha256(payload.encode()).hexdigest()[:16]
 
 
 def sha256_file(path) -> str:
