@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-31T18:43:07+00:00",
+  "generated_at": "2026-08-31T21:15:10+00:00",
   "is_synthetic": true,
   "data_source": "3 authored filing pairs with labelled changes (src/corpus.py)",
   "edgar_configured": false,
@@ -227,9 +227,9 @@
     "n_quiet_pairs": 1
   },
   "timing": {
-    "seconds_per_corpus_pass": 0.00093,
+    "seconds_per_corpus_pass": 0.00058,
     "chars_processed": 3781,
-    "chars_per_second": 4052620,
+    "chars_per_second": 6554738,
     "human_baseline_measured": false
   },
   "toc_check": {
