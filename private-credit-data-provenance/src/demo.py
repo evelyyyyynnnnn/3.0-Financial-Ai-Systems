@@ -63,7 +63,135 @@ def run() -> dict:
     return results
 
 
+def run_real() -> dict:
+    """Extract terms from real BDC filings, with provenance that is checkable.
+
+    Accuracy is not reported: nobody has annotated a real schedule of
+    investments with the values an extractor should return. Provenance IS
+    reported and IS verified, because it needs no answer key -- for every
+    extracted value the recorded character span is re-read from the document
+    and must contain the value it claims to support. A span that does not is a
+    defect regardless of whether the value was right.
+    """
+    import sys as _sys
+    _sys.path.insert(0, str(ROOT))
+    from data.load import load_documents
+
+    documents, meta = load_documents(root=ROOT / "data")
+
+    reports, per_doc = {}, []
+    span_ok = span_bad = extracted = abstained = 0
+    for d in documents:
+        ext = extract_all(d.text)
+        rep = build_report(d.doc_id, d.text, ext)
+        reports[d.doc_id] = json.loads(rep.to_json())
+
+        found = {}
+        for fld, e in ext.items():
+            if e is None or getattr(e, "value", None) is None:
+                abstained += 1
+                continue
+            extracted += 1
+            found[fld] = e.value
+            # The check that needs no ground truth: does the cited span
+            # actually contain what it is cited for?
+            a, b = e.span
+            evidence = d.text[a:b]
+            if _span_supports(evidence, e.value):
+                span_ok += 1
+            else:
+                span_bad += 1
+        per_doc.append({"doc_id": d.doc_id, "extracted": found,
+                        "n_extracted": len(found),
+                        "n_abstained": len(ext) - len(found)})
+
+    out_dir = ROOT / "data" / "extractions-real"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for did, rep in reports.items():
+        (out_dir / f"{did}.json").write_text(json.dumps(rep, indent=2) + "\n",
+                                             encoding="utf8")
+
+    results = {
+        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "is_synthetic": False,
+        "data_source": "real BDC 10-K filings from SEC EDGAR; see "
+                       "data/MANIFEST.json for URLs, hashes and retrieval times",
+        "accuracy_reported": False,
+        "accuracy_withheld_because": meta["accuracy_withheld_because"],
+        "fields": list(FIELDS),
+        "provenance_check": {
+            "extracted_values": extracted,
+            "abstentions": abstained,
+            "spans_supporting_their_value": span_ok,
+            "spans_not_supporting_their_value": span_bad,
+            "span_support_rate": round(span_ok / extracted, 4) if extracted else None,
+            "what_this_measures":
+                "whether each cited character span actually contains the value "
+                "it is cited for. This needs no answer key, so it is reportable "
+                "on real filings; it says nothing about whether the value is "
+                "the right one.",
+        },
+        "per_document": per_doc,
+        "documents": meta["documents"],
+        "example_report": reports[documents[0].doc_id] if documents else {},
+    }
+    (ROOT / "results").mkdir(exist_ok=True)
+    (ROOT / "results" / "latest-real.json").write_text(
+        json.dumps(results, indent=2) + "\n", encoding="utf8")
+    return results
+
+
+def _span_supports(evidence: str, value) -> bool:
+    """Does this evidence span contain the value extracted from it?
+
+    Compared on digits so that 5.75, "5.75%" and " 5.75 " all match, and so a
+    commitment of 125000000 matches "$125,000,000".
+    """
+    import re as _re
+    digits = _re.sub(r"[^0-9]", "", str(value))
+    if not digits:
+        return bool(str(value).strip() and str(value).strip().lower()
+                    in evidence.lower())
+    ev = _re.sub(r"[^0-9]", "", evidence)
+    return digits in ev or digits.rstrip("0") in ev
+
+
+def main_real() -> int:
+    from data.datakit import FetchError
+    try:
+        r = run_real()
+    except FetchError as exc:
+        print(f"cannot run on real data: {exc}", file=sys.stderr)
+        return 2
+    print(f"source: {r['data_source']}")
+    for d in r["documents"]:
+        print(f"  {d['doc_id']:<6} {d['document_chars']:>9,} chars, schedule "
+              f"{'located' if d['schedule_located'] else 'NOT located'} "
+              f"({d['section_chars']:,} chars scanned) [{d['sha256']}]")
+    print(f"\n{'document':<10}{'extracted':>10}{'abstained':>11}   fields")
+    for x in r["per_document"]:
+        fields = ", ".join(sorted(x["extracted"]))
+        print(f"{x['doc_id']:<10}{x['n_extracted']:>10}{x['n_abstained']:>11}   "
+              f"{fields[:60]}")
+    pc = r["provenance_check"]
+    print(f"\nprovenance check ({pc['extracted_values']} values, "
+          f"{pc['abstentions']} abstentions):")
+    print(f"  spans that contain the value they support: "
+          f"{pc['spans_supporting_their_value']}")
+    print(f"  spans that do not:                         "
+          f"{pc['spans_not_supporting_their_value']}")
+    if pc["span_support_rate"] is not None:
+        print(f"  support rate: {pc['span_support_rate']:.1%}")
+    print(f"\n{pc['what_this_measures']}")
+    print("\nEXTRACTION ACCURACY IS NOT REPORTED: " +
+          r["accuracy_withheld_because"])
+    print("wrote results/latest-real.json")
+    return 0
+
+
 def main() -> int:
+    if "--real" in sys.argv[1:]:
+        return main_real()
     r = run()
     c, v = r["corpus"], r["values"]
     print(f"corpus: {c['n_documents']} term sheets x {c['n_fields']} fields "

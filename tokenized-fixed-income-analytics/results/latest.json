@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-31T18:39:58+00:00",
+  "generated_at": "2026-08-31T21:50:25+00:00",
   "is_synthetic": true,
   "data_source": "synthetic on-chain trade and redemption history (src/chain.py)",
   "universe_size": 6,
