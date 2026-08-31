@@ -33,16 +33,16 @@ jobs:
       - name: Run refresh script
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: python scripts/refresh_data.py
+        run: python previous/scripts/refresh_data.py
 
       - name: Commit and push if data.json changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- project-1/giant-portfolio/data.json; then
+          if git diff --quiet -- previous/project-1/giant-portfolio/data.json; then
             echo "No changes to data.json — nothing to commit."
           else
-            git add project-1/giant-portfolio/data.json
+            git add previous/project-1/giant-portfolio/data.json
             git commit -m "chore: refresh portfolio data $(date -u +'%Y-%m-%d')"
             git push
           fi

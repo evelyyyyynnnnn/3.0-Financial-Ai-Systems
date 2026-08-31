@@ -1,97 +1,106 @@
-# 3.0 Financial AI Systems
+# 3.0 — Financial AI Systems
 
-Portfolio of work supporting the endeavor described in the EB2-NIW petition:
-the design and implementation of **optimization-driven, system-level decision
-frameworks** — integrating operations research, mathematical optimization, and
-applied AI — for domains where a wrong decision carries systemic consequences.
+The repository carrying the petition. Eleven projects with no baselines read as volume; four with measured results read as contribution.
 
-Two independently deployable sites. Point Vercel's root directory at either;
-each carries its own `vercel.json` and needs no build step.
+Part of a five-repository portfolio supporting the endeavor described in the
+EB2-NIW petition: **optimization-driven, system-level decision frameworks** —
+integrating operations research, mathematical optimization and applied AI — for
+domains where a wrong decision carries systemic consequences. The three pillars
+are financial stability, healthcare safety and secure digital infrastructure.
 
-| Deploy root | Site | Contains |
-|---|---|---|
-| `project-1/` | **Portfolio** | Seven projects, a two-level site, and the live 13F tracker |
-| `project-2/` | **Trustworthy Systems** | Three systems on one site, a page each: Filing Intelligence, Contagion Observatory, Contract Audit |
-
-Alongside them: `roadmap/` (planned, not built) and `project-1/reference/`
-(third-party code).
-
-Every project has its own README with the method, the run instructions, and an
-explicit statement of what it does *not* establish.
-
-## Coverage against the petition
-
-| Pillar | Status |
+| | |
 |---|---|
-| Financial stability | `project-1`, and Filing Intelligence + Contagion in `project-2` |
-| Secure digital infrastructure | Contract Audit in `project-2` |
-| Healthcare safety | **No code in this repository.** It does not belong under "Financial AI Systems" — it wants a separate repository rather than being folded in here. |
+| Petition-grade projects today | 11 built (3 core) |
+| Verdict | **Count is fine — depth is the problem** |
 
-## Data, and where it comes from
+> "Petition-grade" means: original work, a stated method, real data at a stated
+> scale, a measured result, and a README a reviewer can follow. Counts exclude
+> duplicates, forks of third-party work, retired projects, and asset-only
+> folders.
 
-The three systems in `project-2` follow the same shape as the 13F tracker, which has been running
-this way for a while: **a pipeline produces `data.json`, and the site is pure
-static**. Browsers cannot call SEC EDGAR or market APIs directly (CORS, and
-per-client rate limits), so precomputation is not a shortcut — it is the only
-workable architecture for a static deploy.
+## Projects
 
-Projects 2 and 3 ship **sample data so the site renders before any live pull**,
-and both label it in the payload and on the page:
+| Folder | Project | Pillar | Evidence value |
+|---|---|---|---|
+| [`private-credit-data-provenance/`](private-credit-data-provenance/) | Private Credit Data Provenance | Financial Stability | Planned — build this next; strongest single alignment in the workspace |
+| [`tokenized-fixed-income-analytics/`](tokenized-fixed-income-analytics/) | Tokenized Fixed-Income Analytics | Financial Stability | Planned — build this next |
+| [`filing-intelligence/`](filing-intelligence/) | Filing Intelligence | Financial Stability | CORE — carries a scale claim that is currently unevidenced |
+| [`contagion-observatory/`](contagion-observatory/) | Contagion Observatory | Financial Stability | CORE — carries a scale claim that is currently unevidenced |
+| [`measured-results/`](measured-results/) | Measured Results | Financial Stability | Supporting — converts volume into contribution |
 
-- Filing Intelligence uses **fictional issuers**. Attaching invented risk-factor
-  language to a real ticker would produce something that reads like an SEC
-  disclosure without being one.
-- Contagion uses **simulated series**, built from a factor model with planted
-  structure so the estimators can be checked against a known answer.
+## What each one is
 
-Replace either with real data in one command — see each README.
+### 1. Private Credit Data Provenance — [`private-credit-data-provenance/`](private-credit-data-provenance/)
 
-## Automation
+Extract terms from private credit documents where every extracted value carries a citation back to the source span.
 
-`.github/workflows/` must stay at the repository root; GitHub Actions reads
-workflows from nowhere else.
+*Why it earns its place:* Notion structural opportunity #1. Private-credit and alternative-asset data are opaque and non-standardised; valuation is subjective; regulators (Form PF, AIFMD) demand more transparency; AUM is projected toward USD 5tn by 2029. Simultaneously a national-interest argument that writes itself and a commercial thesis.
 
-| Workflow | Schedule | Refreshes |
-|---|---|---|
-| `refresh-data.yml` | 1st of each month | `project-1/giant-portfolio/data.json` from Notion |
-| `refresh-filings.yml` | 3rd of each month | `project-2/filing-intelligence/data/data.json` from SEC EDGAR |
+*Target scale:* Private credit term sheets (universe to be stated)
 
-Both also run on demand from the Actions tab, and both commit only when the
-data actually changed — which redeploys the affected site.
+### 2. Tokenized Fixed-Income Analytics — [`tokenized-fixed-income-analytics/`](tokenized-fixed-income-analytics/)
 
-Secrets: `NOTION_TOKEN` for the tracker, `SEC_USER_AGENT` for filings (SEC
-requires a contact string on every API request, e.g. `Jane Doe jane@example.com`).
+Measure liquidity, holder concentration, and redemption latency for tokenized debt from on-chain trade data.
 
-## Project inventory
+*Why it earns its place:* Notion structural opportunity #2. Bridges the financial-stability and secure-digital-infrastructure pillars, which the petition currently treats as separate. Building it makes the "three pillars, one framework" story true rather than asserted.
 
-[`project-overview.xlsx`](project-overview.xlsx) lists every project here —
-built, research, retired, third-party, and planned — with its core idea, the
-non-obvious decision behind it, status, stack, and entry point. Regenerate it
-after adding or retiring a project:
+*Target scale:* On-chain tokenized-debt trade data (universe to be stated)
 
-```bash
-python scripts/build_overview.py
+### 3. Filing Intelligence — [`filing-intelligence/`](filing-intelligence/)
+
+Report what CHANGED in a company's SEC risk disclosures since its prior filing, rather than summarising the filing.
+
+*Why it earns its place:* Carries two of the petition's scale claims. Simulated data underneath a real number is the sharpest RFE risk in the portfolio.
+
+*Target scale:* 600+ U.S. corporate filings (10-K / 10-Q)
+
+### 4. Contagion Observatory — [`contagion-observatory/`](contagion-observatory/)
+
+Measure which crypto-equity links actually TRANSMIT stress, and simulate what a shock to one asset does to the rest.
+
+*Why it earns its place:* Carries the asset-count claims. The asset counts are not demonstrable from the repo as it stands.
+
+*Target scale:* 7,500+ crypto assets and 6,000+ U.S. equities/ETFs
+
+### 5. Measured Results — [`measured-results/`](measured-results/)
+
+One measured-results table per built project: baseline, metric, and out-of-sample performance.
+
+*Why it earns its place:* Eleven projects with no baselines read as volume. Four with measured results read as contribution.
+
+*Target scale:* All built projects in this repository
+
+## Repository layout
+
+```
+3.0-Financial-Ai-Systems/
+├── private-credit-data-provenance/
+├── tokenized-fixed-income-analytics/
+├── filing-intelligence/
+├── contagion-observatory/
+├── measured-results/
+└── previous/        everything that was here before this restructure
 ```
 
-The table at the top of that script is the source of truth; the Summary sheet
-counts by status with formulas rather than hardcoded totals.
+Each project folder carries the same skeleton: `README.md`, `docs/`
+(METHOD, DATA, EVIDENCE), `src/`, `data/`, `results/`, `tests/`.
 
-## Roadmap
+## Ground rules
 
-`roadmap/` holds scoping documents for work that is planned but **not
-implemented**. It is a separate directory from the numbered projects so that
-distinction is visible from the tree, not just from a status line. A project
-graduates out of it when there is code.
+1. **No number without a run log.** Anything cited in the petition must appear
+   in that project's `results/README.md` with a run date behind it.
+2. **No simulated data under a real claim.** Sample data lives in
+   `data/sample/`, labelled, and is never the source of a cited figure.
+3. **Adoption must be documentable** — named institutions, dated
+   correspondence, registry statistics. Never an inflated count.
+4. **Third-party and forked code stays labelled** and is never counted.
 
-## Attribution
+## previous/
 
-Third-party code lives in `project-1/reference/`, separated at the directory
-level rather than by a caveat. It currently holds
-`options-volatility-trading` — MIT-licensed, Copyright (c) 2021 MCF Long
-Short, from `mcf-long-short/ibkr-options-volatility-trading`, a course group
-project at Union University's Masters in Computational Finance. Its
-`ib_client/` directory is Interactive Brokers' official Python TWS API.
-Everything under the numbered projects outside that directory is original work.
+Everything that lived at the top level before this restructure is preserved
+under [`previous/`](previous/) with nothing deleted. See
+[`previous/README.md`](previous/README.md) for the inventory and the disposition
+of each item.
 
-The three systems in `project-2` were built as portfolio work; their commit dates reflect
-when they were written.
+---
+Scaffold generated from `NIW_Project_Portfolio_and_Gap_Plan.xlsx` (sheets: Repo Build-Out Plan, Core Ideas at a Glance, NIW Claim vs Repo Evidence, Notion 创业 Alignment). Structure only — no results are claimed here yet.
