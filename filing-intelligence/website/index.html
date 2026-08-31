@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Filing Intelligence</title>
+<meta name="description" content="What CHANGED in a company&#x27;s SEC risk disclosures since its prior filing — matched risk by risk, so reordering is not reported as change.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#FCFCFD; --surface:#FFFFFF; --surface-2:#F4F5F8;
+  --ink:#16191F; --ink-2:#40474F; --muted:#6C7480;
+  --line:#E2E5EA; --line-2:#EFF1F4;
+  --accent:#1D5B70; --accent-2:#E6F0F3;
+  --ok:#2C6B4F; --ok-bg:#E5F1EA;
+  --warn:#8A6212; --warn-bg:#F7EFDC;
+  --demo:#6E4B8F; --demo-bg:#F0EAF6;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme=light]){
+    --bg:#0F1216; --surface:#161A20; --surface-2:#1C212A;
+    --ink:#E9ECF0; --ink-2:#BEC5CE; --muted:#8A939F;
+    --line:#282F38; --line-2:#20262E;
+    --accent:#72B3CB; --accent-2:#18272E;
+    --ok:#7BC09F; --ok-bg:#15251E;
+    --warn:#D8AD5E; --warn-bg:#292216;
+    --demo:#B79AD6; --demo-bg:#241C2E;
+  }
+}
+:root[data-theme=dark]{
+  --bg:#0F1216; --surface:#161A20; --surface-2:#1C212A;
+  --ink:#E9ECF0; --ink-2:#BEC5CE; --muted:#8A939F;
+  --line:#282F38; --line-2:#20262E;
+  --accent:#72B3CB; --accent-2:#18272E;
+  --ok:#7BC09F; --ok-bg:#15251E;
+  --warn:#D8AD5E; --warn-bg:#292216;
+  --demo:#B79AD6; --demo-bg:#241C2E;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+    "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:15.5px;line-height:1.62;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px 88px}
+h1,h2,h3{font-family:Spectral,Georgia,"Songti SC",serif;margin:0;text-wrap:balance}
+h1{font-size:clamp(28px,4.2vw,42px);font-weight:700;letter-spacing:-.015em;line-height:1.14}
+h2{font-size:clamp(20px,2.5vw,25px);font-weight:600;letter-spacing:-.01em}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+a{color:var(--accent)}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.88em}
+.stack{display:flex;flex-direction:column;gap:14px}
+.stack-lg{display:flex;flex-direction:column;gap:22px}
+section{margin-top:52px}
+
+header.mast{border-bottom:1px solid var(--line);padding:44px 0 26px;margin-bottom:8px;
+  display:flex;flex-direction:column;gap:15px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--ink-2);font-size:16.5px;max-width:66ch}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;padding:3px 9px;border-radius:4px;background:var(--surface-2);
+  color:var(--muted);font-weight:500;white-space:nowrap}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}
+.tag.demo{background:var(--demo-bg);color:var(--demo)}
+.tag.warn{background:var(--warn-bg);color:var(--warn)}
+
+.banner{display:flex;gap:13px;align-items:flex-start;background:var(--demo-bg);
+  border-radius:9px;padding:15px 18px;margin-top:26px}
+.banner .bi{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--demo);flex:none;padding-top:3px;font-weight:600}
+.banner p{font-size:14.2px;color:var(--ink-2)}
+
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.metric{background:var(--surface);padding:15px 16px;display:flex;flex-direction:column;gap:5px}
+.metric .mk{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);line-height:1.35}
+.metric .mv{font-family:Spectral,Georgia,serif;font-size:26px;font-weight:600;
+  font-variant-numeric:tabular-nums;line-height:1.1;color:var(--accent)}
+.metric .mn{font-size:12.4px;color:var(--muted);line-height:1.4}
+
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.8px;min-width:520px}
+th{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);font-weight:500;padding:11px 14px;
+  border-bottom:1px solid var(--line);background:var(--surface-2)}
+td{padding:10px 14px;border-bottom:1px solid var(--line-2);vertical-align:top;line-height:1.5}
+td.n{font-variant-numeric:tabular-nums;text-align:right}
+tr:last-child td{border-bottom:0}
+
+pre{margin:0;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 17px;overflow-x:auto;font-family:"IBM Plex Mono",monospace;
+  font-size:12.8px;line-height:1.62;color:var(--ink-2)}
+ul.tight{margin:0;padding-left:19px;display:flex;flex-direction:column;gap:7px}
+ul.tight li::marker{color:var(--muted)}
+.note{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
+  padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.foot{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:9px}
+figure{margin:0}
+svg.chart{display:block;width:100%;height:auto}
+@media (max-width:600px){.wrap{padding:0 17px 68px}.banner{flex-direction:column;gap:7px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="mast">
+  <div class="eyebrow">3.0-Financial-Ai-Systems &middot; Financial Stability</div>
+  <h1>Filing Intelligence</h1>
+  <p class="lede">What CHANGED in a company&#x27;s SEC risk disclosures since its prior filing — matched risk by risk, so reordering is not reported as change.</p>
+  <div class="tags"><span class="tag ">Item 1A extraction</span><span class="tag ">risk-level matching</span><span class="tag demo">authored pairs</span><span class="tag warn">EDGAR not pulled</span></div>
+</header>
+<div class="banner">
+  <span class="bi">Data</span>
+  <p>This run used three authored filing pairs with labelled changes, NOT filings from EDGAR. The EDGAR client in src/edgar.py is real and unexercised — running it against the live universe is the step that would turn this into evidence, and it has not been run. No scale claim and no time-saving percentage appears anywhere on this page.</p>
+</div>
+
+<section>
+  <h2>Why this is not a text diff</h2>
+  <div class="stack">
+    <p>The report a reader wants is: which risks are new, which are gone, and which are
+    still there but now say something different. A positional diff cannot produce that,
+    because risks get reordered between filings and the diff then reports the entire
+    section as changed.</p>
+    <p>So risks are matched across the two documents first, by token overlap, and only
+    then classified. Matching is greedy rather than optimal — with a few dozen risks the
+    difference is negligible, and greedy keeps every pairing explainable as "the best
+    remaining match", which a reader can check.</p>
+  </div>
+</section>
+
+<section>
+  <h2>This run</h2>
+  <div class="stack-lg">
+    <div class="metrics"><div class="metric"><span class="mk">Material changes found</span><span class="mv">6/6</span><span class="mn">100% of labelled changes</span></div><div class="metric"><span class="mk">False alarms</span><span class="mv">0</span><span class="mn">on the identical-filings pair</span></div><div class="metric"><span class="mk">Throughput</span><span class="mv">4,052,620</span><span class="mn">characters per second</span></div><div class="metric"><span class="mk">Filings from EDGAR</span><span class="mv">0</span><span class="mn">the client is unexercised</span></div></div>
+    <p class="mono" style="color:var(--muted);font-size:12.5px">
+      generated 2026-08-31T18:43:07+00:00 &middot; 3 authored filing pairs with labelled changes (src/corpus.py)
+    </p>
+    <div class="tw"><table><thead><tr><th>Company</th><th>Periods</th><th>Added</th><th>Removed</th><th>Reworded</th><th>Unchanged</th><th>Tests</th></tr></thead><tbody><tr><td>Meridian Components</td><td>FY2023 → FY2024</td><td class="n">1</td><td class="n">1</td><td class="n">1</td><td class="n">1</td><td>One added, one removed, one materially reworded with a changed concentration figure, one untouched.</td></tr><tr><td>Harborline Bancorp</td><td>FY2023 → FY2024</td><td class="n">1</td><td class="n">0</td><td class="n">2</td><td class="n">1</td><td>Two rewordings, one addition, nothing removed. The interest-rate risk is byte-identical and must not be reported as changed.</td></tr><tr><td>Steadfast Services</td><td>FY2023 → FY2024</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">2</td><td>Identical filings. A change detector that reports anything here is producing noise, which is the failure mode that makes these tools ignored in practice.</td></tr></tbody></table></div>
+  </div>
+</section>
+
+<section>
+  <h2>Every material change it reported</h2>
+  <div class="stack-lg">
+    <div class="tw"><table><thead><tr><th>Company</th><th>Kind</th><th>Similarity</th><th>Figures changed</th><th>Summary</th></tr></thead><tbody><tr><td>Meridian Components</td><td>reworded</td><td class="n">0.68</td><td>2024, 42</td><td>REWORDED: We depend on a limited number of suppliers for critical components. A single supplier…</td></tr><tr><td>Meridian Components</td><td>added</td><td class="n">0.05</td><td>—</td><td>NEW: We are subject to evolving data protection and artificial intelligence regulation in the ju</td></tr><tr><td>Meridian Components</td><td>removed</td><td class="n">0.00</td><td>—</td><td>REMOVED: We face intense competition in all of our markets. Some of our competitors have…</td></tr><tr><td>Harborline Bancorp</td><td>reworded</td><td class="n">0.48</td><td>18, 24</td><td>REWORDED: We are exposed to credit risk in our commercial real estate portfolio, which represent</td></tr><tr><td>Harborline Bancorp</td><td>reworded</td><td class="n">0.67</td><td>—</td><td>REWORDED: Our business depends on the continued availability of deposits. A significant withdraw</td></tr><tr><td>Harborline Bancorp</td><td>added</td><td class="n">0.00</td><td>—</td><td>NEW: We rely on third-party cloud infrastructure for core banking functions. A prolonged outage </td></tr></tbody></table></div>
+    <div class="note">
+      <h3>The quiet pair is the important one</h3>
+      <p>Steadfast Services files an identical Item 1A in both periods, and the detector
+      reports 0 material changes for it. That is
+      the property that decides whether a tool like this gets used: a report that flags
+      something every quarter is indistinguishable from not running it.</p>
+      <p>Byte-identical risks are classified as unchanged only when similarity is above
+      0.97 <em>and</em> no figure has moved. A risk whose wording is untouched but whose
+      concentration percentage went from 31 to 42 is a material change, and catching
+      that is most of the value here.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Finding the right Item 1A</h2>
+  <div class="stack-lg">
+    <div class="tw"><table><thead><tr><th>Check</th><th>Result</th></tr></thead><tbody><tr><td>Occurrences of &#x27;Item 1A&#x27; in the test document</td><td class="n">2</td></tr><tr><td>Selected the section body, not the table of contents</td><td class="n">yes</td></tr><tr><td>Characters selected</td><td class="n">1405</td></tr></tbody></table></div>
+    <p>A 10-K names Item 1A in its table of contents, in cross-references, and at the
+    section itself. The naive first match lands in the table of contents every time.
+    The rule used here is that the real heading is the occurrence followed by the most
+    text before the next item heading — simple, checkable, and stated so a reader can
+    judge it rather than trust it.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Timing, and the number that is missing</h2>
+  <div class="stack-lg">
+    <div class="tw"><table><thead><tr><th>Measure</th><th>Value</th></tr></thead><tbody><tr><td>Characters processed per second</td><td>4,052,620</td></tr><tr><td>Time for one pass over the corpus</td><td>0.9 ms</td></tr><tr><td>Human baseline measured</td><td>NO</td></tr></tbody></table></div>
+    <div class="note">
+      <h3>No time-saving percentage is claimed</h3>
+      <p>Throughput is measured and reported above. A <em>reduction</em> figure needs
+      two numbers — machine time and human time on the same documents — and the second
+      has never been measured here. Dividing a measured machine time by an assumed human
+      time produces a percentage that looks empirical and is not.</p>
+      <p>Getting that number honestly means timing analysts reading the same filings,
+      with the same task definition, and reporting the spread. Until then this page
+      reports characters per second and nothing more.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Getting real filings in</h2>
+  <div class="stack-lg">
+    <p><code>src/edgar.py</code> implements the submissions API, rate limiting at the
+    SEC's requested 10 requests per second, and the mandatory descriptive User-Agent.
+    It is not called by the demo or the tests: a build whose output depends on a live
+    third-party service is not reproducible, and a test suite should not be hitting
+    EDGAR.</p>
+    <pre>from src.edgar import fetch_company_filings, USER_AGENT
+# set USER_AGENT to a real contact address first -- the SEC refuses requests without one
+refs = fetch_company_filings(cik="0000320193", forms=("10-K",), limit=4)</pre>
+    <p>Configured for live pulls: <strong>no</strong>.
+    Filings pulled in this run: <strong>0</strong>.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Reproduce it</h2>
+  <div class="stack">
+    <pre>cd filing-intelligence
+pip install -r requirements.txt
+python -m pytest tests/ -q
+python -m src.demo</pre>
+  </div>
+</section>
+
+<section>
+  <h2>What this does not establish</h2>
+  <div class="stack">
+    <ul class="tight">
+      <li><strong>No filings have been processed.</strong> Three authored pairs is a
+      correctness test for the matching logic, not a corpus, and no scale claim
+      follows from it.</li>
+      <li>The pairs were written by the same person who wrote the matcher, so 100%
+      recall here shows the rules handle the cases they were written against.</li>
+      <li>Real Item 1A sections run to tens of thousands of words with nested
+      sub-headings and exhibits; the paragraph splitter used here would need work
+      before it survived one.</li>
+      <li>Matching is lexical. Two risks describing the same exposure in different
+      vocabulary will be reported as one removed and one added.</li>
+      <li>No time-saving percentage, for the reason set out above.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="foot">
+  <p>3.0-Financial-Ai-Systems &middot; filing-intelligence &middot; part of a five-repository portfolio on optimization-driven,
+     system-level decision frameworks.</p>
+  <p>Every figure on this page was produced by running <code>python -m src.demo</code> in this
+     project and reading <code>results.json</code>. Nothing here is hand-entered. The run used clearly-labelled synthetic data; swap in the real source and the same pipeline reports real numbers.</p>
+</div>
+</div>
+</body>
+</html>

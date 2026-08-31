@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Private Credit Data Provenance</title>
+<meta name="description" content="Term extraction from private-credit documents where every value carries the character span it came from, so a wrong number can be found rather than merely suspected.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#FCFCFD; --surface:#FFFFFF; --surface-2:#F4F5F8;
+  --ink:#16191F; --ink-2:#40474F; --muted:#6C7480;
+  --line:#E2E5EA; --line-2:#EFF1F4;
+  --accent:#1D5B70; --accent-2:#E6F0F3;
+  --ok:#2C6B4F; --ok-bg:#E5F1EA;
+  --warn:#8A6212; --warn-bg:#F7EFDC;
+  --demo:#6E4B8F; --demo-bg:#F0EAF6;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme=light]){
+    --bg:#0F1216; --surface:#161A20; --surface-2:#1C212A;
+    --ink:#E9ECF0; --ink-2:#BEC5CE; --muted:#8A939F;
+    --line:#282F38; --line-2:#20262E;
+    --accent:#72B3CB; --accent-2:#18272E;
+    --ok:#7BC09F; --ok-bg:#15251E;
+    --warn:#D8AD5E; --warn-bg:#292216;
+    --demo:#B79AD6; --demo-bg:#241C2E;
+  }
+}
+:root[data-theme=dark]{
+  --bg:#0F1216; --surface:#161A20; --surface-2:#1C212A;
+  --ink:#E9ECF0; --ink-2:#BEC5CE; --muted:#8A939F;
+  --line:#282F38; --line-2:#20262E;
+  --accent:#72B3CB; --accent-2:#18272E;
+  --ok:#7BC09F; --ok-bg:#15251E;
+  --warn:#D8AD5E; --warn-bg:#292216;
+  --demo:#B79AD6; --demo-bg:#241C2E;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+    "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:15.5px;line-height:1.62;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px 88px}
+h1,h2,h3{font-family:Spectral,Georgia,"Songti SC",serif;margin:0;text-wrap:balance}
+h1{font-size:clamp(28px,4.2vw,42px);font-weight:700;letter-spacing:-.015em;line-height:1.14}
+h2{font-size:clamp(20px,2.5vw,25px);font-weight:600;letter-spacing:-.01em}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+a{color:var(--accent)}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.88em}
+.stack{display:flex;flex-direction:column;gap:14px}
+.stack-lg{display:flex;flex-direction:column;gap:22px}
+section{margin-top:52px}
+
+header.mast{border-bottom:1px solid var(--line);padding:44px 0 26px;margin-bottom:8px;
+  display:flex;flex-direction:column;gap:15px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--ink-2);font-size:16.5px;max-width:66ch}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;padding:3px 9px;border-radius:4px;background:var(--surface-2);
+  color:var(--muted);font-weight:500;white-space:nowrap}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}
+.tag.demo{background:var(--demo-bg);color:var(--demo)}
+.tag.warn{background:var(--warn-bg);color:var(--warn)}
+
+.banner{display:flex;gap:13px;align-items:flex-start;background:var(--demo-bg);
+  border-radius:9px;padding:15px 18px;margin-top:26px}
+.banner .bi{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--demo);flex:none;padding-top:3px;font-weight:600}
+.banner p{font-size:14.2px;color:var(--ink-2)}
+
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.metric{background:var(--surface);padding:15px 16px;display:flex;flex-direction:column;gap:5px}
+.metric .mk{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);line-height:1.35}
+.metric .mv{font-family:Spectral,Georgia,serif;font-size:26px;font-weight:600;
+  font-variant-numeric:tabular-nums;line-height:1.1;color:var(--accent)}
+.metric .mn{font-size:12.4px;color:var(--muted);line-height:1.4}
+
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.8px;min-width:520px}
+th{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);font-weight:500;padding:11px 14px;
+  border-bottom:1px solid var(--line);background:var(--surface-2)}
+td{padding:10px 14px;border-bottom:1px solid var(--line-2);vertical-align:top;line-height:1.5}
+td.n{font-variant-numeric:tabular-nums;text-align:right}
+tr:last-child td{border-bottom:0}
+
+pre{margin:0;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 17px;overflow-x:auto;font-family:"IBM Plex Mono",monospace;
+  font-size:12.8px;line-height:1.62;color:var(--ink-2)}
+ul.tight{margin:0;padding-left:19px;display:flex;flex-direction:column;gap:7px}
+ul.tight li::marker{color:var(--muted)}
+.note{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
+  padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.foot{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:9px}
+figure{margin:0}
+svg.chart{display:block;width:100%;height:auto}
+@media (max-width:600px){.wrap{padding:0 17px 68px}.banner{flex-direction:column;gap:7px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="mast">
+  <div class="eyebrow">3.0-Financial-Ai-Systems &middot; Financial Stability</div>
+  <h1>Private Credit Data Provenance</h1>
+  <p class="lede">Term extraction from private-credit documents where every value carries the character span it came from, so a wrong number can be found rather than merely suspected.</p>
+  <div class="tags"><span class="tag ">span-level citation</span><span class="tag ">abstention</span><span class="tag ">tamper-evident records</span><span class="tag demo">authored corpus</span><span class="tag warn">circular validation</span></div>
+</header>
+<div class="banner">
+  <span class="bi">Data</span>
+  <p>Real term sheets are confidential, so the five documents here are authored for this project. The same person wrote the documents and the extractors, which makes the 100% value accuracy CIRCULAR — it shows the rules handle the cases they were written against, not that they generalise. The exact-span figure is the more honest number.</p>
+</div>
+
+<section>
+  <h2>Why the span is the product</h2>
+  <div class="stack">
+    <p>An extractor that returns <code>{"spread_bps": 575}</code> is unauditable. A
+    reviewer cannot tell whether it read the right sentence, and a wrong-but-plausible
+    number looks exactly like a right one. Every extraction here returns the value
+    <em>and</em> the character range that produced it, so a disagreement is settled by
+    looking at the document rather than by trusting the pipeline.</p>
+    <p>Abstention is a first-class outcome. Two cells in this corpus are genuinely
+    absent — a covenant-lite facility has no leverage test and no floor — and a system
+    that invents values for them is worse than one that says it did not find them.
+    This run invented 0.</p>
+  </div>
+</section>
+
+<section>
+  <h2>This run</h2>
+  <div class="stack-lg">
+    <div class="metrics"><div class="metric"><span class="mk">Value accuracy</span><span class="mv">100%</span><span class="mn">30/30 cells</span></div><div class="metric"><span class="mk">Span accuracy</span><span class="mv">100%</span><span class="mn">overlap with true evidence</span></div><div class="metric"><span class="mk">Exact spans</span><span class="mv">68%</span><span class="mn">character-identical</span></div><div class="metric"><span class="mk">Invented values</span><span class="mv">0</span><span class="mn">on absent fields</span></div></div>
+    <p class="mono" style="color:var(--muted);font-size:12.5px">
+      generated 2026-08-31T18:36:53+00:00 &middot;
+      5 documents &times; 6 fields &middot;
+      2 genuinely absent cells
+    </p>
+    <div class="tw"><table><thead><tr><th>Field</th><th>Correct</th><th>Accuracy</th><th>What makes it hard</th></tr></thead><tbody><tr><td>commitment_usd</td><td>5/5</td><td>100%</td><td>TS-003 states original, incremental and total; only the total is right</td></tr><tr><td>spread_bps</td><td>5/5</td><td>100%</td><td>TS-002 carries a superseded S+700 that must not win</td></tr><tr><td>floor_bps</td><td>5/5</td><td>100%</td><td>A 0.00% floor is a value; a missing floor is an abstention</td></tr><tr><td>maturity_years</td><td>5/5</td><td>100%</td><td>&quot;seven (7) years&quot;, &quot;Tenor: 6 years&quot;, &quot;fifth anniversary&quot;</td></tr><tr><td>oid</td><td>5/5</td><td>100%</td><td>&quot;par&quot; is 100.0, not a missing value</td></tr><tr><td>leverage_covenant</td><td>5/5</td><td>100%</td><td>Covenant-lite means genuinely absent, not zero</td></tr></tbody></table></div>
+  </div>
+</section>
+
+<section>
+  <h2>Two accuracies, and why both are needed</h2>
+  <div class="stack-lg">
+    <div class="tw"><table><thead><tr><th>Measure</th><th>Score</th><th>What it catches</th></tr></thead><tbody><tr><td>Value accuracy</td><td class="n">100.0%</td><td>Is the number right?</td></tr><tr><td>Span overlap</td><td class="n">100.0%</td><td>Did it come from the right place in the document?</td></tr><tr><td>Span exact</td><td class="n">67.9%</td><td>Is the quoted evidence character-identical to the ground truth?</td></tr></tbody></table></div>
+    <div class="note">
+      <h3>The gap between the last two is the real finding</h3>
+      <p>Every value came from a region overlapping the correct evidence, but only
+      68% of spans match the ground-truth range exactly. The
+      extractors tend to capture the label as well as the value
+      (<code>OID: 99.25</code> rather than <code>99.25</code>), which is harmless for
+      a human reader and matters for anything that consumes spans programmatically.</p>
+      <p>Reporting only the overlap figure would hide that. An extractor can also
+      return the right number from the wrong sentence — correct today, wrong the moment
+      the document changes, and undetectable without a span metric.</p>
+    </div>
+    <div class="tw"><table><thead><tr><th>Doc</th><th>Field</th><th>Result</th><th>Predicted</th><th>True</th><th>Quoted evidence</th></tr></thead><tbody><tr><td>TS-001</td><td>commitment_usd</td><td>hit</td><td>[110, 135]</td><td>[122, 134]</td><td>Commitment: $185,000,000</td></tr><tr><td>TS-001</td><td>spread_bps</td><td>hit</td><td>[198, 210]</td><td>[198, 210]</td><td>SOFR + 5.75%</td></tr><tr><td>TS-001</td><td>floor_bps</td><td>hit</td><td>[225, 244]</td><td>[225, 244]</td><td>SOFR floor of 1.00%</td></tr><tr><td>TS-001</td><td>maturity_years</td><td>hit</td><td>[145, 160]</td><td>[145, 160]</td><td>seven (7) years</td></tr><tr><td>TS-001</td><td>oid</td><td>hit</td><td>[245, 274]</td><td>[270, 274]</td><td>Original Issue Discount: 98.5</td></tr><tr><td>TS-001</td><td>leverage_covenant</td><td>hit</td><td>[334, 339]</td><td>[334, 339]</td><td>5.25x</td></tr><tr><td>TS-002</td><td>commitment_usd</td><td>hit</td><td>[116, 132]</td><td>[116, 132]</td><td>USD 92.5 million</td></tr><tr><td>TS-002</td><td>spread_bps</td><td>hit</td><td>[179, 184]</td><td>[179, 184]</td><td>S+650</td></tr><tr><td>TS-002</td><td>floor_bps</td><td>hit</td><td>[192, 203]</td><td>[192, 203]</td><td>0.75% floor</td></tr><tr><td>TS-002</td><td>maturity_years</td><td>hit</td><td>[238, 255]</td><td>[238, 255]</td><td>fifth anniversary</td></tr><tr><td>TS-002</td><td>oid</td><td>hit</td><td>[278, 286]</td><td>[278, 286]</td><td>99.0 OID</td></tr><tr><td>TS-002</td><td>leverage_covenant</td><td>hit</td><td>[341, 346]</td><td>[341, 346]</td><td>4.75x</td></tr><tr><td>TS-003</td><td>commitment_usd</td><td>hit</td><td>[147, 179]</td><td>[147, 177]</td><td>Total Commitment: $175,000,000</td></tr><tr><td>TS-003</td><td>spread_bps</td><td>hit</td><td>[187, 210]</td><td>[187, 210]</td><td>SOFR plus 5.25 per cent</td></tr><tr><td>TS-003</td><td>floor_bps</td><td>hit</td><td>[222, 239]</td><td>[222, 239]</td><td>SOFR Floor: 1.25%</td></tr><tr><td>TS-003</td><td>maturity_years</td><td>hit</td><td>[240, 254]</td><td>[240, 254]</td><td>Tenor: 6 years</td></tr><tr><td>TS-003</td><td>oid</td><td>hit</td><td>[255, 265]</td><td>[255, 265]</td><td>OID: 99.25</td></tr><tr><td>TS-003</td><td>leverage_covenant</td><td>hit</td><td>[313, 318]</td><td>[313, 318]</td><td>6.00x</td></tr><tr><td>TS-004</td><td>commitment_usd</td><td>hit</td><td>[55, 79]</td><td>[63, 78]</td><td>Amount: EUR 210,000,000</td></tr><tr><td>TS-004</td><td>spread_bps</td><td>hit</td><td>[100, 115]</td><td>[100, 115]</td><td>EURIBOR + 4.90%</td></tr><tr><td>TS-004</td><td>floor_bps</td><td>hit</td><td>[117, 136]</td><td>[117, 136]</td><td>EURIBOR floor 0.00%</td></tr><tr><td>TS-004</td><td>maturity_years</td><td>hit</td><td>[137, 160]</td><td>[153, 160]</td><td>Final Maturity: 8 years</td></tr><tr><td>TS-004</td><td>oid</td><td>hit</td><td>[161, 177]</td><td>[174, 177]</td><td>Issue Price: par</td></tr><tr><td>TS-004</td><td>leverage_covenant</td><td>hit</td><td>[219, 224]</td><td>[219, 224]</td><td>5.75x</td></tr><tr><td>TS-005</td><td>commitment_usd</td><td>hit</td><td>[62, 89]</td><td>[77, 88]</td><td>Facility Size: $65,000,000</td></tr><tr><td>TS-005</td><td>spread_bps</td><td>hit</td><td>[95, 107]</td><td>[95, 107]</td><td>SOFR + 6.25%</td></tr><tr><td>TS-005</td><td>maturity_years</td><td>hit</td><td>[108, 125]</td><td>[118, 125]</td><td>Maturity: 5 years</td></tr><tr><td>TS-005</td><td>oid</td><td>hit</td><td>[126, 135]</td><td>[131, 135]</td><td>OID: 98.0</td></tr></tbody></table></div>
+  </div>
+</section>
+
+<section>
+  <h2>Records that notice when the document changes</h2>
+  <div class="stack-lg">
+    <div class="tw"><table><thead><tr><th>Check</th><th>Result</th></tr></thead><tbody><tr><td>Record verifies against the original document</td><td>pass</td></tr><tr><td>Record rejects an edited document</td><td>pass</td></tr><tr><td>Reason given</td><td>document has changed since extraction</td></tr></tbody></table></div>
+    <p>Each record stores a hash of the source document alongside the span and the
+    quoted evidence. Editing the spread from 5.75% to 6.75% invalidates every record
+    for that document, which is the property that makes an extraction archive usable
+    months later: a record that still verifies is one you can rely on.</p>
+  </div>
+</section>
+
+<section>
+  <h2>The corpus</h2>
+  <div class="stack-lg">
+    <div class="tw"><table><thead><tr><th>Document</th><th>SHA-256</th><th>Chars</th><th>What it tests</th></tr></thead><tbody><tr><td>TS-001</td><td>0796d8a9055a21f5</td><td class="n">417</td><td>Canonical layout. Every field present and stated once.</td></tr><tr><td>TS-002</td><td>901e463ca61af318</td><td class="n">419</td><td>Prose form, abbreviations, and a superseded spread that must not be picked.</td></tr><tr><td>TS-003</td><td>1a5552d989bf1efd</td><td class="n">366</td><td>Three commitment figures. Only the total is correct; the others are distractors.</td></tr><tr><td>TS-004</td><td>390d6f330f00941c</td><td class="n">294</td><td>Non-USD, zero floor, &#x27;par&#x27; rather than a number, and an equity distractor.</td></tr><tr><td>TS-005</td><td>a75d29d7458acc2c</td><td class="n">203</td><td>Covenant-lite with no floor. Two fields are genuinely absent, and a system that invents values for them is worse than one that abstains.</td></tr></tbody></table></div>
+  </div>
+</section>
+
+<section>
+  <h2>A full extraction report — TS-003</h2>
+  <div class="stack-lg">
+    <div class="tw"><table><thead><tr><th>Field</th><th>Value</th><th>Rule</th><th>Confidence</th><th>Evidence</th></tr></thead><tbody><tr><td>commitment_usd</td><td>175000000.0</td><td>total-commitment</td><td class="n">0.95</td><td>Total Commitment: $175,000,000</td></tr><tr><td>spread_bps</td><td>525.0</td><td>benchmark-plus-pct</td><td class="n">0.92</td><td>SOFR plus 5.25 per cent</td></tr><tr><td>floor_bps</td><td>125.0</td><td>named-floor</td><td class="n">0.93</td><td>SOFR Floor: 1.25%</td></tr><tr><td>maturity_years</td><td>6.0</td><td>labelled</td><td class="n">0.92</td><td>Tenor: 6 years</td></tr><tr><td>oid</td><td>99.25</td><td>labelled-oid</td><td class="n">0.93</td><td>OID: 99.25</td></tr><tr><td>leverage_covenant</td><td>6.0</td><td>leverage-multiple</td><td class="n">0.9</td><td>6.00x</td></tr></tbody></table></div>
+    <p>Written to <code>data/extractions/TS-003.json</code>. The
+    <code>rule</code> column names which pattern fired, so a systematic error can be
+    traced to one rule rather than to "the extractor".</p>
+  </div>
+</section>
+
+<section>
+  <h2>Reproduce it</h2>
+  <div class="stack">
+    <pre>cd private-credit-data-provenance
+pip install -r requirements.txt
+python -m pytest tests/ -q
+python -m src.demo</pre>
+  </div>
+</section>
+
+<section>
+  <h2>What this does not establish</h2>
+  <div class="stack">
+    <ul class="tight">
+      <li><strong>The accuracy figures are circular.</strong> The same person wrote the
+      documents and the rules. 100% shows the rules handle the cases they were written
+      against; it says nothing about an unseen term sheet.</li>
+      <li>Five documents. Real private-credit paper runs to tens of pages with
+      defined terms, cross-references and schedules, none of which are here.</li>
+      <li>Rule-based extraction of the kind used here degrades sharply on unseen
+      phrasings. The rule names in every record exist so that degradation is
+      diagnosable, not so it can be denied.</li>
+      <li>No PDF or OCR layer. Real documents arrive as scans, and layout-aware
+      extraction is a different problem from the one solved here.</li>
+      <li>Nothing here has been run against a real portfolio, and no regulatory
+      reporting claim follows from it.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="foot">
+  <p>3.0-Financial-Ai-Systems &middot; private-credit-data-provenance &middot; part of a five-repository portfolio on optimization-driven,
+     system-level decision frameworks.</p>
+  <p>Every figure on this page was produced by running <code>python -m src.demo</code> in this
+     project and reading <code>results.json</code>. Nothing here is hand-entered. The run used clearly-labelled synthetic data; swap in the real source and the same pipeline reports real numbers.</p>
+</div>
+</div>
+</body>
+</html>

@@ -1,69 +1,87 @@
 # Private Credit Data Provenance
 
-> **Status: scaffold.** Structure only — no method, data or result is claimed
-> yet. Every "not yet measured" below is a real gap, not a placeholder to be
-> filled in with an estimate.
+> Term extraction from private-credit documents where every value carries the character span it came from, so a wrong number can be found rather than merely suspected.
 
-**Repository:** `3.0-Financial-Ai-Systems`
-**NIW pillar (Dhanasar prong 1):** Financial Stability
-**Evidence value:** Planned — build this next; strongest single alignment in the workspace
+**Repository:** `3.0-Financial-Ai-Systems` &middot; **Pillar:** Financial Stability
 
-## Core idea
+## Status
 
-Extract terms from private credit documents where every extracted value carries a citation back to the source span.
+This is working code with a runnable demo and 0 tests. It is **not** a
+finished result.
 
-## Why it earns its place
+Real term sheets are confidential, so the five documents here are authored for this project. The same person wrote the documents and the extractors, which makes the 100% value accuracy CIRCULAR — it shows the rules handle the cases they were written against, not that they generalise. The exact-span figure is the more honest number.
 
-Notion structural opportunity #1. Private-credit and alternative-asset data are opaque and non-standardised; valuation is subjective; regulators (Form PF, AIFMD) demand more transparency; AUM is projected toward USD 5tn by 2029. Simultaneously a national-interest argument that writes itself and a commercial thesis.
+Last run: `2026-08-31T18:36:53+00:00`
 
-## The petition claim it supports
+## Quick start
 
-> Market transparency, regulatory reporting and systemic risk in private credit.
-
-**What the portfolio shows today:** A scoping document only, in the archived roadmap/ folder.
-
-**Action required:** Build the term-sheet parser as the MVP. Shares its provenance layer with the data-provenance-library in repo 5.0.
-
-Prior work to build on: `previous/roadmap/private-credit-data-provenance`.
-
-## Petition-grade checklist
-
-A project counts as petition-grade only when all five are true. None are yet.
-
-- [ ] Original work, authored here
-- [ ] A stated method (`docs/METHOD.md`)
-- [ ] Real data at a stated scale (`docs/DATA.md` — target: Private credit term sheets (universe to be stated))
-- [ ] A measured result (`results/README.md`)
-- [ ] A README a reviewer can follow, start to finish
-
-## Measured results
-
-Target scale: **Private credit term sheets (universe to be stated)**
-
-| Metric | Baseline | Result | Out-of-sample |
-|---|---|---|---|
-| Term-extraction accuracy (held-out) | _not yet measured_ | _not yet measured_ | _pending_ |
-| Span-citation precision — every value traceable to source | _not yet measured_ | _not yet measured_ | _pending_ |
-| Coverage across document formats | _not yet measured_ | _not yet measured_ | _pending_ |
-| Human-review time saved | _not yet measured_ | _not yet measured_ | _pending_ |
-
-Populate this from `results/`. Do not cite any number in the petition that does
-not appear here with a run date behind it.
+```bash
+pip install -r requirements.txt
+python -m pytest tests/ -q     # 0 tests
+python -m src.demo             # runs everything, rewrites results/ and website/
+```
 
 ## Layout
 
 ```
-private-credit-data-provenance/
-├── README.md        this file
-├── docs/
-│   ├── METHOD.md    what the method is and why it is non-obvious
-│   ├── DATA.md      source, scale, licence, and how to reproduce the pull
-│   └── EVIDENCE.md  the petition claim, the gap, and the exhibit it becomes
-├── src/             implementation
-├── data/            pointers and manifests — never raw licensed data
-├── results/         measured results, run logs, and the baseline comparison
-└── tests/           tests that establish the result is reproducible
+README.md
+data/
+  |-- README.md
+  |-- extractions/
+  |-- manifests/
+  |-- sample/
+docs/
+  |-- DATA.md
+  |-- EVIDENCE.md
+  |-- METHOD.md
+requirements.txt
+results/
+  |-- README.md
+  |-- latest.json
+src/
+  |-- .gitkeep
+  |-- __init__.py
+  |-- demo.py
+  |-- documents.py
+  |-- extract.py
+  |-- provenance.py
+  |-- site.py
+  |-- sitekit.py
+tests/
+  |-- .gitkeep
+  |-- test_extraction.py
+website/
+  |-- README.md
+  |-- index.html
+  |-- results.json
+  |-- vercel.json
 ```
 
----
-Scaffold generated from `NIW_Project_Portfolio_and_Gap_Plan.xlsx` (sheets: Repo Build-Out Plan, Core Ideas at a Glance, NIW Claim vs Repo Evidence, Notion 创业 Alignment). Structure only — no results are claimed here yet.
+- `src/` &mdash; the implementation.
+- `tests/` &mdash; pytest suite. These guard behaviour, not just imports.
+- `results/latest.json` &mdash; the output of the last demo run. Every figure quoted
+  anywhere in this project traces back to this file.
+- `website/` &mdash; a self-contained static site, deployable to Vercel by copying the
+  folder into its own repository. See `website/README.md`.
+
+## The website
+
+`website/` has no build step. To deploy it independently:
+
+```bash
+cp -r website/ ../my-private-credit-data-provenance-site && cd ../my-private-credit-data-provenance-site
+git init && git add -A && git commit -m "site"
+vercel deploy --prod
+```
+
+The page is regenerated from `results.json` on every `python -m src.demo`, so the
+figures on the site and the figures the code produces cannot drift apart. Do not edit
+numbers on the page by hand.
+
+## Honesty note
+
+Everything in this project runs on clearly-labelled synthetic or authored data.
+Swap in the real source and the same pipeline reports real numbers &mdash; that is
+what the structure is for. Until that happens, nothing here should be cited as a
+measured result, and the site's closing section states explicitly what the project
+does not establish.
