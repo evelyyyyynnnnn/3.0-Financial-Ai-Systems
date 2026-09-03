@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Measured Results</title>
+<meta name="description" content="Every figure the portfolio can actually support, read from the file each project&#x27;s own demo wrote — and every claim it cannot.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#FCFCFD; --surface:#FFFFFF; --surface-2:#F4F5F8;
+  --ink:#16191F; --ink-2:#40474F; --muted:#6C7480;
+  --line:#E2E5EA; --line-2:#EFF1F4;
+  --accent:#1D5B70; --accent-2:#E6F0F3;
+  --ok:#2C6B4F; --ok-bg:#E5F1EA;
+  --warn:#8A6212; --warn-bg:#F7EFDC;
+  --demo:#6E4B8F; --demo-bg:#F0EAF6;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme=light]){
+    --bg:#0F1216; --surface:#161A20; --surface-2:#1C212A;
+    --ink:#E9ECF0; --ink-2:#BEC5CE; --muted:#8A939F;
+    --line:#282F38; --line-2:#20262E;
+    --accent:#72B3CB; --accent-2:#18272E;
+    --ok:#7BC09F; --ok-bg:#15251E;
+    --warn:#D8AD5E; --warn-bg:#292216;
+    --demo:#B79AD6; --demo-bg:#241C2E;
+  }
+}
+:root[data-theme=dark]{
+  --bg:#0F1216; --surface:#161A20; --surface-2:#1C212A;
+  --ink:#E9ECF0; --ink-2:#BEC5CE; --muted:#8A939F;
+  --line:#282F38; --line-2:#20262E;
+  --accent:#72B3CB; --accent-2:#18272E;
+  --ok:#7BC09F; --ok-bg:#15251E;
+  --warn:#D8AD5E; --warn-bg:#292216;
+  --demo:#B79AD6; --demo-bg:#241C2E;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+    "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:15.5px;line-height:1.62;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px 88px}
+h1,h2,h3{font-family:Spectral,Georgia,"Songti SC",serif;margin:0;text-wrap:balance}
+h1{font-size:clamp(28px,4.2vw,42px);font-weight:700;letter-spacing:-.015em;line-height:1.14}
+h2{font-size:clamp(20px,2.5vw,25px);font-weight:600;letter-spacing:-.01em}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+a{color:var(--accent)}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.88em}
+.stack{display:flex;flex-direction:column;gap:14px}
+.stack-lg{display:flex;flex-direction:column;gap:22px}
+section{margin-top:52px}
+
+header.mast{border-bottom:1px solid var(--line);padding:44px 0 26px;margin-bottom:8px;
+  display:flex;flex-direction:column;gap:15px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--ink-2);font-size:16.5px;max-width:66ch}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;padding:3px 9px;border-radius:4px;background:var(--surface-2);
+  color:var(--muted);font-weight:500;white-space:nowrap}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}
+.tag.demo{background:var(--demo-bg);color:var(--demo)}
+.tag.warn{background:var(--warn-bg);color:var(--warn)}
+
+.banner{display:flex;gap:13px;align-items:flex-start;background:var(--demo-bg);
+  border-radius:9px;padding:15px 18px;margin-top:26px}
+.banner .bi{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--demo);flex:none;padding-top:3px;font-weight:600}
+.banner p{font-size:14.2px;color:var(--ink-2)}
+
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.metric{background:var(--surface);padding:15px 16px;display:flex;flex-direction:column;gap:5px}
+.metric .mk{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);line-height:1.35}
+.metric .mv{font-family:Spectral,Georgia,serif;font-size:26px;font-weight:600;
+  font-variant-numeric:tabular-nums;line-height:1.1;color:var(--accent)}
+.metric .mn{font-size:12.4px;color:var(--muted);line-height:1.4}
+
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.8px;min-width:520px}
+th{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);font-weight:500;padding:11px 14px;
+  border-bottom:1px solid var(--line);background:var(--surface-2)}
+td{padding:10px 14px;border-bottom:1px solid var(--line-2);vertical-align:top;line-height:1.5}
+td.n{font-variant-numeric:tabular-nums;text-align:right}
+tr:last-child td{border-bottom:0}
+
+pre{margin:0;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 17px;overflow-x:auto;font-family:"IBM Plex Mono",monospace;
+  font-size:12.8px;line-height:1.62;color:var(--ink-2)}
+ul.tight{margin:0;padding-left:19px;display:flex;flex-direction:column;gap:7px}
+ul.tight li::marker{color:var(--muted)}
+.note{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
+  padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.foot{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:9px}
+figure{margin:0}
+svg.chart{display:block;width:100%;height:auto}
+@media (max-width:600px){.wrap{padding:0 17px 68px}.banner{flex-direction:column;gap:7px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="mast">
+  <div class="eyebrow">3.0-Financial-Ai-Systems &middot; Financial Stability</div>
+  <h1>Measured Results</h1>
+  <p class="lede">Every figure the portfolio can actually support, read from the file each project&#x27;s own demo wrote — and every claim it cannot.</p>
+  <div class="tags"><span class="tag ">reads 21 projects</span><span class="tag ">no hand-entered numbers</span><span class="tag warn">claims audit</span></div>
+</header>
+<div class="banner">
+  <span class="bi">Data</span>
+  <p>This page is generated by walking the five repositories and reading each project&#x27;s results/latest.json. A number with no run behind it cannot appear here, and a project that has never been run is listed as such rather than omitted. All current runs use synthetic or authored data.</p>
+</div>
+
+<section>
+  <h2>Why this page exists</h2>
+  <div class="stack">
+    <p>Numbers get quoted in a CV, a README or a petition, and over time nobody can say
+    which run produced them or whether that run still exists. Every figure below is read
+    from the JSON file the project's own demo wrote. A number with no run behind it
+    cannot appear here, and a project that has never been run is listed as such rather
+    than quietly left out.</p>
+    <p>That constraint is the product. It is also why the "on real data" count reads
+    <strong>0</strong>.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Portfolio state</h2>
+  <div class="stack-lg">
+    <div class="metrics"><div class="metric"><span class="mk">Projects</span><span class="mv">21</span><span class="mn">across 5 repositories</span></div><div class="metric"><span class="mk">With a recorded run</span><span class="mv">21</span><span class="mn">0 never run</span></div><div class="metric"><span class="mk">On real data</span><span class="mv">0</span><span class="mn">21 on synthetic</span></div><div class="metric"><span class="mk">Tests</span><span class="mv">555</span><span class="mn">across the portfolio</span></div></div>
+    <p class="mono" style="color:var(--muted);font-size:12.5px">
+      generated 2026-08-31T21:50:26+00:00 &middot; read from
+      21 results files
+    </p>
+    <div class="tw"><table><thead><tr><th>Repo</th><th>Project</th><th>Run</th><th>Tests</th><th>Site</th><th>Headline measured figures</th></tr></thead><tbody><tr><td>1.0</td><td>agent-verification-harness</td><td>yes</td><td class="n">32</td><td>yes</td><td>Precision 0.8333; Recall 1.0</td></tr><tr><td>1.0</td><td>blockchain-shared-charging</td><td>yes</td><td class="n">29</td><td>yes</td><td>Gas per session 177374; L1 overhead at 20 gwei 107.5</td></tr><tr><td>1.0</td><td>chaintrust-bench</td><td>yes</td><td class="n">27</td><td>yes</td><td>Baseline macro-F1, seed tier 1.0; Baseline macro-F1, hard tier 0.0</td></tr><tr><td>1.0</td><td>llm-audit-agent</td><td>yes</td><td class="n">17</td><td>yes</td><td>Agent macro-F1, hard tier 0.5556; Agent macro-F1, seed tier 0.6857</td></tr><tr><td>2.0</td><td>clinical-empathy-analysis</td><td>yes</td><td class="n">32</td><td>yes</td><td>LOO correlation 0.9463; Transcripts 16</td></tr><tr><td>2.0</td><td>icu-early-warning</td><td>yes</td><td class="n">32</td><td>yes</td><td>AUROC, hypotension 0.7043; Calibration ECE 0.01214</td></tr><tr><td>2.0</td><td>physiological-waveform-pipeline</td><td>yes</td><td class="n">31</td><td>yes</td><td>Artifact rejection F1 0.9042; Specificity 0.9893</td></tr><tr><td>2.0</td><td>pyhealth-rhealth-extension</td><td>yes</td><td class="n">29</td><td>yes</td><td>Leakage inflation 23.05; Package exports 14</td></tr><tr><td>3.0</td><td>contagion-observatory</td><td>yes</td><td class="n">39</td><td>yes</td><td>Edge recall 1.0; Edge precision 0.1591</td></tr><tr><td>3.0</td><td>filing-intelligence</td><td>yes</td><td class="n">33</td><td>yes</td><td>Material changes recovered 1.0; False alarms on unchanged pairs 0</td></tr><tr><td>3.0</td><td>measured-results</td><td>yes</td><td class="n">11</td><td>yes</td><td>—</td></tr><tr><td>3.0</td><td>private-credit-data-provenance</td><td>yes</td><td class="n">30</td><td>yes</td><td>Value accuracy 1.0; Span accuracy, exact 0.6786</td></tr><tr><td>3.0</td><td>tokenized-fixed-income-analytics</td><td>yes</td><td class="n">34</td><td>yes</td><td>Stress latency ratio 5.152; Tokens analysed 6</td></tr><tr><td>4.0</td><td>decision-audit-framework</td><td>yes</td><td class="n">19</td><td>yes</td><td>—</td></tr><tr><td>4.0</td><td>decision-benchmark-suite</td><td>yes</td><td class="n">19</td><td>yes</td><td>—</td></tr><tr><td>4.0</td><td>icu-triage-optimization</td><td>yes</td><td class="n">18</td><td>yes</td><td>—</td></tr><tr><td>4.0</td><td>optimization-under-uncertainty</td><td>yes</td><td class="n">20</td><td>yes</td><td>—</td></tr><tr><td>5.0</td><td>data-provenance-library</td><td>yes</td><td class="n">20</td><td>yes</td><td>—</td></tr><tr><td>5.0</td><td>llm-eval-calibration-harness</td><td>yes</td><td class="n">22</td><td>yes</td><td>—</td></tr><tr><td>5.0</td><td>quant-productivity-toolkit</td><td>yes</td><td class="n">28</td><td>yes</td><td>—</td></tr><tr><td>5.0</td><td>risk-portfolio-saas</td><td>yes</td><td class="n">33</td><td>yes</td><td>—</td></tr></tbody></table></div>
+  </div>
+</section>
+
+<section>
+  <h2>Petition claims against what the code shows</h2>
+  <div class="stack-lg">
+    <div class="tw"><table><thead><tr><th>Claim</th><th>Project that would evidence it</th><th>Status</th><th>What the run shows</th></tr></thead><tbody><tr><td>600+ filings analysed; ~70% cut in processing time</td><td>filing-intelligence</td><td>not evidenced</td><td>0 filings pulled from EDGAR; no human baseline measured, so no reduction percentage is computed anywhere.</td></tr><tr><td>7,500+ crypto and 6,000+ equities</td><td>contagion-observatory</td><td>not evidenced</td><td>18 synthetic assets. The résumé supports this claim from other work; this repository does not.</td></tr><tr><td>1.2M on-chain transactions; ChainTrust-Bench adopted by two fintech startups</td><td>chaintrust-bench</td><td>partially addressed</td><td>The benchmark now exists under that name with 17 authored cases and a two-tier design. No mined corpus, no DOI, no release, no adopters.</td></tr><tr><td>LLM audit agents cut manual audit workload 65%</td><td>llm-audit-agent</td><td>contradicted by the run</td><td>Measured review-load change is 0.0% with the stub backend, and the agent currently loses to the rule-based baseline overall. No language model has been run against the corpus.</td></tr><tr><td>12,000 ICU patients, 58,000 waveform-hours, 22% false-alert cut</td><td>icu-early-warning</td><td>not evidenced</td><td>400 synthetic patients, 4 synthetic waveform-hours. Measured false-alert reduction is 8.7% at matched sensitivity, on synthetic data.</td></tr><tr><td>PyHealth / RHealth extensions used by external research groups</td><td>pyhealth-rhealth-extension</td><td>partially addressed</td><td>An installable package now exists. It is not published to PyPI, so it has no downloads and no users.</td></tr></tbody></table></div>
+    <div class="note warn" style="background:var(--warn-bg);border-color:transparent">
+      <h3>Read the status column literally</h3>
+      <p>"Not evidenced" means the repository cannot support the claim today — not that
+      the claim is false. Several are supported by work recorded elsewhere in the
+      résumé. What this table establishes is narrower and more useful: which claims a
+      reader following the code would be unable to verify.</p>
+      <p>One row says <em>contradicted by the run</em>. The audit agent's measured
+      review-load change is 0.0% and it currently loses to the rule-based baseline. That
+      is on the page because a roll-up that only reported the flattering projects would
+      defeat its own purpose.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Test coverage by project</h2>
+  <div class="stack-lg">
+    <figure><svg class="chart" viewBox="0 0 680 744" role="img" aria-label="Bar chart of results"><text x="180" y="26.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">agent-verification-harness</text><rect x="190" y="9" width="346.3" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="545.3" y="26.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">32</text><text x="180" y="61.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">blockchain-shared-charging</text><rect x="190" y="44" width="313.8" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="512.8" y="61.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">29</text><text x="180" y="96.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">chaintrust-bench</text><rect x="190" y="79" width="292.2" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="491.2" y="96.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">27</text><text x="180" y="131.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">llm-audit-agent</text><rect x="190" y="114" width="183.9" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="382.9" y="131.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">17</text><text x="180" y="166.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">clinical-empathy-analysis</text><rect x="190" y="149" width="346.3" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="545.3" y="166.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">32</text><text x="180" y="201.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">icu-early-warning</text><rect x="190" y="184" width="346.3" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="545.3" y="201.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">32</text><text x="180" y="236.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">physiological-waveform-pip</text><rect x="190" y="219" width="335.4" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="534.4" y="236.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">31</text><text x="180" y="271.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">pyhealth-rhealth-extension</text><rect x="190" y="254" width="313.8" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="512.8" y="271.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">29</text><text x="180" y="306.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">contagion-observatory</text><rect x="190" y="289" width="422.0" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="621.0" y="306.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">39</text><text x="180" y="341.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">filing-intelligence</text><rect x="190" y="324" width="357.1" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="556.1" y="341.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">33</text><text x="180" y="376.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">measured-results</text><rect x="190" y="359" width="119.0" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="318.0" y="376.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">11</text><text x="180" y="411.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">private-credit-data-proven</text><rect x="190" y="394" width="324.6" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="523.6" y="411.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">30</text><text x="180" y="446.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">tokenized-fixed-income-ana</text><rect x="190" y="429" width="367.9" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="566.9" y="446.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">34</text><text x="180" y="481.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">decision-audit-framework</text><rect x="190" y="464" width="205.6" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="404.6" y="481.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">19</text><text x="180" y="516.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">decision-benchmark-suite</text><rect x="190" y="499" width="205.6" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="404.6" y="516.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">19</text><text x="180" y="551.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">icu-triage-optimization</text><rect x="190" y="534" width="194.8" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="393.8" y="551.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">18</text><text x="180" y="586.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">optimization-under-uncerta</text><rect x="190" y="569" width="216.4" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="415.4" y="586.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">20</text><text x="180" y="621.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">data-provenance-library</text><rect x="190" y="604" width="216.4" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="415.4" y="621.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">20</text><text x="180" y="656.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">llm-eval-calibration-harne</text><rect x="190" y="639" width="238.1" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="437.1" y="656.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">22</text><text x="180" y="691.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">quant-productivity-toolkit</text><rect x="190" y="674" width="303.0" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="502.0" y="691.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">28</text><text x="180" y="726.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">risk-portfolio-saas</text><rect x="190" y="709" width="357.1" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="556.1" y="726.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">33</text></svg></figure>
+    <p>555 tests across 21 projects. These guard
+    behaviour, not imports: several encode findings directly, so that a regression
+    changes a test result rather than silently changing a number on a website.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Every measured figure</h2>
+  <div class="stack-lg">
+    <h3>agent-verification-harness</h3><div class="tw"><table><thead><tr><th>Metric</th><th>Value</th><th>Note</th></tr></thead><tbody><tr><td>Precision</td><td class="n">0.8333</td><td>on flagged claims</td></tr><tr><td>Recall</td><td class="n">1.0</td><td>of bad claims caught</td></tr><tr><td>Claims checked</td><td class="n">12</td><td>—</td></tr></tbody></table></div><h3>blockchain-shared-charging</h3><div class="tw"><table><thead><tr><th>Metric</th><th>Value</th><th>Note</th></tr></thead><tbody><tr><td>Gas per session</td><td class="n">177374</td><td>estimated</td></tr><tr><td>L1 overhead at 20 gwei</td><td class="n">107.5</td><td>percent of session value — not viable</td></tr></tbody></table></div><h3>chaintrust-bench</h3><div class="tw"><table><thead><tr><th>Metric</th><th>Value</th><th>Note</th></tr></thead><tbody><tr><td>Baseline macro-F1, seed tier</td><td class="n">1.0</td><td>—</td></tr><tr><td>Baseline macro-F1, hard tier</td><td class="n">0.0</td><td>headroom the benchmark exists to create</td></tr><tr><td>Corpus size</td><td class="n">17</td><td>cases</td></tr></tbody></table></div><h3>llm-audit-agent</h3><div class="tw"><table><thead><tr><th>Metric</th><th>Value</th><th>Note</th></tr></thead><tbody><tr><td>Agent macro-F1, hard tier</td><td class="n">0.5556</td><td>baseline scores 0.000 here</td></tr><tr><td>Agent macro-F1, seed tier</td><td class="n">0.6857</td><td>baseline scores 1.000 — the agent regresses</td></tr><tr><td>Review-load change</td><td class="n">0.0</td><td>percent, at equal corpus</td></tr></tbody></table></div><h3>clinical-empathy-analysis</h3><div class="tw"><table><thead><tr><th>Metric</th><th>Value</th><th>Note</th></tr></thead><tbody><tr><td>LOO correlation</td><td class="n">0.9463</td><td>circular — see the project page</td></tr><tr><td>Transcripts</td><td class="n">16</td><td>authored</td></tr></tbody></table></div><h3>icu-early-warning</h3><div class="tw"><table><thead><tr><th>Metric</th><th>Value</th><th>Note</th></tr></thead><tbody><tr><td>AUROC, hypotension</td><td class="n">0.7043</td><td>4-hour horizon</td></tr><tr><td>Calibration ECE</td><td class="n">0.01214</td><td>after isotonic</td></tr><tr><td>False-alert reduction</td><td class="n">8.73</td><td>percent, at matched 80% sensitivity</td></tr></tbody></table></div><h3>physiological-waveform-pipeline</h3><div class="tw"><table><thead><tr><th>Metric</th><th>Value</th><th>Note</th></tr></thead><tbody><tr><td>Artifact rejection F1</td><td class="n">0.9042</td><td>vs injected truth</td></tr><tr><td>Specificity</td><td class="n">0.9893</td><td>clean windows kept</td></tr><tr><td>Waveform-hours</td><td class="n">4.0</td><td>synthetic</td></tr></tbody></table></div><h3>pyhealth-rhealth-extension</h3><div class="tw"><table><thead><tr><th>Metric</th><th>Value</th><th>Note</th></tr></thead><tbody><tr><td>Leakage inflation</td><td class="n">23.05</td><td>percent AUROC, row split vs subject split</td></tr><tr><td>Package exports</td><td class="n">14</td><td>public API</td></tr></tbody></table></div><h3>contagion-observatory</h3><div class="tw"><table><thead><tr><th>Metric</th><th>Value</th><th>Note</th></tr></thead><tbody><tr><td>Edge recall</td><td class="n">1.0</td><td>of constructed edges</td></tr><tr><td>Edge precision</td><td class="n">0.1591</td><td>the honest cost</td></tr><tr><td>True edges</td><td class="n">7</td><td>of 306 pairs</td></tr></tbody></table></div><h3>filing-intelligence</h3><div class="tw"><table><thead><tr><th>Metric</th><th>Value</th><th>Note</th></tr></thead><tbody><tr><td>Material changes recovered</td><td class="n">1.0</td><td>of labelled</td></tr><tr><td>False alarms on unchanged pairs</td><td class="n">0</td><td>—</td></tr><tr><td>Filings pulled from EDGAR</td><td class="n">0</td><td>the client is unexercised</td></tr></tbody></table></div><h3>private-credit-data-provenance</h3><div class="tw"><table><thead><tr><th>Metric</th><th>Value</th><th>Note</th></tr></thead><tbody><tr><td>Value accuracy</td><td class="n">1.0</td><td>circular</td></tr><tr><td>Span accuracy, exact</td><td class="n">0.6786</td><td>—</td></tr><tr><td>Invented values</td><td class="n">0</td><td>on genuinely absent fields</td></tr></tbody></table></div><h3>tokenized-fixed-income-analytics</h3><div class="tw"><table><thead><tr><th>Metric</th><th>Value</th><th>Note</th></tr></thead><tbody><tr><td>Stress latency ratio</td><td class="n">5.152</td><td>redemption queue lengthening</td></tr><tr><td>Tokens analysed</td><td class="n">6</td><td>synthetic</td></tr></tbody></table></div>
+  </div>
+</section>
+
+<section>
+  <h2>Reproduce it</h2>
+  <div class="stack">
+    <pre># run every project first, then roll up
+for d in ../../*/*/; do (cd "$d" && python -m src.demo); done
+cd measured-results && python -m src.demo</pre>
+  </div>
+</section>
+
+<section>
+  <h2>What this does not establish</h2>
+  <div class="stack">
+    <ul class="tight">
+      <li>Every run behind these numbers used synthetic or authored data. The
+      portfolio currently contains <strong>0</strong> projects with
+      a result computed on real data.</li>
+      <li>Several projects were validated against corpora written by the same person
+      who wrote the method. Those figures measure internal consistency, and each
+      project's own page says so.</li>
+      <li>0 projects have no recorded run at all.</li>
+      <li>This page checks that figures trace to a run. It cannot check that the
+      run was well designed — that judgement stays with each project's page.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="foot">
+  <p>3.0-Financial-Ai-Systems &middot; measured-results &middot; part of a five-repository portfolio on optimization-driven,
+     system-level decision frameworks.</p>
+  <p>Every figure on this page was produced by running <code>python -m src.demo</code> in this
+     project and reading <code>results.json</code>. Nothing here is hand-entered. The run used clearly-labelled synthetic data; swap in the real source and the same pipeline reports real numbers.</p>
+</div>
+</div>
+</body>
+</html>

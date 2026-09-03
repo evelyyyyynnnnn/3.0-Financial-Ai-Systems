@@ -1,0 +1,2 @@
+# Standard library only. This project reads the other projects' output.
+pytest>=7.0

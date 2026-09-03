@@ -1,0 +1,2 @@
+# Standard library only. EDGAR access uses urllib and is not exercised by tests.
+pytest>=7.0
