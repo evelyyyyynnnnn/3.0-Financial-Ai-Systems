@@ -1,0 +1,2 @@
+# Standard library only.
+pytest>=7.0
