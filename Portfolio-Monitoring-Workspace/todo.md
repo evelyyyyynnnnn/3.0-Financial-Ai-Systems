@@ -1,0 +1,18 @@
+- [ ] Read the new RTF attachment and extract the requested dashboard changes.
+- [ ] Convert the brief into concrete frontend update tasks for the asset monitoring project.
+- [ ] Implement the requested changes in the existing dashboard.
+- [ ] Validate the updated pages in preview.
+- [ ] Save a new checkpoint and deliver the updated website report.
+- [ ] Read the newest RTF attachment and extract the requested website changes.
+- [ ] Convert the new brief into concrete frontend update tasks.
+- [ ] Implement the requested changes in the existing asset monitoring website.
+- [ ] Validate the updated pages and interactions in preview.
+- [ ] Save a new checkpoint and deliver the updated website report.
+- [ ] Translate the new reference direction into a professional, light, and simple visual system.
+- [ ] Update navigation, hero, spacing, and typography to reflect the lighter wealth-management style.
+- [ ] Restyle the core pages so the site feels cleaner, calmer, and more minimal.
+- [ ] Validate the refreshed interface in preview.
+- [ ] Save a new checkpoint and deliver the updated website report.
+- [ ] Replace the homepage overview hero statement with the user-provided portfolio and risk-management sentences.
+- [ ] Advise the user on the GitHub connector re-authorization message and the next steps needed to continue making changes.
+- [ ] Create a downloadable compressed archive of the current project for local use and manual GitHub upload.
