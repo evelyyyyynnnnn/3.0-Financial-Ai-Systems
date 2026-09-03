@@ -1,0 +1,604 @@
+{
+  "generated_at": "2026-08-31T21:50:24+00:00",
+  "is_synthetic": true,
+  "data_source": "5 authored private-credit term sheets (src/documents.py)",
+  "corpus": {
+    "n_documents": 5,
+    "n_fields": 6,
+    "field_instances": 28,
+    "absent_instances": 2,
+    "present_per_field": {
+      "commitment_usd": 5,
+      "spread_bps": 5,
+      "floor_bps": 4,
+      "maturity_years": 5,
+      "oid": 5,
+      "leverage_covenant": 4
+    }
+  },
+  "fields": [
+    "commitment_usd",
+    "spread_bps",
+    "floor_bps",
+    "maturity_years",
+    "oid",
+    "leverage_covenant"
+  ],
+  "values": {
+    "n": 30,
+    "correct": 30,
+    "accuracy": 1.0,
+    "extracted_correct": 28,
+    "wrong_or_invented": 0,
+    "missed": 0,
+    "correct_abstentions": 2,
+    "per_field": {
+      "commitment_usd": {
+        "correct": 5,
+        "wrong": 0,
+        "n": 5,
+        "accuracy": 1.0
+      },
+      "spread_bps": {
+        "correct": 5,
+        "wrong": 0,
+        "n": 5,
+        "accuracy": 1.0
+      },
+      "floor_bps": {
+        "correct": 5,
+        "wrong": 0,
+        "n": 5,
+        "accuracy": 1.0
+      },
+      "maturity_years": {
+        "correct": 5,
+        "wrong": 0,
+        "n": 5,
+        "accuracy": 1.0
+      },
+      "oid": {
+        "correct": 5,
+        "wrong": 0,
+        "n": 5,
+        "accuracy": 1.0
+      },
+      "leverage_covenant": {
+        "correct": 5,
+        "wrong": 0,
+        "n": 5,
+        "accuracy": 1.0
+      }
+    }
+  },
+  "spans_overlap": {
+    "n": 28,
+    "hit": 28,
+    "miss": 0,
+    "no_span": 0,
+    "span_accuracy": 1.0,
+    "mode": "overlap"
+  },
+  "spans_exact": {
+    "n": 28,
+    "hit": 19,
+    "miss": 9,
+    "no_span": 0,
+    "span_accuracy": 0.6786,
+    "mode": "exact"
+  },
+  "span_details": [
+    {
+      "doc": "TS-001",
+      "field": "commitment_usd",
+      "result": "hit",
+      "predicted_span": [
+        110,
+        135
+      ],
+      "true_span": [
+        122,
+        134
+      ],
+      "quoted": "Commitment: $185,000,000"
+    },
+    {
+      "doc": "TS-001",
+      "field": "spread_bps",
+      "result": "hit",
+      "predicted_span": [
+        198,
+        210
+      ],
+      "true_span": [
+        198,
+        210
+      ],
+      "quoted": "SOFR + 5.75%"
+    },
+    {
+      "doc": "TS-001",
+      "field": "floor_bps",
+      "result": "hit",
+      "predicted_span": [
+        225,
+        244
+      ],
+      "true_span": [
+        225,
+        244
+      ],
+      "quoted": "SOFR floor of 1.00%"
+    },
+    {
+      "doc": "TS-001",
+      "field": "maturity_years",
+      "result": "hit",
+      "predicted_span": [
+        145,
+        160
+      ],
+      "true_span": [
+        145,
+        160
+      ],
+      "quoted": "seven (7) years"
+    },
+    {
+      "doc": "TS-001",
+      "field": "oid",
+      "result": "hit",
+      "predicted_span": [
+        245,
+        274
+      ],
+      "true_span": [
+        270,
+        274
+      ],
+      "quoted": "Original Issue Discount: 98.5"
+    },
+    {
+      "doc": "TS-001",
+      "field": "leverage_covenant",
+      "result": "hit",
+      "predicted_span": [
+        334,
+        339
+      ],
+      "true_span": [
+        334,
+        339
+      ],
+      "quoted": "5.25x"
+    },
+    {
+      "doc": "TS-002",
+      "field": "commitment_usd",
+      "result": "hit",
+      "predicted_span": [
+        116,
+        132
+      ],
+      "true_span": [
+        116,
+        132
+      ],
+      "quoted": "USD 92.5 million"
+    },
+    {
+      "doc": "TS-002",
+      "field": "spread_bps",
+      "result": "hit",
+      "predicted_span": [
+        179,
+        184
+      ],
+      "true_span": [
+        179,
+        184
+      ],
+      "quoted": "S+650"
+    },
+    {
+      "doc": "TS-002",
+      "field": "floor_bps",
+      "result": "hit",
+      "predicted_span": [
+        192,
+        203
+      ],
+      "true_span": [
+        192,
+        203
+      ],
+      "quoted": "0.75% floor"
+    },
+    {
+      "doc": "TS-002",
+      "field": "maturity_years",
+      "result": "hit",
+      "predicted_span": [
+        238,
+        255
+      ],
+      "true_span": [
+        238,
+        255
+      ],
+      "quoted": "fifth anniversary"
+    },
+    {
+      "doc": "TS-002",
+      "field": "oid",
+      "result": "hit",
+      "predicted_span": [
+        278,
+        286
+      ],
+      "true_span": [
+        278,
+        286
+      ],
+      "quoted": "99.0 OID"
+    },
+    {
+      "doc": "TS-002",
+      "field": "leverage_covenant",
+      "result": "hit",
+      "predicted_span": [
+        341,
+        346
+      ],
+      "true_span": [
+        341,
+        346
+      ],
+      "quoted": "4.75x"
+    },
+    {
+      "doc": "TS-003",
+      "field": "commitment_usd",
+      "result": "hit",
+      "predicted_span": [
+        147,
+        179
+      ],
+      "true_span": [
+        147,
+        177
+      ],
+      "quoted": "Total Commitment: $175,000,000"
+    },
+    {
+      "doc": "TS-003",
+      "field": "spread_bps",
+      "result": "hit",
+      "predicted_span": [
+        187,
+        210
+      ],
+      "true_span": [
+        187,
+        210
+      ],
+      "quoted": "SOFR plus 5.25 per cent"
+    },
+    {
+      "doc": "TS-003",
+      "field": "floor_bps",
+      "result": "hit",
+      "predicted_span": [
+        222,
+        239
+      ],
+      "true_span": [
+        222,
+        239
+      ],
+      "quoted": "SOFR Floor: 1.25%"
+    },
+    {
+      "doc": "TS-003",
+      "field": "maturity_years",
+      "result": "hit",
+      "predicted_span": [
+        240,
+        254
+      ],
+      "true_span": [
+        240,
+        254
+      ],
+      "quoted": "Tenor: 6 years"
+    },
+    {
+      "doc": "TS-003",
+      "field": "oid",
+      "result": "hit",
+      "predicted_span": [
+        255,
+        265
+      ],
+      "true_span": [
+        255,
+        265
+      ],
+      "quoted": "OID: 99.25"
+    },
+    {
+      "doc": "TS-003",
+      "field": "leverage_covenant",
+      "result": "hit",
+      "predicted_span": [
+        313,
+        318
+      ],
+      "true_span": [
+        313,
+        318
+      ],
+      "quoted": "6.00x"
+    },
+    {
+      "doc": "TS-004",
+      "field": "commitment_usd",
+      "result": "hit",
+      "predicted_span": [
+        55,
+        79
+      ],
+      "true_span": [
+        63,
+        78
+      ],
+      "quoted": "Amount: EUR 210,000,000"
+    },
+    {
+      "doc": "TS-004",
+      "field": "spread_bps",
+      "result": "hit",
+      "predicted_span": [
+        100,
+        115
+      ],
+      "true_span": [
+        100,
+        115
+      ],
+      "quoted": "EURIBOR + 4.90%"
+    },
+    {
+      "doc": "TS-004",
+      "field": "floor_bps",
+      "result": "hit",
+      "predicted_span": [
+        117,
+        136
+      ],
+      "true_span": [
+        117,
+        136
+      ],
+      "quoted": "EURIBOR floor 0.00%"
+    },
+    {
+      "doc": "TS-004",
+      "field": "maturity_years",
+      "result": "hit",
+      "predicted_span": [
+        137,
+        160
+      ],
+      "true_span": [
+        153,
+        160
+      ],
+      "quoted": "Final Maturity: 8 years"
+    },
+    {
+      "doc": "TS-004",
+      "field": "oid",
+      "result": "hit",
+      "predicted_span": [
+        161,
+        177
+      ],
+      "true_span": [
+        174,
+        177
+      ],
+      "quoted": "Issue Price: par"
+    },
+    {
+      "doc": "TS-004",
+      "field": "leverage_covenant",
+      "result": "hit",
+      "predicted_span": [
+        219,
+        224
+      ],
+      "true_span": [
+        219,
+        224
+      ],
+      "quoted": "5.75x"
+    },
+    {
+      "doc": "TS-005",
+      "field": "commitment_usd",
+      "result": "hit",
+      "predicted_span": [
+        62,
+        89
+      ],
+      "true_span": [
+        77,
+        88
+      ],
+      "quoted": "Facility Size: $65,000,000"
+    },
+    {
+      "doc": "TS-005",
+      "field": "spread_bps",
+      "result": "hit",
+      "predicted_span": [
+        95,
+        107
+      ],
+      "true_span": [
+        95,
+        107
+      ],
+      "quoted": "SOFR + 6.25%"
+    },
+    {
+      "doc": "TS-005",
+      "field": "maturity_years",
+      "result": "hit",
+      "predicted_span": [
+        108,
+        125
+      ],
+      "true_span": [
+        118,
+        125
+      ],
+      "quoted": "Maturity: 5 years"
+    },
+    {
+      "doc": "TS-005",
+      "field": "oid",
+      "result": "hit",
+      "predicted_span": [
+        126,
+        135
+      ],
+      "true_span": [
+        131,
+        135
+      ],
+      "quoted": "OID: 98.0"
+    }
+  ],
+  "tamper": {
+    "verified_on_original": true,
+    "rejected_on_edited": true,
+    "reason": "document has changed since extraction"
+  },
+  "example_report": {
+    "doc_id": "TS-003",
+    "records": [
+      {
+        "doc_id": "TS-003",
+        "doc_sha": "1a5552d989bf1efd",
+        "field": "commitment_usd",
+        "value": 175000000.0,
+        "span": [
+          147,
+          179
+        ],
+        "evidence": "Total Commitment: $175,000,000",
+        "rule": "total-commitment",
+        "confidence": 0.95
+      },
+      {
+        "doc_id": "TS-003",
+        "doc_sha": "1a5552d989bf1efd",
+        "field": "spread_bps",
+        "value": 525.0,
+        "span": [
+          187,
+          210
+        ],
+        "evidence": "SOFR plus 5.25 per cent",
+        "rule": "benchmark-plus-pct",
+        "confidence": 0.92
+      },
+      {
+        "doc_id": "TS-003",
+        "doc_sha": "1a5552d989bf1efd",
+        "field": "floor_bps",
+        "value": 125.0,
+        "span": [
+          222,
+          239
+        ],
+        "evidence": "SOFR Floor: 1.25%",
+        "rule": "named-floor",
+        "confidence": 0.93
+      },
+      {
+        "doc_id": "TS-003",
+        "doc_sha": "1a5552d989bf1efd",
+        "field": "maturity_years",
+        "value": 6.0,
+        "span": [
+          240,
+          254
+        ],
+        "evidence": "Tenor: 6 years",
+        "rule": "labelled",
+        "confidence": 0.92
+      },
+      {
+        "doc_id": "TS-003",
+        "doc_sha": "1a5552d989bf1efd",
+        "field": "oid",
+        "value": 99.25,
+        "span": [
+          255,
+          265
+        ],
+        "evidence": "OID: 99.25",
+        "rule": "labelled-oid",
+        "confidence": 0.93
+      },
+      {
+        "doc_id": "TS-003",
+        "doc_sha": "1a5552d989bf1efd",
+        "field": "leverage_covenant",
+        "value": 6.0,
+        "span": [
+          313,
+          318
+        ],
+        "evidence": "6.00x",
+        "rule": "leverage-multiple",
+        "confidence": 0.9
+      }
+    ]
+  },
+  "documents": [
+    {
+      "doc_id": "TS-001",
+      "sha": "0796d8a9055a21f5",
+      "note": "Canonical layout. Every field present and stated once.",
+      "chars": 417
+    },
+    {
+      "doc_id": "TS-002",
+      "sha": "901e463ca61af318",
+      "note": "Prose form, abbreviations, and a superseded spread that must not be picked.",
+      "chars": 419
+    },
+    {
+      "doc_id": "TS-003",
+      "sha": "1a5552d989bf1efd",
+      "note": "Three commitment figures. Only the total is correct; the others are distractors.",
+      "chars": 366
+    },
+    {
+      "doc_id": "TS-004",
+      "sha": "390d6f330f00941c",
+      "note": "Non-USD, zero floor, 'par' rather than a number, and an equity distractor.",
+      "chars": 294
+    },
+    {
+      "doc_id": "TS-005",
+      "sha": "a75d29d7458acc2c",
+      "note": "Covenant-lite with no floor. Two fields are genuinely absent, and a system that invents values for them is worse than one that abstains.",
+      "chars": 203
+    }
+  ]
+}

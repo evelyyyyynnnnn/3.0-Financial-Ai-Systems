@@ -1,0 +1,260 @@
+{
+  "generated_at": "2026-08-31T21:50:25+00:00",
+  "is_synthetic": true,
+  "data_source": "synthetic on-chain trade and redemption history (src/chain.py)",
+  "universe_size": 6,
+  "total_trades": 12492,
+  "total_redemptions": 2424,
+  "tokens": [
+    {
+      "symbol": "TBILL-A",
+      "concentration": {
+        "hhi": 0.00766,
+        "effective_holders": 130.53,
+        "n_wallets": 220,
+        "top5_share": 0.111,
+        "gini": 0.3388
+      },
+      "liquidity": {
+        "amihud_x1e6": 0.0901,
+        "roll_spread_bps": 788.66,
+        "turnover_annual": 11.594,
+        "median_gap_h": 0.671,
+        "p95_gap_h": 3.276,
+        "max_gap_h": 8.723,
+        "n_trades": 2813
+      },
+      "redemption": {
+        "n": 426,
+        "n_settled": 424,
+        "n_unsettled": 2,
+        "median_latency_h": 26.018,
+        "p95_latency_h": 186.849,
+        "mean_latency_h": 45.216,
+        "unsettled_share": 0.0047
+      },
+      "stress": {
+        "n_inside": 68,
+        "n_outside": 356,
+        "median_inside_h": 147.311,
+        "median_outside_h": 21.441,
+        "ratio": 6.871
+      }
+    },
+    {
+      "symbol": "TBILL-B",
+      "concentration": {
+        "hhi": 0.04209,
+        "effective_holders": 23.76,
+        "n_wallets": 140,
+        "top5_share": 0.3506,
+        "gini": 0.5517
+      },
+      "liquidity": {
+        "amihud_x1e6": 0.1022,
+        "roll_spread_bps": 517.64,
+        "turnover_annual": 8.198,
+        "median_gap_h": 0.962,
+        "p95_gap_h": 4.587,
+        "max_gap_h": 14.111,
+        "n_trades": 1955
+      },
+      "redemption": {
+        "n": 428,
+        "n_settled": 422,
+        "n_unsettled": 6,
+        "median_latency_h": 25.928,
+        "p95_latency_h": 200.875,
+        "mean_latency_h": 47.867,
+        "unsettled_share": 0.014
+      },
+      "stress": {
+        "n_inside": 67,
+        "n_outside": 355,
+        "median_inside_h": 154.887,
+        "median_outside_h": 23.037,
+        "ratio": 6.723
+      }
+    },
+    {
+      "symbol": "CORP-A",
+      "concentration": {
+        "hhi": 0.02525,
+        "effective_holders": 39.61,
+        "n_wallets": 90,
+        "top5_share": 0.2715,
+        "gini": 0.4528
+      },
+      "liquidity": {
+        "amihud_x1e6": 0.1972,
+        "roll_spread_bps": 1034.55,
+        "turnover_annual": 6.787,
+        "median_gap_h": 1.326,
+        "p95_gap_h": 5.941,
+        "max_gap_h": 17.112,
+        "n_trades": 1505
+      },
+      "redemption": {
+        "n": 408,
+        "n_settled": 403,
+        "n_unsettled": 5,
+        "median_latency_h": 24.191,
+        "p95_latency_h": 141.618,
+        "mean_latency_h": 40.075,
+        "unsettled_share": 0.0123
+      },
+      "stress": {
+        "n_inside": 54,
+        "n_outside": 349,
+        "median_inside_h": 108.849,
+        "median_outside_h": 22.319,
+        "ratio": 4.877
+      }
+    },
+    {
+      "symbol": "CORP-B",
+      "concentration": {
+        "hhi": 0.18365,
+        "effective_holders": 5.45,
+        "n_wallets": 55,
+        "top5_share": 0.6602,
+        "gini": 0.7175
+      },
+      "liquidity": {
+        "amihud_x1e6": 0.3697,
+        "roll_spread_bps": 2217.21,
+        "turnover_annual": 3.846,
+        "median_gap_h": 2.289,
+        "p95_gap_h": 10.294,
+        "max_gap_h": 20.885,
+        "n_trades": 876
+      },
+      "redemption": {
+        "n": 408,
+        "n_settled": 405,
+        "n_unsettled": 3,
+        "median_latency_h": 24.367,
+        "p95_latency_h": 142.914,
+        "mean_latency_h": 41.061,
+        "unsettled_share": 0.0074
+      },
+      "stress": {
+        "n_inside": 51,
+        "n_outside": 354,
+        "median_inside_h": 119.486,
+        "median_outside_h": 22.238,
+        "ratio": 5.373
+      }
+    },
+    {
+      "symbol": "MUNI-A",
+      "concentration": {
+        "hhi": 0.15498,
+        "effective_holders": 6.45,
+        "n_wallets": 32,
+        "top5_share": 0.7456,
+        "gini": 0.6832
+      },
+      "liquidity": {
+        "amihud_x1e6": 0.5459,
+        "roll_spread_bps": 3396.97,
+        "turnover_annual": 2.115,
+        "median_gap_h": 3.684,
+        "p95_gap_h": 18.914,
+        "max_gap_h": 33.124,
+        "n_trades": 490
+      },
+      "redemption": {
+        "n": 405,
+        "n_settled": 401,
+        "n_unsettled": 4,
+        "median_latency_h": 27.222,
+        "p95_latency_h": 164.407,
+        "mean_latency_h": 43.998,
+        "unsettled_share": 0.0099
+      },
+      "stress": {
+        "n_inside": 65,
+        "n_outside": 336,
+        "median_inside_h": 118.308,
+        "median_outside_h": 23.989,
+        "ratio": 4.932
+      }
+    },
+    {
+      "symbol": "STABLE-X",
+      "concentration": {
+        "hhi": 0.00362,
+        "effective_holders": 276.43,
+        "n_wallets": 400,
+        "top5_share": 0.067,
+        "gini": 0.2478
+      },
+      "liquidity": {
+        "amihud_x1e6": 0.0603,
+        "roll_spread_bps": 322.37,
+        "turnover_annual": 19.292,
+        "median_gap_h": 0.415,
+        "p95_gap_h": 1.796,
+        "max_gap_h": 4.877,
+        "n_trades": 4853
+      },
+      "redemption": {
+        "n": 349,
+        "n_settled": 341,
+        "n_unsettled": 8,
+        "median_latency_h": 22.421,
+        "p95_latency_h": 60.002,
+        "mean_latency_h": 26.665,
+        "unsettled_share": 0.0229
+      },
+      "stress": {
+        "n_inside": 15,
+        "n_outside": 326,
+        "median_inside_h": 11.647,
+        "median_outside_h": 23.441,
+        "ratio": 0.497
+      }
+    }
+  ],
+  "stress": {
+    "n_tokens_with_episode": 6,
+    "median_latency_ratio": 5.152,
+    "max_latency_ratio": 6.871
+  },
+  "recovery": {
+    "sweep": [
+      {
+        "alpha": 0.7,
+        "mean_hhi": 0.38308,
+        "effective_holders": 2.6
+      },
+      {
+        "alpha": 0.9,
+        "mean_hhi": 0.23468,
+        "effective_holders": 4.3
+      },
+      {
+        "alpha": 1.1,
+        "mean_hhi": 0.13857,
+        "effective_holders": 7.2
+      },
+      {
+        "alpha": 1.5,
+        "mean_hhi": 0.04956,
+        "effective_holders": 20.2
+      },
+      {
+        "alpha": 2.0,
+        "mean_hhi": 0.02049,
+        "effective_holders": 48.8
+      },
+      {
+        "alpha": 3.0,
+        "mean_hhi": 0.01101,
+        "effective_holders": 90.9
+      }
+    ],
+    "monotone_in_alpha": true
+  }
+}
