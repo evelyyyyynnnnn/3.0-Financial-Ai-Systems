@@ -1,0 +1,77 @@
+{
+  "doc_id": "TS-005",
+  "records": [
+    {
+      "doc_id": "TS-005",
+      "doc_sha": "a75d29d7458acc2c",
+      "field": "commitment_usd",
+      "value": 65000000.0,
+      "span": [
+        62,
+        89
+      ],
+      "evidence": "Facility Size: $65,000,000",
+      "rule": "labelled-amount",
+      "confidence": 0.85
+    },
+    {
+      "doc_id": "TS-005",
+      "doc_sha": "a75d29d7458acc2c",
+      "field": "spread_bps",
+      "value": 625.0,
+      "span": [
+        95,
+        107
+      ],
+      "evidence": "SOFR + 6.25%",
+      "rule": "benchmark-plus-pct",
+      "confidence": 0.92
+    },
+    {
+      "doc_id": "TS-005",
+      "doc_sha": "a75d29d7458acc2c",
+      "field": "floor_bps",
+      "value": null,
+      "span": null,
+      "evidence": "",
+      "rule": "not-found",
+      "confidence": 0.0
+    },
+    {
+      "doc_id": "TS-005",
+      "doc_sha": "a75d29d7458acc2c",
+      "field": "maturity_years",
+      "value": 5.0,
+      "span": [
+        108,
+        125
+      ],
+      "evidence": "Maturity: 5 years",
+      "rule": "labelled",
+      "confidence": 0.92
+    },
+    {
+      "doc_id": "TS-005",
+      "doc_sha": "a75d29d7458acc2c",
+      "field": "oid",
+      "value": 98.0,
+      "span": [
+        126,
+        135
+      ],
+      "evidence": "OID: 98.0",
+      "rule": "labelled-oid",
+      "confidence": 0.93
+    },
+    {
+      "doc_id": "TS-005",
+      "doc_sha": "a75d29d7458acc2c",
+      "field": "leverage_covenant",
+      "value": null,
+      "span": null,
+      "evidence": "covenant-lite",
+      "rule": "explicit-absence",
+      "confidence": 0.9
+    }
+  ]
+}
