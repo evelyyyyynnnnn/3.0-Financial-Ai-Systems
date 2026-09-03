@@ -22,3 +22,6 @@ npm-debug.log*
 # Editor
 .vscode/
 .idea/
+data/raw/
+*/data/raw/
+*/data/MANIFEST.json

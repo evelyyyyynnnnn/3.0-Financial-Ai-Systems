@@ -1,0 +1,83 @@
+{
+  "doc_id": "TS-001",
+  "records": [
+    {
+      "doc_id": "TS-001",
+      "doc_sha": "0796d8a9055a21f5",
+      "field": "commitment_usd",
+      "value": 185000000.0,
+      "span": [
+        110,
+        135
+      ],
+      "evidence": "Commitment: $185,000,000",
+      "rule": "labelled-amount",
+      "confidence": 0.85
+    },
+    {
+      "doc_id": "TS-001",
+      "doc_sha": "0796d8a9055a21f5",
+      "field": "spread_bps",
+      "value": 575.0,
+      "span": [
+        198,
+        210
+      ],
+      "evidence": "SOFR + 5.75%",
+      "rule": "benchmark-plus-pct",
+      "confidence": 0.92
+    },
+    {
+      "doc_id": "TS-001",
+      "doc_sha": "0796d8a9055a21f5",
+      "field": "floor_bps",
+      "value": 100.0,
+      "span": [
+        225,
+        244
+      ],
+      "evidence": "SOFR floor of 1.00%",
+      "rule": "named-floor",
+      "confidence": 0.93
+    },
+    {
+      "doc_id": "TS-001",
+      "doc_sha": "0796d8a9055a21f5",
+      "field": "maturity_years",
+      "value": 7.0,
+      "span": [
+        145,
+        160
+      ],
+      "evidence": "seven (7) years",
+      "rule": "word-and-digit",
+      "confidence": 0.95
+    },
+    {
+      "doc_id": "TS-001",
+      "doc_sha": "0796d8a9055a21f5",
+      "field": "oid",
+      "value": 98.5,
+      "span": [
+        245,
+        274
+      ],
+      "evidence": "Original Issue Discount: 98.5",
+      "rule": "labelled-oid",
+      "confidence": 0.93
+    },
+    {
+      "doc_id": "TS-001",
+      "doc_sha": "0796d8a9055a21f5",
+      "field": "leverage_covenant",
+      "value": 5.25,
+      "span": [
+        334,
+        339
+      ],
+      "evidence": "5.25x",
+      "rule": "leverage-multiple",
+      "confidence": 0.9
+    }
+  ]
+}
