@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-08-31T21:50:26+00:00",
+  "generated_at": "2026-09-07T00:20:37+00:00",
   "is_synthetic": true,
   "data_source": "each project's own results/latest.json",
   "summary": {
     "n_projects": 21,
-    "n_with_results": 21,
-    "n_never_run": 0,
-    "n_synthetic_data": 21,
-    "n_real_data": 0,
-    "n_with_site": 21,
-    "total_tests": 555,
+    "n_with_results": 20,
+    "n_never_run": 1,
+    "n_synthetic_data": 3,
+    "n_real_data": 17,
+    "n_with_site": 20,
+    "total_tests": 612,
     "repos": [
       "1.0-Secure-Ai-Agent-Infrastructure",
       "2.0-Healthcare-Ai-Systems",
@@ -21,76 +21,28 @@
   "projects": [
     {
       "repo": "1.0-Secure-Ai-Agent-Infrastructure",
-      "project": "agent-verification-harness",
+      "project": "1-agent-verification-harness",
       "has_results": true,
-      "generated_at": "2026-08-31T21:32:37+00:00",
-      "is_synthetic": true,
-      "data_source": "6 authored transcripts, 12 labelled claims",
+      "generated_at": "2026-09-07T00:10:55+00:00",
+      "is_synthetic": false,
+      "data_source": "real US government releases (BLS, Federal Reserve); see data/MANIFEST.json for URLs, hashes and retrieval times",
       "n_tests": 32,
       "has_site": true,
-      "headline": [
-        {
-          "metric": "Precision",
-          "value": 0.8333,
-          "note": "on flagged claims"
-        },
-        {
-          "metric": "Recall",
-          "value": 1.0,
-          "note": "of bad claims caught"
-        },
-        {
-          "metric": "Claims checked",
-          "value": 12,
-          "note": ""
-        }
-      ]
-    },
-    {
-      "repo": "1.0-Secure-Ai-Agent-Infrastructure",
-      "project": "blockchain-shared-charging",
-      "has_results": true,
-      "generated_at": "2026-08-31T21:32:38+00:00",
-      "is_synthetic": true,
-      "data_source": "off-chain model of SharedCharging.sol; gas figures are opcode-level estimates, not node measurements",
-      "n_tests": 29,
-      "has_site": true,
-      "headline": [
-        {
-          "metric": "Gas per session",
-          "value": 177374,
-          "note": "estimated"
-        },
-        {
-          "metric": "L1 overhead at 20 gwei",
-          "value": 107.5,
-          "note": "percent of session value \u2014 not viable"
-        }
-      ]
+      "headline": []
     },
     {
       "repo": "1.0-Secure-Ai-Agent-Infrastructure",
       "project": "chaintrust-bench",
       "has_results": true,
-      "generated_at": "2026-08-31T21:32:39+00:00",
-      "is_synthetic": true,
-      "data_source": "seed corpus (authored for this benchmark)",
+      "generated_at": "2026-09-06T23:54:22+00:00",
+      "is_synthetic": false,
+      "data_source": "/Users/evelyndu/Desktop/Github-Website/1.0-Secure-Ai-Agent-Infrastructure/chaintrust-bench/data/real-corpus.jsonl",
       "n_tests": 27,
       "has_site": true,
       "headline": [
         {
-          "metric": "Baseline macro-F1, seed tier",
-          "value": 1.0,
-          "note": ""
-        },
-        {
-          "metric": "Baseline macro-F1, hard tier",
-          "value": 0.0,
-          "note": "headroom the benchmark exists to create"
-        },
-        {
           "metric": "Corpus size",
-          "value": 17,
+          "value": 121,
           "note": "cases"
         }
       ]
@@ -99,25 +51,15 @@
       "repo": "1.0-Secure-Ai-Agent-Infrastructure",
       "project": "llm-audit-agent",
       "has_results": true,
-      "generated_at": "2026-08-31T21:32:39+00:00",
-      "is_synthetic": true,
+      "generated_at": "2026-09-01T22:18:55+00:00",
+      "is_synthetic": false,
       "data_source": "",
-      "n_tests": 17,
+      "n_tests": 18,
       "has_site": true,
       "headline": [
         {
-          "metric": "Agent macro-F1, hard tier",
-          "value": 0.5556,
-          "note": "baseline scores 0.000 here"
-        },
-        {
-          "metric": "Agent macro-F1, seed tier",
-          "value": 0.6857,
-          "note": "baseline scores 1.000 \u2014 the agent regresses"
-        },
-        {
           "metric": "Review-load change",
-          "value": 0.0,
+          "value": 43.81,
           "note": "percent, at equal corpus"
         }
       ]
@@ -126,47 +68,36 @@
       "repo": "2.0-Healthcare-Ai-Systems",
       "project": "clinical-empathy-analysis",
       "has_results": true,
-      "generated_at": "2026-08-31T21:44:40+00:00",
-      "is_synthetic": true,
-      "data_source": "16 authored bilingual transcripts with analyst empathy ratings",
+      "generated_at": "2026-09-06T23:54:23+00:00",
+      "is_synthetic": false,
+      "data_source": "MTS-Dialog, real doctor-patient consultation transcripts; see data/MANIFEST.json for hashes and retrieval times",
       "n_tests": 32,
       "has_site": true,
-      "headline": [
-        {
-          "metric": "LOO correlation",
-          "value": 0.9463,
-          "note": "circular \u2014 see the project page"
-        },
-        {
-          "metric": "Transcripts",
-          "value": 16,
-          "note": "authored"
-        }
-      ]
+      "headline": []
     },
     {
       "repo": "2.0-Healthcare-Ai-Systems",
       "project": "icu-early-warning",
       "has_results": true,
-      "generated_at": "2026-08-31T21:44:46+00:00",
-      "is_synthetic": true,
-      "data_source": "synthetic ICU cohort generated by src/cohort.py",
+      "generated_at": "2026-09-06T23:55:09+00:00",
+      "is_synthetic": false,
+      "data_source": "PhysioNet MIMIC-IV clinical database demo (open access); see data/MANIFEST.json for file hashes and retrieval times",
       "n_tests": 32,
       "has_site": true,
       "headline": [
         {
           "metric": "AUROC, hypotension",
-          "value": 0.7043,
+          "value": 0.783,
           "note": "4-hour horizon"
         },
         {
           "metric": "Calibration ECE",
-          "value": 0.01214,
+          "value": 0.06092,
           "note": "after isotonic"
         },
         {
           "metric": "False-alert reduction",
-          "value": 8.73,
+          "value": 19.36,
           "note": "percent, at matched 80% sensitivity"
         }
       ]
@@ -175,42 +106,26 @@
       "repo": "2.0-Healthcare-Ai-Systems",
       "project": "physiological-waveform-pipeline",
       "has_results": true,
-      "generated_at": "2026-08-31T21:45:00+00:00",
-      "is_synthetic": true,
-      "data_source": "synthetic ABP cohort generated by src/synth.py",
+      "generated_at": "2026-09-06T23:56:50+00:00",
+      "is_synthetic": false,
+      "data_source": "PhysioNet BIDMC PPG and Respiration Dataset (open access); see data/MANIFEST.json for file hashes and retrieval times",
       "n_tests": 31,
       "has_site": true,
-      "headline": [
-        {
-          "metric": "Artifact rejection F1",
-          "value": 0.9042,
-          "note": "vs injected truth"
-        },
-        {
-          "metric": "Specificity",
-          "value": 0.9893,
-          "note": "clean windows kept"
-        },
-        {
-          "metric": "Waveform-hours",
-          "value": 4.0,
-          "note": "synthetic"
-        }
-      ]
+      "headline": []
     },
     {
       "repo": "2.0-Healthcare-Ai-Systems",
       "project": "pyhealth-rhealth-extension",
       "has_results": true,
-      "generated_at": "2026-08-31T21:45:04+00:00",
-      "is_synthetic": true,
-      "data_source": "synthetic subjects with a per-subject offset (src/demo.py)",
+      "generated_at": "2026-09-06T23:57:16+00:00",
+      "is_synthetic": false,
+      "data_source": "PhysioNet MIMIC-IV clinical database demo (open access); see data/MANIFEST.json for file hashes and retrieval times",
       "n_tests": 29,
       "has_site": true,
       "headline": [
         {
           "metric": "Leakage inflation",
-          "value": 23.05,
+          "value": 81.57,
           "note": "percent AUROC, row split vs subject split"
         },
         {
@@ -224,49 +139,23 @@
       "repo": "3.0-Financial-Ai-Systems",
       "project": "contagion-observatory",
       "has_results": true,
-      "generated_at": "2026-08-31T21:50:22+00:00",
-      "is_synthetic": true,
-      "data_source": "synthetic multi-asset panel with a constructed edge set (src/market.py)",
-      "n_tests": 39,
+      "generated_at": "2026-09-07T00:11:33+00:00",
+      "is_synthetic": false,
+      "data_source": "real daily value-weighted returns of the Fama-French 10 industry portfolios (Kenneth R. French Data Library; see data/MANIFEST.json for the URL, sha256 and retrieval time)",
+      "n_tests": 41,
       "has_site": true,
-      "headline": [
-        {
-          "metric": "Edge recall",
-          "value": 1.0,
-          "note": "of constructed edges"
-        },
-        {
-          "metric": "Edge precision",
-          "value": 0.1591,
-          "note": "the honest cost"
-        },
-        {
-          "metric": "True edges",
-          "value": 7,
-          "note": "of 306 pairs"
-        }
-      ]
+      "headline": []
     },
     {
       "repo": "3.0-Financial-Ai-Systems",
       "project": "filing-intelligence",
       "has_results": true,
-      "generated_at": "2026-08-31T21:50:23+00:00",
-      "is_synthetic": true,
-      "data_source": "3 authored filing pairs with labelled changes (src/corpus.py)",
+      "generated_at": "2026-09-07T00:04:56+00:00",
+      "is_synthetic": false,
+      "data_source": "real 10-K filings retrieved from SEC EDGAR (see data/MANIFEST.json for URLs, hashes and retrieval times)",
       "n_tests": 33,
       "has_site": true,
       "headline": [
-        {
-          "metric": "Material changes recovered",
-          "value": 1.0,
-          "note": "of labelled"
-        },
-        {
-          "metric": "False alarms on unchanged pairs",
-          "value": 0,
-          "note": ""
-        },
         {
           "metric": "Filings pulled from EDGAR",
           "value": 0,
@@ -278,7 +167,7 @@
       "repo": "3.0-Financial-Ai-Systems",
       "project": "measured-results",
       "has_results": true,
-      "generated_at": "2026-08-31T19:24:30+00:00",
+      "generated_at": "2026-08-31T21:50:26+00:00",
       "is_synthetic": true,
       "data_source": "each project's own results/latest.json",
       "n_tests": 11,
@@ -287,30 +176,25 @@
     },
     {
       "repo": "3.0-Financial-Ai-Systems",
+      "project": "portfolio-optimization-engine",
+      "has_results": false,
+      "generated_at": "",
+      "is_synthetic": null,
+      "data_source": "",
+      "n_tests": 3,
+      "has_site": false,
+      "headline": []
+    },
+    {
+      "repo": "3.0-Financial-Ai-Systems",
       "project": "private-credit-data-provenance",
       "has_results": true,
-      "generated_at": "2026-08-31T21:50:24+00:00",
-      "is_synthetic": true,
-      "data_source": "5 authored private-credit term sheets (src/documents.py)",
+      "generated_at": "2026-09-07T00:06:16+00:00",
+      "is_synthetic": false,
+      "data_source": "real BDC 10-K filings from SEC EDGAR; see data/MANIFEST.json for URLs, hashes and retrieval times",
       "n_tests": 30,
       "has_site": true,
-      "headline": [
-        {
-          "metric": "Value accuracy",
-          "value": 1.0,
-          "note": "circular"
-        },
-        {
-          "metric": "Span accuracy, exact",
-          "value": 0.6786,
-          "note": ""
-        },
-        {
-          "metric": "Invented values",
-          "value": 0,
-          "note": "on genuinely absent fields"
-        }
-      ]
+      "headline": []
     },
     {
       "repo": "3.0-Financial-Ai-Systems",
@@ -338,10 +222,10 @@
       "repo": "4.0-Decision-Intelligence-Framework",
       "project": "decision-audit-framework",
       "has_results": true,
-      "generated_at": "2026-08-31T19:00:04+00:00",
-      "is_synthetic": true,
-      "data_source": "synthetic credit applications (src/demo.py)",
-      "n_tests": 19,
+      "generated_at": "2026-09-06T23:58:26+00:00",
+      "is_synthetic": false,
+      "data_source": "Statlog German Credit Data (UCI); see data/MANIFEST.json for the URL, hash and retrieval time",
+      "n_tests": 33,
       "has_site": true,
       "headline": []
     },
@@ -349,7 +233,7 @@
       "repo": "4.0-Decision-Intelligence-Framework",
       "project": "decision-benchmark-suite",
       "has_results": true,
-      "generated_at": "2026-08-31T19:09:17+00:00",
+      "generated_at": "2026-08-31T21:57:57+00:00",
       "is_synthetic": true,
       "data_source": "closed-form benchmark tasks with exact oracles (src/tasks.py)",
       "n_tests": 19,
@@ -360,10 +244,10 @@
       "repo": "4.0-Decision-Intelligence-Framework",
       "project": "icu-triage-optimization",
       "has_results": true,
-      "generated_at": "2026-08-31T19:06:07+00:00",
-      "is_synthetic": true,
-      "data_source": "ICU early-warning model (repo 2.0)",
-      "n_tests": 18,
+      "generated_at": "2026-09-06T23:58:50+00:00",
+      "is_synthetic": false,
+      "data_source": "PhysioNet MIMIC-IV clinical database demo (open access); see data/MANIFEST.json for file hashes and retrieval times",
+      "n_tests": 26,
       "has_site": true,
       "headline": []
     },
@@ -371,10 +255,10 @@
       "repo": "4.0-Decision-Intelligence-Framework",
       "project": "optimization-under-uncertainty",
       "has_results": true,
-      "generated_at": "2026-08-31T18:56:48+00:00",
-      "is_synthetic": true,
-      "data_source": "synthetic scenario samples (src/problems.py)",
-      "n_tests": 20,
+      "generated_at": "2026-09-07T00:12:00+00:00",
+      "is_synthetic": false,
+      "data_source": "real daily returns of the 10 Fama-French industry portfolios (value-weighted); see data/MANIFEST.json for the URL, hash and retrieval time",
+      "n_tests": 33,
       "has_site": true,
       "headline": []
     },
@@ -382,10 +266,10 @@
       "repo": "5.0-Ai-Engineering-Toolkit",
       "project": "data-provenance-library",
       "has_results": true,
-      "generated_at": "2026-08-31T21:08:19+00:00",
-      "is_synthetic": true,
-      "data_source": "two authored filing extracts (src/demo.py)",
-      "n_tests": 20,
+      "generated_at": "2026-09-06T23:58:59+00:00",
+      "is_synthetic": false,
+      "data_source": "SEC EDGAR XBRL company-concept API -- values as filed, each carrying the accession number of the filing it was reported in; see data/MANIFEST.json for hashes",
+      "n_tests": 33,
       "has_site": true,
       "headline": []
     },
@@ -393,10 +277,10 @@
       "repo": "5.0-Ai-Engineering-Toolkit",
       "project": "llm-eval-calibration-harness",
       "has_results": true,
-      "generated_at": "2026-08-31T19:14:56+00:00",
-      "is_synthetic": true,
-      "data_source": "14 authored questions over 2 authored filing extracts",
-      "n_tests": 22,
+      "generated_at": "2026-09-06T23:59:03+00:00",
+      "is_synthetic": false,
+      "data_source": "SEC EDGAR XBRL company-concept API -- every answer is a filed value; see data/MANIFEST.json for hashes",
+      "n_tests": 35,
       "has_site": true,
       "headline": []
     },
@@ -404,10 +288,10 @@
       "repo": "5.0-Ai-Engineering-Toolkit",
       "project": "quant-productivity-toolkit",
       "has_results": true,
-      "generated_at": "2026-08-31T21:08:19+00:00",
-      "is_synthetic": true,
-      "data_source": "synthetic return series with known contamination",
-      "n_tests": 28,
+      "generated_at": "2026-09-07T00:09:53+00:00",
+      "is_synthetic": false,
+      "data_source": "Fama-French daily research factors, and a daily price index cumulated from the Ken French daily market total return (Mkt-RF + RF), base 100 -- a real, reproducible market price path, not raw single-stock closes (Stooq per-ticker closes were unavailable: it now returns a bot-check page); see data/MANIFEST.json for URLs, hashes and retrieval times",
+      "n_tests": 42,
       "has_site": true,
       "headline": []
     },
@@ -415,10 +299,10 @@
       "repo": "5.0-Ai-Engineering-Toolkit",
       "project": "risk-portfolio-saas",
       "has_results": true,
-      "generated_at": "2026-08-31T21:20:27+00:00",
-      "is_synthetic": true,
-      "data_source": "synthetic factor market with fat tails (src/demo.py)",
-      "n_tests": 33,
+      "generated_at": "2026-09-07T00:16:52+00:00",
+      "is_synthetic": false,
+      "data_source": "Fama-French 10-industry value-weighted daily returns (Kenneth R. French Data Library); see data/MANIFEST.json for the URL, sha256 and retrieval time",
+      "n_tests": 38,
       "has_site": true,
       "headline": []
     }

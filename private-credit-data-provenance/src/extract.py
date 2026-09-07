@@ -33,8 +33,20 @@ class Extraction:
                 "rule": self.rule}
 
 
-def _num(s: str) -> float:
-    return float(s.replace(",", "").replace(" ", ""))
+def _num(s: str):
+    """Parse a captured number, or return None if the capture is empty/unparseable.
+
+    Real filings produce regex matches whose numeric group is blank or malformed
+    far more often than the authored corpus did; returning None lets the caller
+    skip that match instead of crashing the whole extraction.
+    """
+    s = (s or "").replace(",", "").replace(" ", "")
+    if not s:
+        return None
+    try:
+        return float(s)
+    except ValueError:
+        return None
 
 
 def _find(text, pattern, flags=re.I):
@@ -78,6 +90,8 @@ def extract_commitment(text: str):
             if "equity" in line or "separately committed" in line:
                 continue
             val = _num(m.group(1))
+            if val is None:
+                continue
             if m.lastindex and m.lastindex >= 2 and m.group(2):
                 val *= 1_000_000
             return Extraction("commitment_usd", val, (m.start(), m.end()),
@@ -203,4 +217,13 @@ EXTRACTORS = {
 
 
 def extract_all(text: str) -> dict:
-    return {f: fn(text) for f, fn in EXTRACTORS.items()}
+    # A single field's extractor tripping on the irregularities of a real filing
+    # must not sink the whole document. On an unexpected error, record the field
+    # as not-found (rule "extractor-error") and carry on with the others.
+    out = {}
+    for f, fn in EXTRACTORS.items():
+        try:
+            out[f] = fn(text)
+        except Exception:
+            out[f] = Extraction(f, None, None, "", 0.0, "extractor-error")
+    return out

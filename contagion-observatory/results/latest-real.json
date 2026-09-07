@@ -1,0 +1,456 @@
+{
+  "generated_at": "2026-09-07T00:11:33+00:00",
+  "is_synthetic": false,
+  "data_source": "real daily value-weighted returns of the Fama-French 10 industry portfolios (Kenneth R. French Data Library; see data/MANIFEST.json for the URL, sha256 and retrieval time)",
+  "universe": {
+    "n_assets": 10,
+    "n_crypto": 0,
+    "n_equity": 10,
+    "n_days": 756,
+    "first_date": "2023-07-27",
+    "last_date": "2026-07-31",
+    "stress_days": 76,
+    "stress_share": 0.1005,
+    "n_candidate_pairs": 90
+  },
+  "recovery_reported": false,
+  "recovery_withheld_because": "the real transmission graph is unknown -- that is the question, not the answer -- so edge-recovery precision has no denominator",
+  "provenance": [
+    {
+      "symbol": "Durbl",
+      "status": "ok",
+      "n_returns": 756,
+      "first": "2023-07-27",
+      "last": "2026-07-31",
+      "sha256": "b1a23edba335ddd3",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/10_Industry_Portfolios_daily_CSV.zip"
+    },
+    {
+      "symbol": "Enrgy",
+      "status": "ok",
+      "n_returns": 756,
+      "first": "2023-07-27",
+      "last": "2026-07-31",
+      "sha256": "b1a23edba335ddd3",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/10_Industry_Portfolios_daily_CSV.zip"
+    },
+    {
+      "symbol": "HiTec",
+      "status": "ok",
+      "n_returns": 756,
+      "first": "2023-07-27",
+      "last": "2026-07-31",
+      "sha256": "b1a23edba335ddd3",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/10_Industry_Portfolios_daily_CSV.zip"
+    },
+    {
+      "symbol": "Hlth",
+      "status": "ok",
+      "n_returns": 756,
+      "first": "2023-07-27",
+      "last": "2026-07-31",
+      "sha256": "b1a23edba335ddd3",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/10_Industry_Portfolios_daily_CSV.zip"
+    },
+    {
+      "symbol": "Manuf",
+      "status": "ok",
+      "n_returns": 756,
+      "first": "2023-07-27",
+      "last": "2026-07-31",
+      "sha256": "b1a23edba335ddd3",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/10_Industry_Portfolios_daily_CSV.zip"
+    },
+    {
+      "symbol": "NoDur",
+      "status": "ok",
+      "n_returns": 756,
+      "first": "2023-07-27",
+      "last": "2026-07-31",
+      "sha256": "b1a23edba335ddd3",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/10_Industry_Portfolios_daily_CSV.zip"
+    },
+    {
+      "symbol": "Other",
+      "status": "ok",
+      "n_returns": 756,
+      "first": "2023-07-27",
+      "last": "2026-07-31",
+      "sha256": "b1a23edba335ddd3",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/10_Industry_Portfolios_daily_CSV.zip"
+    },
+    {
+      "symbol": "Shops",
+      "status": "ok",
+      "n_returns": 756,
+      "first": "2023-07-27",
+      "last": "2026-07-31",
+      "sha256": "b1a23edba335ddd3",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/10_Industry_Portfolios_daily_CSV.zip"
+    },
+    {
+      "symbol": "Telcm",
+      "status": "ok",
+      "n_returns": 756,
+      "first": "2023-07-27",
+      "last": "2026-07-31",
+      "sha256": "b1a23edba335ddd3",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/10_Industry_Portfolios_daily_CSV.zip"
+    },
+    {
+      "symbol": "Utils",
+      "status": "ok",
+      "n_returns": 756,
+      "first": "2023-07-27",
+      "last": "2026-07-31",
+      "sha256": "b1a23edba335ddd3",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/10_Industry_Portfolios_daily_CSV.zip"
+    }
+  ],
+  "top_edges": [
+    {
+      "src": "Other",
+      "dst": "Telcm",
+      "lagged_corr": 0.09448,
+      "tail_lift": 3.0263,
+      "score": 0.09448
+    },
+    {
+      "src": "Manuf",
+      "dst": "Telcm",
+      "lagged_corr": 0.08191,
+      "tail_lift": 1.7105,
+      "score": 0.08191
+    },
+    {
+      "src": "Enrgy",
+      "dst": "Manuf",
+      "lagged_corr": 0.08014,
+      "tail_lift": 1.5789,
+      "score": 0.08014
+    },
+    {
+      "src": "NoDur",
+      "dst": "Shops",
+      "lagged_corr": -0.07805,
+      "tail_lift": 2.7632,
+      "score": 0.07805
+    },
+    {
+      "src": "Manuf",
+      "dst": "Other",
+      "lagged_corr": 0.07736,
+      "tail_lift": 3.5526,
+      "score": 0.07736
+    },
+    {
+      "src": "Enrgy",
+      "dst": "Utils",
+      "lagged_corr": 0.07647,
+      "tail_lift": 1.4474,
+      "score": 0.07647
+    },
+    {
+      "src": "Other",
+      "dst": "NoDur",
+      "lagged_corr": 0.0725,
+      "tail_lift": 2.1053,
+      "score": 0.0725
+    },
+    {
+      "src": "Manuf",
+      "dst": "NoDur",
+      "lagged_corr": 0.07035,
+      "tail_lift": 1.9737,
+      "score": 0.07035
+    },
+    {
+      "src": "Enrgy",
+      "dst": "Durbl",
+      "lagged_corr": -0.07018,
+      "tail_lift": 0.6579,
+      "score": 0.07018
+    },
+    {
+      "src": "Hlth",
+      "dst": "Enrgy",
+      "lagged_corr": -0.06844,
+      "tail_lift": 0.9211,
+      "score": 0.06844
+    },
+    {
+      "src": "Durbl",
+      "dst": "Telcm",
+      "lagged_corr": -0.06633,
+      "tail_lift": 0.3947,
+      "score": 0.06633
+    },
+    {
+      "src": "Utils",
+      "dst": "Shops",
+      "lagged_corr": -0.06547,
+      "tail_lift": 1.4474,
+      "score": 0.06547
+    },
+    {
+      "src": "HiTec",
+      "dst": "Other",
+      "lagged_corr": 0.06483,
+      "tail_lift": 2.1053,
+      "score": 0.06483
+    },
+    {
+      "src": "Other",
+      "dst": "Utils",
+      "lagged_corr": 0.06358,
+      "tail_lift": 2.1053,
+      "score": 0.06358
+    },
+    {
+      "src": "Utils",
+      "dst": "HiTec",
+      "lagged_corr": -0.06277,
+      "tail_lift": 0.7895,
+      "score": 0.06277
+    },
+    {
+      "src": "HiTec",
+      "dst": "Telcm",
+      "lagged_corr": 0.06276,
+      "tail_lift": 0.7895,
+      "score": 0.06276
+    },
+    {
+      "src": "NoDur",
+      "dst": "Durbl",
+      "lagged_corr": 0.06263,
+      "tail_lift": 0.1316,
+      "score": 0.06263
+    },
+    {
+      "src": "Utils",
+      "dst": "Durbl",
+      "lagged_corr": 0.06091,
+      "tail_lift": 0.1316,
+      "score": 0.06091
+    },
+    {
+      "src": "Hlth",
+      "dst": "Durbl",
+      "lagged_corr": 0.05817,
+      "tail_lift": 0.0,
+      "score": 0.05817
+    },
+    {
+      "src": "Durbl",
+      "dst": "NoDur",
+      "lagged_corr": -0.05803,
+      "tail_lift": 0.1316,
+      "score": 0.05803
+    }
+  ],
+  "tail_raw": [
+    {
+      "pair": "unlinked pairs (mean of 60)",
+      "kind": "none",
+      "strength": 0.0,
+      "tail_lift": 3.167,
+      "tail_dep": 0.317
+    }
+  ],
+  "tail_residual": [
+    {
+      "pair": "unlinked pairs (mean of 60)",
+      "kind": "none",
+      "strength": 0.0,
+      "tail_lift": 1.807,
+      "tail_dep": 0.181
+    }
+  ],
+  "shocks": {
+    "Durbl": {
+      "shocked": "Durbl",
+      "magnitude": -0.2,
+      "rounds": 4,
+      "final": {
+        "Durbl": -0.2,
+        "Enrgy": 0.0,
+        "HiTec": 0.0,
+        "Hlth": 0.0,
+        "Manuf": 0.0,
+        "NoDur": 0.0,
+        "Other": 0.0,
+        "Shops": 0.0,
+        "Telcm": 0.0,
+        "Utils": 0.0
+      },
+      "n_reached": 0,
+      "reached": [],
+      "total_absolute_impact": 0.0,
+      "history": [
+        {
+          "Durbl": -0.2,
+          "Enrgy": 0.0,
+          "HiTec": 0.0,
+          "Hlth": 0.0,
+          "Manuf": 0.0,
+          "NoDur": 0.0,
+          "Other": 0.0,
+          "Shops": 0.0,
+          "Telcm": 0.0,
+          "Utils": 0.0
+        },
+        {
+          "Durbl": -0.2,
+          "Enrgy": 0.0,
+          "HiTec": 0.0,
+          "Hlth": 0.0,
+          "Manuf": 0.0,
+          "NoDur": 0.0,
+          "Other": 0.0,
+          "Shops": 0.0,
+          "Telcm": 0.0,
+          "Utils": 0.0
+        }
+      ]
+    },
+    "Enrgy": {
+      "shocked": "Enrgy",
+      "magnitude": -0.2,
+      "rounds": 4,
+      "final": {
+        "Durbl": 0.0,
+        "Enrgy": -0.2,
+        "HiTec": 0.0,
+        "Hlth": 0.0,
+        "Manuf": 0.0,
+        "NoDur": 0.0,
+        "Other": 0.0,
+        "Shops": 0.0,
+        "Telcm": 0.0,
+        "Utils": 0.0
+      },
+      "n_reached": 0,
+      "reached": [],
+      "total_absolute_impact": 0.0,
+      "history": [
+        {
+          "Durbl": 0.0,
+          "Enrgy": -0.2,
+          "HiTec": 0.0,
+          "Hlth": 0.0,
+          "Manuf": 0.0,
+          "NoDur": 0.0,
+          "Other": 0.0,
+          "Shops": 0.0,
+          "Telcm": 0.0,
+          "Utils": 0.0
+        },
+        {
+          "Durbl": 0.0,
+          "Enrgy": -0.2,
+          "HiTec": 0.0,
+          "Hlth": 0.0,
+          "Manuf": 0.0,
+          "NoDur": 0.0,
+          "Other": 0.0,
+          "Shops": 0.0,
+          "Telcm": 0.0,
+          "Utils": 0.0
+        }
+      ]
+    },
+    "HiTec": {
+      "shocked": "HiTec",
+      "magnitude": -0.2,
+      "rounds": 4,
+      "final": {
+        "Durbl": 0.0,
+        "Enrgy": 0.0,
+        "HiTec": -0.2,
+        "Hlth": 0.0,
+        "Manuf": 0.0,
+        "NoDur": 0.0,
+        "Other": 0.0,
+        "Shops": 0.0,
+        "Telcm": 0.0,
+        "Utils": 0.0
+      },
+      "n_reached": 0,
+      "reached": [],
+      "total_absolute_impact": 0.0,
+      "history": [
+        {
+          "Durbl": 0.0,
+          "Enrgy": 0.0,
+          "HiTec": -0.2,
+          "Hlth": 0.0,
+          "Manuf": 0.0,
+          "NoDur": 0.0,
+          "Other": 0.0,
+          "Shops": 0.0,
+          "Telcm": 0.0,
+          "Utils": 0.0
+        },
+        {
+          "Durbl": 0.0,
+          "Enrgy": 0.0,
+          "HiTec": -0.2,
+          "Hlth": 0.0,
+          "Manuf": 0.0,
+          "NoDur": 0.0,
+          "Other": 0.0,
+          "Shops": 0.0,
+          "Telcm": 0.0,
+          "Utils": 0.0
+        }
+      ]
+    },
+    "Hlth": {
+      "shocked": "Hlth",
+      "magnitude": -0.2,
+      "rounds": 4,
+      "final": {
+        "Durbl": 0.0,
+        "Enrgy": 0.0,
+        "HiTec": 0.0,
+        "Hlth": -0.2,
+        "Manuf": 0.0,
+        "NoDur": 0.0,
+        "Other": 0.0,
+        "Shops": 0.0,
+        "Telcm": 0.0,
+        "Utils": 0.0
+      },
+      "n_reached": 0,
+      "reached": [],
+      "total_absolute_impact": 0.0,
+      "history": [
+        {
+          "Durbl": 0.0,
+          "Enrgy": 0.0,
+          "HiTec": 0.0,
+          "Hlth": -0.2,
+          "Manuf": 0.0,
+          "NoDur": 0.0,
+          "Other": 0.0,
+          "Shops": 0.0,
+          "Telcm": 0.0,
+          "Utils": 0.0
+        },
+        {
+          "Durbl": 0.0,
+          "Enrgy": 0.0,
+          "HiTec": 0.0,
+          "Hlth": -0.2,
+          "Manuf": 0.0,
+          "NoDur": 0.0,
+          "Other": 0.0,
+          "Shops": 0.0,
+          "Telcm": 0.0,
+          "Utils": 0.0
+        }
+      ]
+    }
+  }
+}

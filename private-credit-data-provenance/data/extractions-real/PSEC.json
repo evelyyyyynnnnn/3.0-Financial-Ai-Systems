@@ -1,0 +1,77 @@
+{
+  "doc_id": "PSEC",
+  "records": [
+    {
+      "doc_id": "PSEC",
+      "doc_sha": "7eac6ab228796667",
+      "field": "commitment_usd",
+      "value": 2025.0,
+      "span": [
+        57654,
+        57689
+      ],
+      "evidence": "aggregate principal amount of 2025",
+      "rule": "labelled-amount",
+      "confidence": 0.85
+    },
+    {
+      "doc_id": "PSEC",
+      "doc_sha": "7eac6ab228796667",
+      "field": "spread_bps",
+      "value": 204.99999999999997,
+      "span": [
+        51740,
+        51755
+      ],
+      "evidence": "SOFR +  2.05  %",
+      "rule": "benchmark-plus-pct",
+      "confidence": 0.92
+    },
+    {
+      "doc_id": "PSEC",
+      "doc_sha": "7eac6ab228796667",
+      "field": "floor_bps",
+      "value": null,
+      "span": null,
+      "evidence": "",
+      "rule": "not-found",
+      "confidence": 0.0
+    },
+    {
+      "doc_id": "PSEC",
+      "doc_sha": "7eac6ab228796667",
+      "field": "maturity_years",
+      "value": 5.0,
+      "span": [
+        52970,
+        52977
+      ],
+      "evidence": "5 Years",
+      "rule": "bare-years",
+      "confidence": 0.7
+    },
+    {
+      "doc_id": "PSEC",
+      "doc_sha": "7eac6ab228796667",
+      "field": "oid",
+      "value": 1.0,
+      "span": [
+        178482,
+        178508
+      ],
+      "evidence": "original issue discount  1",
+      "rule": "labelled-oid",
+      "confidence": 0.93
+    },
+    {
+      "doc_id": "PSEC",
+      "doc_sha": "7eac6ab228796667",
+      "field": "leverage_covenant",
+      "value": null,
+      "span": null,
+      "evidence": "",
+      "rule": "not-found",
+      "confidence": 0.0
+    }
+  ]
+}

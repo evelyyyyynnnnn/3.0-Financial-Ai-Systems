@@ -64,7 +64,10 @@ def discover(root: pathlib.Path | None = None) -> list:
                 continue
             if not (project / "src").is_dir():
                 continue
-            rp = project / "results" / "latest.json"
+            # Prefer the real-data run when a project has one; fall back to the
+            # synthetic demo result otherwise.
+            real_rp = project / "results" / "latest-real.json"
+            rp = real_rp if real_rp.exists() else project / "results" / "latest.json"
             pr = ProjectResult(repo=repo.name, project=project.name, path=project,
                                has_results=rp.exists(),
                                n_tests=_count_tests(project),

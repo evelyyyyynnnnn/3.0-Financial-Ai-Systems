@@ -21,28 +21,25 @@ import sys
 from datetime import date, timedelta
 
 from .datakit import Fetcher, FetchError, NetworkBlocked
-from .marketdata import coingecko_source, stooq_source
+from .marketdata import coingecko_source, french_industries_source
 
 ROOT = pathlib.Path(__file__).resolve().parent
 
 END = date.today()
 START = END - timedelta(days=3 * 365)
 
-# (stooq symbol, why it is in the universe)
-UNIVERSE = [
-    ("btcusd",  "crypto: the shock origin in most specifications"),
-    ("ethusd",  "crypto: second asset, to separate market-wide from BTC-specific"),
-    ("coin.us", "mechanical link: exchange revenue moves with crypto volume"),
-    ("mstr.us", "mechanical link: balance sheet holds bitcoin directly"),
-    ("gbtc.us", "mechanical link: a bitcoin trust, the cleanest equity proxy"),
-    ("xlf.us",  "financials: where a crypto-to-banking channel would show"),
-    ("spy.us",  "broad equity: the control -- a link here means market beta"),
-    ("xle.us",  "energy: a near-placebo, included so the method can be wrong"),
-    ("tlt.us",  "long treasuries: flight-to-quality leg of a risk-off move"),
-]
-
-SOURCES = [stooq_source(sym, START.isoformat(), END.isoformat(), note)
-           for sym, note in UNIVERSE] + [
+# The transmission analysis needs at least three return series that share one
+# trading calendar. The original per-ticker Stooq universe (btcusd, spy.us,
+# coin.us, ...) is now behind a JavaScript bot-wall: every request returns a
+# 796-byte proof-of-work challenge page with HTTP 200, not a CSV, so all nine
+# series parse as unusable and --real cannot run. The Fama-French 10 industry
+# portfolios are the reachable substitute -- ten daily value-weighted return
+# series, one calendar, no login, a stable URL -- and they turn the question
+# into cross-industry transmission rather than crypto->equity contagion.
+SOURCES = [
+    french_industries_source(),
+    # Kept because they are reachable and already cached; not required by the
+    # real analysis, which now runs on the French industry portfolios.
     coingecko_source("bitcoin", days=365),
     coingecko_source("ethereum", days=365),
 ]

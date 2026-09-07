@@ -1,0 +1,201 @@
+{
+  "generated_at": "2026-09-07T00:06:16+00:00",
+  "is_synthetic": false,
+  "data_source": "real BDC 10-K filings from SEC EDGAR; see data/MANIFEST.json for URLs, hashes and retrieval times",
+  "accuracy_reported": false,
+  "accuracy_withheld_because": "nobody has annotated a real BDC schedule of investments with the values an extractor should return, so precision and recall have no denominator",
+  "fields": [
+    "commitment_usd",
+    "spread_bps",
+    "floor_bps",
+    "maturity_years",
+    "oid",
+    "leverage_covenant"
+  ],
+  "provenance_check": {
+    "extracted_values": 18,
+    "abstentions": 12,
+    "spans_supporting_their_value": 17,
+    "spans_not_supporting_their_value": 1,
+    "span_support_rate": 0.9444,
+    "what_this_measures": "whether each cited character span actually contains the value it is cited for. This needs no answer key, so it is reportable on real filings; it says nothing about whether the value is the right one."
+  },
+  "per_document": [
+    {
+      "doc_id": "ARCC",
+      "extracted": {
+        "commitment_usd": 13.2,
+        "spread_bps": 258.1
+      },
+      "n_extracted": 2,
+      "n_abstained": 4
+    },
+    {
+      "doc_id": "FSK",
+      "extracted": {
+        "commitment_usd": 4.125,
+        "spread_bps": 450.0,
+        "floor_bps": 0.0,
+        "leverage_covenant": 1.0
+      },
+      "n_extracted": 4,
+      "n_abstained": 2
+    },
+    {
+      "doc_id": "MAIN",
+      "extracted": {
+        "commitment_usd": 3.0,
+        "spread_bps": 650.0,
+        "floor_bps": 150.0,
+        "maturity_years": 4.6,
+        "leverage_covenant": 5.0
+      },
+      "n_extracted": 5,
+      "n_abstained": 1
+    },
+    {
+      "doc_id": "OBDC",
+      "extracted": {
+        "commitment_usd": 1.65,
+        "spread_bps": 425.0,
+        "maturity_years": 1.0
+      },
+      "n_extracted": 3,
+      "n_abstained": 3
+    },
+    {
+      "doc_id": "PSEC",
+      "extracted": {
+        "commitment_usd": 2025.0,
+        "spread_bps": 204.99999999999997,
+        "maturity_years": 5.0,
+        "oid": 1.0
+      },
+      "n_extracted": 4,
+      "n_abstained": 2
+    }
+  ],
+  "documents": [
+    {
+      "doc_id": "ARCC",
+      "url": "https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm",
+      "sha256": "ad71baf7a7214d63",
+      "retrieved_utc": "2026-09-06T23:57:21+00:00",
+      "document_chars": 1672167,
+      "section_chars": 400000,
+      "schedule_located": true,
+      "section_offset": 967454
+    },
+    {
+      "doc_id": "FSK",
+      "url": "https://www.sec.gov/Archives/edgar/data/1422183/000162828026011734/fsk-20251231.htm",
+      "sha256": "f571fa3c7cb34e24",
+      "retrieved_utc": "2026-09-06T23:57:22+00:00",
+      "document_chars": 1086160,
+      "section_chars": 373169,
+      "schedule_located": true,
+      "section_offset": 712991
+    },
+    {
+      "doc_id": "MAIN",
+      "url": "https://www.sec.gov/Archives/edgar/data/1396440/000139644026000016/main-20251231.htm",
+      "sha256": "0ff928ddaead03a2",
+      "retrieved_utc": "2026-09-06T23:57:22+00:00",
+      "document_chars": 1050428,
+      "section_chars": 400000,
+      "schedule_located": true,
+      "section_offset": 579472
+    },
+    {
+      "doc_id": "OBDC",
+      "url": "https://www.sec.gov/Archives/edgar/data/1655888/000165588826000010/obdc-20251231.htm",
+      "sha256": "9b4c0a2aee3c086c",
+      "retrieved_utc": "2026-09-06T23:57:21+00:00",
+      "document_chars": 1552467,
+      "section_chars": 400000,
+      "schedule_located": true,
+      "section_offset": 958604
+    },
+    {
+      "doc_id": "PSEC",
+      "url": "https://www.sec.gov/Archives/edgar/data/1287032/000128703226000269/psec-20260630.htm",
+      "sha256": "e228eaf5431d898e",
+      "retrieved_utc": "2026-09-06T23:57:22+00:00",
+      "document_chars": 1643574,
+      "section_chars": 400000,
+      "schedule_located": true,
+      "section_offset": 730908
+    }
+  ],
+  "example_report": {
+    "doc_id": "ARCC",
+    "records": [
+      {
+        "doc_id": "ARCC",
+        "doc_sha": "3453f872ecf458d2",
+        "field": "commitment_usd",
+        "value": 13.2,
+        "span": [
+          520,
+          529
+        ],
+        "evidence": "$  13.2",
+        "rule": "currency-amount",
+        "confidence": 0.6
+      },
+      {
+        "doc_id": "ARCC",
+        "doc_sha": "3453f872ecf458d2",
+        "field": "spread_bps",
+        "value": 258.1,
+        "span": [
+          225046,
+          225059
+        ],
+        "evidence": "SOFR +2.5810%",
+        "rule": "benchmark-plus-pct",
+        "confidence": 0.92
+      },
+      {
+        "doc_id": "ARCC",
+        "doc_sha": "3453f872ecf458d2",
+        "field": "floor_bps",
+        "value": null,
+        "span": null,
+        "evidence": "",
+        "rule": "not-found",
+        "confidence": 0.0
+      },
+      {
+        "doc_id": "ARCC",
+        "doc_sha": "3453f872ecf458d2",
+        "field": "maturity_years",
+        "value": null,
+        "span": null,
+        "evidence": "",
+        "rule": "not-found",
+        "confidence": 0.0
+      },
+      {
+        "doc_id": "ARCC",
+        "doc_sha": "3453f872ecf458d2",
+        "field": "oid",
+        "value": null,
+        "span": null,
+        "evidence": "",
+        "rule": "not-found",
+        "confidence": 0.0
+      },
+      {
+        "doc_id": "ARCC",
+        "doc_sha": "3453f872ecf458d2",
+        "field": "leverage_covenant",
+        "value": null,
+        "span": null,
+        "evidence": "",
+        "rule": "not-found",
+        "confidence": 0.0
+      }
+    ]
+  }
+}
