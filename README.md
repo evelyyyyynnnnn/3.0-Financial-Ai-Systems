@@ -1,6 +1,6 @@
 # 3.0 — Financial AI Systems
 
-The repository carrying the petition. Eleven projects with no baselines read as volume; four with measured results read as contribution.
+The repository carrying the petition. Seven projects with no baselines read as volume; four with measured results read as contribution.
 
 Part of a five-repository portfolio supporting the endeavor described in the
 EB2-NIW petition: **optimization-driven, system-level decision frameworks** —
@@ -10,7 +10,7 @@ are financial stability, healthcare safety and secure digital infrastructure.
 
 | | |
 |---|---|
-| Petition-grade projects today | 11 built (3 core) |
+| Petition-grade projects today | 7 built (3 core) |
 | Verdict | **Count is fine — depth is the problem** |
 
 > "Petition-grade" means: original work, a stated method, real data at a stated
@@ -66,7 +66,7 @@ Measure which crypto-equity links actually TRANSMIT stress, and simulate what a 
 
 One measured-results table per built project: baseline, metric, and out-of-sample performance.
 
-*Why it earns its place:* Eleven projects with no baselines read as volume. Four with measured results read as contribution.
+*Why it earns its place:* Seven projects with no baselines read as volume. Four with measured results read as contribution.
 
 *Target scale:* All built projects in this repository
 
@@ -82,19 +82,12 @@ One measured-results table per built project: baseline, metric, and out-of-sampl
 │
 │   ── earlier work, promoted out of previous/ ──
 ├── portfolio-optimization-engine/
-├── financial-network-risk/
-├── volatility-forecasting/
-├── credit-risk-ai/
-├── high-frequency-strategy/
-├── live-trading-engine/
-├── trading-system-dashboard-2/
-├── giant-portfolio/
-├── code-pipeline/
-├── archived-investment-dashboard/
-└── reference-options-volatility-trading/
+└── volatility-forecasting/
 ```
 
 Every rebuilt project carries the same skeleton: `README.md`, `src/`, `data/`, `results/`, `tests/`, `website/`.
+
+> Earlier and off-theme prior work (dashboards, consumer apps, templates, and other non-endeavor folders) has been moved to a separate `archive-prior-work` repository to keep this repository focused on the endeavor. It remains recoverable from this repository's git history.
 
 ## Ground rules
 
@@ -115,16 +108,7 @@ Nothing was deleted except items the rebuild genuinely supersedes; those remain 
 | Folder | What it is | How it may be used |
 |---|---|---|
 | [`portfolio-optimization-engine/`](portfolio-optimization-engine/) | Multi-agent portfolio allocation policy. | Prior original work. |
-| [`financial-network-risk/`](financial-network-risk/) | Financial risk as a graph problem — propagation over structure. | Prior original work. |
 | [`volatility-forecasting/`](volatility-forecasting/) | LSTM volatility forecasting. | Prior original work. |
-| [`credit-risk-ai/`](credit-risk-ai/) | Credit risk from three modalities. | Prior original work. |
-| [`high-frequency-strategy/`](high-frequency-strategy/) | Eventized microstructure — order-book events tokenised into sequences. | Prior original work. |
-| [`live-trading-engine/`](live-trading-engine/) | C++ execution layer for factor strategies. | Prior original work. |
-| [`trading-system-dashboard-2/`](trading-system-dashboard-2/) | Market data, portfolio and backtesting platform. | Prior original work. |
-| [`giant-portfolio/`](giant-portfolio/) | 13F institutional positioning tracker. | Prior original work. |
-| [`code-pipeline/`](code-pipeline/) | Macroeconomic data assembly and cleaning notebook. | Prior original work. |
-| [`archived-investment-dashboard/`](archived-investment-dashboard/) | The earlier investment dashboard, retired and superseded by `trading-system-dashboard-2/`. | Retired. Do not cite. |
-| [`reference-options-volatility-trading/`](reference-options-volatility-trading/) | Long/short straddle volatility strategy. | **NOT ORIGINAL WORK — a fork of a third-party MIT-licensed project. Never cite, never count.** |
 
 **Read the third column before citing anything here.** Forks of third-party work, duplicates, retired projects and asset-only folders are labelled as such and are not part of the petition's evidence.
 
