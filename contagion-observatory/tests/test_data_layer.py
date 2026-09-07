@@ -19,8 +19,9 @@ import pytest
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 from data import datakit
-from data.marketdata import (align, parse_coingecko, parse_french, parse_fred,
-                             parse_stooq, stooq_source, to_returns)
+from data.marketdata import (align, parse_coingecko, parse_french,
+                             parse_french_industries, parse_fred, parse_stooq,
+                             stooq_source, to_returns)
 
 D = dt.date.fromisoformat
 
@@ -94,6 +95,52 @@ def test_parse_french_converts_percent_to_decimal():
     _, data = parse_french(_french_zip())
     assert data["Mkt-RF"][0] == pytest.approx(-0.0055)
     assert data["RF"][0] == pytest.approx(0.00021)
+
+
+# --- Fama-French 10 industry portfolios ------------------------------------
+
+def _french_industries_zip():
+    inner = (
+        "This file was created using the 202607 CRSP database.\n"
+        "Missing data are indicated by -99.99 or -999.\n"
+        "\n"
+        "  Average Value Weighted Returns -- Daily\n"
+        ",NoDur,Durbl,Manuf,Enrgy,HiTec,Telcm,Shops,Hlth,Utils,Other\n"
+        "20240102,   0.02,  -0.28,  -0.23,   0.57,  -0.21,  -0.02,  -0.01,"
+        "   0.97,   0.61,   0.20\n"
+        "20240103, -99.99,   1.07,   0.81,   0.64,   0.36,   0.26,   0.01,"
+        "   0.13,   0.47,   0.10\n"      # a missing-data row: must be dropped
+        "20240104,   0.24,   0.72,   0.22,   0.17,   0.47,   0.17,  -0.23,"
+        "   0.23,   0.73,  -0.18\n"
+        "\n"
+        "  Average Equal Weighted Returns -- Daily\n"
+        ",NoDur,Durbl,Manuf,Enrgy,HiTec,Telcm,Shops,Hlth,Utils,Other\n"
+        "20240102,  99.00,  99.00,  99.00,  99.00,  99.00,  99.00,  99.00,"
+        "  99.00,  99.00,  99.00\n")
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        z.writestr("10_Industry_Portfolios_Daily.csv", inner)
+    return buf.getvalue()
+
+
+def test_parse_french_industries_stops_before_the_equal_weighted_block():
+    """Two daily blocks share one file; only the first must be read.
+
+    Concatenating the equal-weighted block onto the value-weighted one would
+    duplicate the calendar and corrupt every lead-lag statistic downstream.
+    """
+    dates, data = parse_french_industries(_french_industries_zip())
+    assert len(dates) == 2                      # the -99.99 row dropped
+    assert set(data) == {"NoDur", "Durbl", "Manuf", "Enrgy", "HiTec",
+                         "Telcm", "Shops", "Hlth", "Utils", "Other"}
+    assert all(len(v) == 2 for v in data.values())
+    assert max(abs(v) for v in data["NoDur"]) < 0.05   # no 0.99 leaked in
+
+
+def test_parse_french_industries_converts_percent_and_drops_missing():
+    dates, data = parse_french_industries(_french_industries_zip())
+    assert data["NoDur"][0] == pytest.approx(0.0002)
+    assert dt.date(2024, 1, 3) not in dates            # the -99.99 row
 
 
 # --- CoinGecko and FRED ----------------------------------------------------

@@ -10,11 +10,11 @@
 
 ## What the repositories currently show
 
-Tail-dependence weighting at 0.65 and real data sources named (Stooq, CoinGecko) — but it currently ships simulated series.
+A synthetic demo with a KNOWN set of transmitting edges, on which precision/recall and shock-recovery are scored, plus a `--real` path that runs the same pipeline on real data: the daily value-weighted returns of the Fama-French 10-industry portfolios (Kenneth R. French Data Library — 10 series, ~756 trading days), ranking cross-industry transmission candidate links. The real run does NOT use the crypto/equity universe named in the petition, and honestly reports no precision/recall or recovery there because the true transmission graph is unknown (`recovery_reported:false`).
 
 ## The gap
 
-Carries the asset-count claims. The asset counts are not demonstrable from the repo as it stands.
+Carries the asset-count claims. The `--real` run demonstrates a working, fully-sourced pipeline on 10 industry portfolios — not the 7,500+ crypto / 6,000+ equity universe in the petition, which is not demonstrable from the repo as it stands.
 
 ## Action
 

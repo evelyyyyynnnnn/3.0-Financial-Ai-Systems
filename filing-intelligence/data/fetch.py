@@ -25,7 +25,7 @@ ROOT = pathlib.Path(__file__).resolve().parent
 # Large registrants with long, heavily-revised Item 1A sections. Diversified
 # across sectors because risk-factor drafting conventions differ by industry,
 # and a differ tuned on one sector's boilerplate will flatter itself.
-COMPANIES = ["AAPL", "JPM", "PFE", "XOM", "BA"]
+COMPANIES = ["AAPL", "MSFT", "PFE", "BA", "KO"]
 
 INDEX = Source(
     name="EDGAR ticker-to-CIK map", url=TICKERS, dest="company_tickers.json",
@@ -38,6 +38,7 @@ def resolve(f: Fetcher) -> list:
     """Two-stage resolution: ticker -> CIK -> the two most recent 10-K URLs."""
     tickers_json = f.get(INDEX).read_bytes()
     filings = []
+    skipped = []
     for tic in COMPANIES:
         cik10 = cik_for_ticker(tickers_json, tic)
         sub = f.get(Source(
@@ -47,7 +48,21 @@ def resolve(f: Fetcher) -> list:
             publisher="U.S. SEC (EDGAR)",
             terms="U.S. government work, public domain",
         ))
-        filings += recent_filings(sub.read_bytes(), tic, form="10-K", limit=2)
+        # A heavy filer can push its prior 10-K out of the "recent" index into
+        # the older files[] overflow, which this fetch does not chase. Skip such
+        # a company rather than aborting the whole run: the diff needs a same-
+        # registrant pair, so a company without two recent 10-Ks simply drops
+        # out and the rest still produce real, honest comparisons.
+        try:
+            filings += recent_filings(sub.read_bytes(), tic, form="10-K", limit=2)
+        except ValueError as exc:
+            skipped.append(f"{tic} ({exc})")
+    if skipped:
+        print("skipped (no two recent 10-Ks): " + "; ".join(skipped))
+    if not filings:
+        raise FetchError(
+            "no company yielded two recent 10-Ks; widen COMPANIES to registrants "
+            "that file annually without overflowing the recent index.")
     return filings
 
 

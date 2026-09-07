@@ -21,6 +21,8 @@ from .datakit import Source
 STOOQ = "https://stooq.com/q/d/l/?s={sym}&d1={start}&d2={end}&i=d"
 FRENCH = ("https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/"
           "F-F_Research_Data_Factors_daily_CSV.zip")
+FRENCH_INDUSTRIES = ("https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/"
+                     "ftp/10_Industry_Portfolios_daily_CSV.zip")
 COINGECKO = ("https://api.coingecko.com/api/v3/coins/{coin}/market_chart"
              "?vs_currency=usd&days={days}&interval=daily")
 FRED = "https://fred.stlouisfed.org/graph/fredgraph.csv?id={series}"
@@ -44,6 +46,24 @@ def french_source() -> Source:
         dest="french/ff_daily.zip", publisher="Kenneth R. French Data Library",
         terms="free for research use, attribution requested",
         note="Mkt-RF, SMB, HML and the daily risk-free rate",
+    )
+
+
+def french_industries_source() -> Source:
+    """The 10 industry portfolios, daily value-weighted returns.
+
+    Ten aligned daily return series with no login and a stable URL, which is
+    what the transmission analysis needs: it wants at least three same-calendar
+    series, and these ten share one trading calendar exactly. Unlike a price
+    tape, this file is already returns, so it is not run through to_returns.
+    """
+    return Source(
+        name="Fama-French 10 industry portfolios, daily",
+        url=FRENCH_INDUSTRIES,
+        dest="french/ff_industries_daily.zip",
+        publisher="Kenneth R. French Data Library",
+        terms="free for research use, attribution requested",
+        note="value-weighted daily returns for 10 industry portfolios",
     )
 
 
@@ -129,6 +149,58 @@ def parse_french(raw: bytes) -> tuple:
             data[c].append(float(v) / 100.0)   # the file is in percent
     if not dates:
         raise ValueError("no daily rows parsed from the French CSV")
+    return dates, data
+
+
+def parse_french_industries(raw: bytes) -> tuple:
+    """Return (dates, {industry: [daily returns]}) from the 10-industry zip.
+
+    The file stacks several blocks in one CSV: value-weighted daily returns
+    first, then equal-weighted daily, then annual blocks. Only the first daily
+    block is parsed. Reading into the next block would concatenate a second copy
+    of the calendar (equal-weighted) onto the first, which is the same
+    block-boundary mistake parse_french guards against for the factor file.
+
+    Values are percent and are divided by 100. French marks a missing month
+    with -99.99 or -999; any row carrying such a sentinel is dropped whole so
+    every industry stays aligned. In a recent window there are none.
+    """
+    with zipfile.ZipFile(io.BytesIO(raw)) as z:
+        name = [n for n in z.namelist() if n.lower().endswith(".csv")][0]
+        text = z.read(name).decode("utf-8", errors="replace")
+
+    lines = text.splitlines()
+    start = None
+    for i in range(len(lines) - 1):
+        cells = [c.strip() for c in lines[i].split(",")]
+        nxt = lines[i + 1].strip().split(",")[0].strip()
+        # A header row is empty in its first cell, names >=3 columns, and is
+        # immediately followed by an 8-digit date row.
+        if cells and cells[0] == "" and len(cells) >= 4 \
+                and nxt.isdigit() and len(nxt) == 8:
+            start = i
+            break
+    if start is None:
+        raise ValueError("could not find a daily returns header row in the "
+                         "French industries CSV")
+
+    cols = [c.strip() for c in lines[start].split(",")][1:]
+    dates, data = [], {c: [] for c in cols}
+    for ln in lines[start + 1:]:
+        s = ln.strip()
+        if not s:
+            break                      # end of the daily value-weighted block
+        parts = [p.strip() for p in s.split(",")]
+        if not parts[0].isdigit() or len(parts[0]) != 8:
+            break                      # annual block / next section
+        vals = [float(p) for p in parts[1:1 + len(cols)]]
+        if any(v <= -99.0 for v in vals):
+            continue                   # -99.99 / -999 = missing month
+        dates.append(datetime.strptime(parts[0], "%Y%m%d").date())
+        for c, v in zip(cols, vals):
+            data[c].append(v / 100.0)
+    if not dates:
+        raise ValueError("no daily rows parsed from the French industries CSV")
     return dates, data
 
 

@@ -1,0 +1,80 @@
+{
+  "doc_id": "MAIN",
+  "records": [
+    {
+      "doc_id": "MAIN",
+      "doc_sha": "e884fb4a9ac3be76",
+      "field": "commitment_usd",
+      "value": 3.0,
+      "span": [
+        299467,
+        299501
+      ],
+      "evidence": "aggregate principal amount of 3.00",
+      "rule": "labelled-amount",
+      "confidence": 0.85
+    },
+    {
+      "doc_id": "MAIN",
+      "doc_sha": "e884fb4a9ac3be76",
+      "field": "spread_bps",
+      "value": 650.0,
+      "span": [
+        101783,
+        101793
+      ],
+      "evidence": "SOFR+6.50%",
+      "rule": "benchmark-plus-pct",
+      "confidence": 0.92
+    },
+    {
+      "doc_id": "MAIN",
+      "doc_sha": "e884fb4a9ac3be76",
+      "field": "floor_bps",
+      "value": 150.0,
+      "span": [
+        101795,
+        101806
+      ],
+      "evidence": "Floor 1.50%",
+      "rule": "bare-floor",
+      "confidence": 0.8
+    },
+    {
+      "doc_id": "MAIN",
+      "doc_sha": "e884fb4a9ac3be76",
+      "field": "maturity_years",
+      "value": 4.6,
+      "span": [
+        304072,
+        304081
+      ],
+      "evidence": "4.6 years",
+      "rule": "bare-years",
+      "confidence": 0.7
+    },
+    {
+      "doc_id": "MAIN",
+      "doc_sha": "e884fb4a9ac3be76",
+      "field": "oid",
+      "value": null,
+      "span": null,
+      "evidence": "",
+      "rule": "not-found",
+      "confidence": 0.0
+    },
+    {
+      "doc_id": "MAIN",
+      "doc_sha": "e884fb4a9ac3be76",
+      "field": "leverage_covenant",
+      "value": 5.0,
+      "span": [
+        250853,
+        250857
+      ],
+      "evidence": "5.0x",
+      "rule": "leverage-multiple",
+      "confidence": 0.9
+    }
+  ]
+}

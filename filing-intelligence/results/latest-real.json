@@ -1,0 +1,284 @@
+{
+  "generated_at": "2026-09-07T00:04:56+00:00",
+  "is_synthetic": false,
+  "data_source": "real 10-K filings retrieved from SEC EDGAR (see data/MANIFEST.json for URLs, hashes and retrieval times)",
+  "edgar_configured": false,
+  "edgar_used_in_this_run": true,
+  "accuracy_reported": false,
+  "accuracy_withheld_because": "real filing pairs carry no human-annotated list of material changes, so there is no denominator for precision or recall",
+  "provenance": [
+    {
+      "ticker": "AAPL",
+      "status": "ok",
+      "prior": {
+        "filed": "2024-11-01",
+        "sha256": "24a830a0f1256e37",
+        "url": "https://www.sec.gov/Archives/edgar/data/320193/000032019324000123/aapl-20240928.htm",
+        "item_1a_chars": 1657
+      },
+      "current": {
+        "filed": "2025-10-31",
+        "sha256": "548ae59778cf08ee",
+        "url": "https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927.htm",
+        "item_1a_chars": 2148
+      }
+    },
+    {
+      "ticker": "BA",
+      "status": "ok",
+      "prior": {
+        "filed": "2025-02-03",
+        "sha256": "5543e481852dd01f",
+        "url": "https://www.sec.gov/Archives/edgar/data/12927/000001292725000015/ba-20241231.htm",
+        "item_1a_chars": 70983
+      },
+      "current": {
+        "filed": "2026-01-30",
+        "sha256": "5e6dd009813c7851",
+        "url": "https://www.sec.gov/Archives/edgar/data/12927/000162828026004357/ba-20251231.htm",
+        "item_1a_chars": 68916
+      }
+    },
+    {
+      "ticker": "KO",
+      "status": "ok",
+      "prior": {
+        "filed": "2025-02-20",
+        "sha256": "03e0f59ce1b6115d",
+        "url": "https://www.sec.gov/Archives/edgar/data/21344/000002134425000011/ko-20241231.htm",
+        "item_1a_chars": 101247
+      },
+      "current": {
+        "filed": "2026-02-20",
+        "sha256": "22dd41f1aab4928f",
+        "url": "https://www.sec.gov/Archives/edgar/data/21344/000162828026010047/ko-20251231.htm",
+        "item_1a_chars": 96919
+      }
+    },
+    {
+      "ticker": "MSFT",
+      "status": "ok",
+      "prior": {
+        "filed": "2025-07-30",
+        "sha256": "99d693f6c1544144",
+        "url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+        "item_1a_chars": 69098
+      },
+      "current": {
+        "filed": "2026-07-29",
+        "sha256": "4bcf2da2871acc19",
+        "url": "https://www.sec.gov/Archives/edgar/data/789019/000119312526323660/msft-20260630.htm",
+        "item_1a_chars": 81351
+      }
+    },
+    {
+      "ticker": "PFE",
+      "status": "ok",
+      "prior": {
+        "filed": "2025-02-27",
+        "sha256": "ecf7be6bf680c4ca",
+        "url": "https://www.sec.gov/Archives/edgar/data/78003/000007800325000054/pfe-20241231.htm",
+        "item_1a_chars": 46564
+      },
+      "current": {
+        "filed": "2026-02-26",
+        "sha256": "175e07c21ee258ed",
+        "url": "https://www.sec.gov/Archives/edgar/data/78003/000007800326000026/pfe-20251231.htm",
+        "item_1a_chars": 45070
+      }
+    }
+  ],
+  "reports": [
+    {
+      "company": "AAPL",
+      "prior_period": "FY2023",
+      "current_period": "FY2024",
+      "n_risks_prior": 6,
+      "n_risks_current": 7,
+      "counts": {
+        "added": 2,
+        "removed": 1,
+        "reworded": 4,
+        "unchanged": 1,
+        "total": 8,
+        "material": 7
+      },
+      "examples": [
+        {
+          "kind": "reworded",
+          "headline": "Operating Expenses Operating expenses for 2025, 2024 and 2023 were as follows (dollars in millions):"
+        },
+        {
+          "kind": "reworded",
+          "headline": "2025 Change 2024 Change 2023 Research and development $ 34,550 10 % $ 31,370 5 % $ 29,915 Percentage of total net sales 8 % 8 % 8 % Selling, general and administrative $ 27,601 6 %"
+        },
+        {
+          "kind": "added",
+          "headline": "Selling, General and Administrative The growth in selling, general and administrative expense during 2025 compared to 2024 was primarily driven by increases in headcount-related ex"
+        },
+        {
+          "kind": "reworded",
+          "headline": "Apple Inc. | 2025 Form 10-K | 24 Provision for Income Taxes Provision for income taxes, effective tax rate and statutory federal income tax rate for 2025, 2024 and 2023 were as fol"
+        },
+        {
+          "kind": "added",
+          "headline": "2025 2024 2023 Provision for income taxes $ 20,719 $ 29,749 $ 16,741 Effective tax rate 15.6 % 24.1 % 14.7 % Statutory federal income tax rate 21 % 21 % 21 % The Company's effectiv"
+        }
+      ]
+    },
+    {
+      "company": "BA",
+      "prior_period": "FY2024",
+      "current_period": "FY2025",
+      "n_risks_prior": 111,
+      "n_risks_current": 107,
+      "counts": {
+        "added": 15,
+        "removed": 19,
+        "reworded": 50,
+        "unchanged": 42,
+        "total": 126,
+        "material": 84
+      },
+      "examples": [
+        {
+          "kind": "reworded",
+          "headline": "We are committed to creating a work environment where every teammate around the world can perform at their best and grow their careers while supporting our company's mission to pro"
+        },
+        {
+          "kind": "added",
+          "headline": "2 Table of Contents We also invest in rewarding performance and have established a multi-level recognition program to acknowledge the achievements of excellent individual or team p"
+        },
+        {
+          "kind": "reworded",
+          "headline": "We support our employees' continuous development of professional, technical and leadership skills through access to digital learning resources and partnerships with leading profess"
+        },
+        {
+          "kind": "reworded",
+          "headline": "Competition The commercial jet aircraft market and the airline industry remain extremely competitive. BCA faces aggressive international competitors who are intent on increasing th"
+        },
+        {
+          "kind": "reworded",
+          "headline": "BDS faces strong competition primarily from General Dynamics Corporation, Lockheed Martin Corporation, Northrop Grumman Corporation, RTX Corporation and SpaceX. Non-U.S. companies "
+        }
+      ]
+    },
+    {
+      "company": "KO",
+      "prior_period": "FY2024",
+      "current_period": "FY2025",
+      "n_risks_prior": 172,
+      "n_risks_current": 164,
+      "counts": {
+        "added": 19,
+        "removed": 27,
+        "reworded": 102,
+        "unchanged": 43,
+        "total": 191,
+        "material": 148
+      },
+      "examples": [
+        {
+          "kind": "reworded",
+          "headline": "CRITICAL ACCOUNTING POLICIES AND ESTIMATES Our consolidated financial statements are prepared in accordance with accounting principles generally accepted in the United States (\"U.S"
+        },
+        {
+          "kind": "reworded",
+          "headline": "\u2022Principles of Consolidation \u2022Recoverability of Equity Method Investments and Indefinite-Lived Intangible Assets \u2022Pension Plan Valuations \u2022Revenue Recognition \u2022Income Taxes 38 Mana"
+        },
+        {
+          "kind": "reworded",
+          "headline": "Recoverability of Equity Method Investments and Indefinite-Lived Intangible Assets Our Company faces many uncertainties and risks related to various economic, political and regulat"
+        },
+        {
+          "kind": "reworded",
+          "headline": "Equity Method Investments Equity method investments are reviewed for impairment whenever significant events or changes in circumstances indicate that the carrying amount of the inv"
+        },
+        {
+          "kind": "added",
+          "headline": "39 evaluating estimated future cash flows when employing the discounted cash flow or estimates of sales proceeds valuation methodologies. The ability to accurately predict future c"
+        }
+      ]
+    },
+    {
+      "company": "MSFT",
+      "prior_period": "FY2024",
+      "current_period": "FY2025",
+      "n_risks_prior": 83,
+      "n_risks_current": 100,
+      "counts": {
+        "added": 23,
+        "removed": 6,
+        "reworded": 50,
+        "unchanged": 27,
+        "total": 106,
+        "material": 79
+      },
+      "examples": [
+        {
+          "kind": "reworded",
+          "headline": "ITEM 1A. RISK FACTORS Our operations and financial results are subject to various risks and uncertainties, including those described below, that could adversely affect our business"
+        },
+        {
+          "kind": "reworded",
+          "headline": "Competition in the technology sector Our competitors range in size from diversified global companies with significant research and development resources to small, specialized firms"
+        },
+        {
+          "kind": "reworded",
+          "headline": "Competition among platform-based ecosystems An important element of our business model has been to create platform-based ecosystems on which many participants can build diverse sol"
+        },
+        {
+          "kind": "reworded",
+          "headline": "\u2022\nA competing vertically-integrated model, in which a single firm controls the hardware and software elements of a product and related services, has succeeded with some consumer pr"
+        },
+        {
+          "kind": "reworded",
+          "headline": "\u2022\nWe derive substantial revenue from licenses of Windows operating systems on PCs. We face significant competition from competing platforms developed for new types of devices, incl"
+        }
+      ]
+    },
+    {
+      "company": "PFE",
+      "prior_period": "FY2024",
+      "current_period": "FY2025",
+      "n_risks_prior": 51,
+      "n_risks_current": 55,
+      "counts": {
+        "added": 18,
+        "removed": 14,
+        "reworded": 30,
+        "unchanged": 7,
+        "total": 69,
+        "material": 62
+      },
+      "examples": [
+        {
+          "kind": "reworded",
+          "headline": "--Pricing and Reimbursement sections. RAW MATERIALS We procure raw materials essential to our business from numerous suppliers worldwide. In general, these materials have been avai"
+        },
+        {
+          "kind": "reworded",
+          "headline": "In the U.S. Drug and Biologic Regulation. The FDA, pursuant to the FFDCA, the Public Health Service Act and other federal statutes and regulations, extensively regulates pre- and p"
+        },
+        {
+          "kind": "reworded",
+          "headline": "For a biopharmaceutical company to market a drug or a biologic product, including vaccines, the FDA must approve a product's NDA or BLA (or supplemental NDA or supplemental BLA). P"
+        },
+        {
+          "kind": "reworded",
+          "headline": "A drug or biologic may be subject to post marketing commitments, which are studies or clinical trials that the product sponsor agrees to conduct, or post marketing requirements, wh"
+        },
+        {
+          "kind": "added",
+          "headline": "Biosimilar Regulation. The FDA regulates biosimilars which are follow-on products that reference an innovative biological product. A product is biosimilar if the products are highl"
+        }
+      ]
+    }
+  ],
+  "timing": {
+    "seconds_per_corpus_pass": 0.00031,
+    "chars_processed": 3781,
+    "chars_per_second": 12167092,
+    "human_baseline_measured": false
+  }
+}

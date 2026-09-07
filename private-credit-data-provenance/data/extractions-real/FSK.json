@@ -1,0 +1,77 @@
+{
+  "doc_id": "FSK",
+  "records": [
+    {
+      "doc_id": "FSK",
+      "doc_sha": "03ed3528d15e6e3c",
+      "field": "commitment_usd",
+      "value": 4.125,
+      "span": [
+        308021,
+        308056
+      ],
+      "evidence": "aggregate principal amount of 4.125",
+      "rule": "labelled-amount",
+      "confidence": 0.85
+    },
+    {
+      "doc_id": "FSK",
+      "doc_sha": "03ed3528d15e6e3c",
+      "field": "spread_bps",
+      "value": 450.0,
+      "span": [
+        1027,
+        1037
+      ],
+      "evidence": "E  +  4.5%",
+      "rule": "benchmark-plus-pct",
+      "confidence": 0.92
+    },
+    {
+      "doc_id": "FSK",
+      "doc_sha": "03ed3528d15e6e3c",
+      "field": "floor_bps",
+      "value": 0.0,
+      "span": [
+        278777,
+        278785
+      ],
+      "evidence": "0% floor",
+      "rule": "pct-floor",
+      "confidence": 0.9
+    },
+    {
+      "doc_id": "FSK",
+      "doc_sha": "03ed3528d15e6e3c",
+      "field": "maturity_years",
+      "value": null,
+      "span": null,
+      "evidence": "",
+      "rule": "not-found",
+      "confidence": 0.0
+    },
+    {
+      "doc_id": "FSK",
+      "doc_sha": "03ed3528d15e6e3c",
+      "field": "oid",
+      "value": null,
+      "span": null,
+      "evidence": "",
+      "rule": "not-found",
+      "confidence": 0.0
+    },
+    {
+      "doc_id": "FSK",
+      "doc_sha": "03ed3528d15e6e3c",
+      "field": "leverage_covenant",
+      "value": 1.0,
+      "span": [
+        218342,
+        218346
+      ],
+      "evidence": "1.0x",
+      "rule": "leverage-multiple",
+      "confidence": 0.9
+    }
+  ]
+}

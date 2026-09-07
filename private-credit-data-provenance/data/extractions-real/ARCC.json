@@ -1,0 +1,71 @@
+{
+  "doc_id": "ARCC",
+  "records": [
+    {
+      "doc_id": "ARCC",
+      "doc_sha": "3453f872ecf458d2",
+      "field": "commitment_usd",
+      "value": 13.2,
+      "span": [
+        520,
+        529
+      ],
+      "evidence": "$  13.2",
+      "rule": "currency-amount",
+      "confidence": 0.6
+    },
+    {
+      "doc_id": "ARCC",
+      "doc_sha": "3453f872ecf458d2",
+      "field": "spread_bps",
+      "value": 258.1,
+      "span": [
+        225046,
+        225059
+      ],
+      "evidence": "SOFR +2.5810%",
+      "rule": "benchmark-plus-pct",
+      "confidence": 0.92
+    },
+    {
+      "doc_id": "ARCC",
+      "doc_sha": "3453f872ecf458d2",
+      "field": "floor_bps",
+      "value": null,
+      "span": null,
+      "evidence": "",
+      "rule": "not-found",
+      "confidence": 0.0
+    },
+    {
+      "doc_id": "ARCC",
+      "doc_sha": "3453f872ecf458d2",
+      "field": "maturity_years",
+      "value": null,
+      "span": null,
+      "evidence": "",
+      "rule": "not-found",
+      "confidence": 0.0
+    },
+    {
+      "doc_id": "ARCC",
+      "doc_sha": "3453f872ecf458d2",
+      "field": "oid",
+      "value": null,
+      "span": null,
+      "evidence": "",
+      "rule": "not-found",
+      "confidence": 0.0
+    },
+    {
+      "doc_id": "ARCC",
+      "doc_sha": "3453f872ecf458d2",
+      "field": "leverage_covenant",
+      "value": null,
+      "span": null,
+      "evidence": "",
+      "rule": "not-found",
+      "confidence": 0.0
+    }
+  ]
+}

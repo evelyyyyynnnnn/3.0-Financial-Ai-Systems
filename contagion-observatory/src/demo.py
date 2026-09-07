@@ -127,13 +127,14 @@ def run_real() -> dict:
 
     crypto = [n for n, c in market.classes.items() if c == "crypto"]
     shocked = crypto[:2] + [n for n in ("spy.us", "xle.us") if n in market.names]
+    if not shocked:                       # no crypto/ETF names (e.g. industries)
+        shocked = list(market.names[:4])
     shocks = {n: propagate(market, n, magnitude=-0.20) for n in shocked}
 
     results = {
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "is_synthetic": False,
-        "data_source": "real daily closes from Stooq (see data/MANIFEST.json for "
-                       "URLs, hashes and retrieval times)",
+        "data_source": meta["data_source"],
         "universe": {
             "n_assets": meta["n_assets"],
             "n_crypto": sum(1 for v in market.classes.values() if v == "crypto"),

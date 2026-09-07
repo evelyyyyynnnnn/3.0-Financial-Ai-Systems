@@ -1,0 +1,74 @@
+{
+  "doc_id": "OBDC",
+  "records": [
+    {
+      "doc_id": "OBDC",
+      "doc_sha": "8c43eff8889a7152",
+      "field": "commitment_usd",
+      "value": 1.65,
+      "span": [
+        281636,
+        281648
+      ],
+      "evidence": "amount 1.650",
+      "rule": "labelled-amount",
+      "confidence": 0.85
+    },
+    {
+      "doc_id": "OBDC",
+      "doc_sha": "8c43eff8889a7152",
+      "field": "spread_bps",
+      "value": 425.0,
+      "span": [
+        488,
+        497
+      ],
+      "evidence": "S+  4.25%",
+      "rule": "benchmark-plus-pct",
+      "confidence": 0.92
+    },
+    {
+      "doc_id": "OBDC",
+      "doc_sha": "8c43eff8889a7152",
+      "field": "floor_bps",
+      "value": null,
+      "span": null,
+      "evidence": "",
+      "rule": "not-found",
+      "confidence": 0.0
+    },
+    {
+      "doc_id": "OBDC",
+      "doc_sha": "8c43eff8889a7152",
+      "field": "maturity_years",
+      "value": 1.0,
+      "span": [
+        397477,
+        397483
+      ],
+      "evidence": "1 year",
+      "rule": "bare-years",
+      "confidence": 0.7
+    },
+    {
+      "doc_id": "OBDC",
+      "doc_sha": "8c43eff8889a7152",
+      "field": "oid",
+      "value": null,
+      "span": null,
+      "evidence": "",
+      "rule": "not-found",
+      "confidence": 0.0
+    },
+    {
+      "doc_id": "OBDC",
+      "doc_sha": "8c43eff8889a7152",
+      "field": "leverage_covenant",
+      "value": null,
+      "span": null,
+      "evidence": "",
+      "rule": "not-found",
+      "confidence": 0.0
+    }
+  ]
+}
