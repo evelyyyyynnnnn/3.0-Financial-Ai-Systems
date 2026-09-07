@@ -54,7 +54,7 @@ workflows from nowhere else.
 | Workflow | Schedule | Refreshes |
 |---|---|---|
 | `refresh-data.yml` | 1st of each month | `project-1/giant-portfolio/data.json` from Notion |
-| `refresh-filings.yml` | 3rd of each month | `project-2/filing-intelligence/data/data.json` from SEC EDGAR |
+| `refresh-filings.yml` | 3rd of each month | `project-2/2-filing-intelligence/data/data.json` from SEC EDGAR |
 
 Both also run on demand from the Actions tab, and both commit only when the
 data actually changed — which redeploys the affected site.

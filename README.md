@@ -22,15 +22,15 @@ are financial stability, healthcare safety and secure digital infrastructure.
 
 | Folder | Project | Pillar | Evidence value |
 |---|---|---|---|
-| [`private-credit-data-provenance/`](private-credit-data-provenance/) | Private Credit Data Provenance | Financial Stability | Planned — build this next; strongest single alignment in the workspace |
-| [`tokenized-fixed-income-analytics/`](tokenized-fixed-income-analytics/) | Tokenized Fixed-Income Analytics | Financial Stability | Planned — build this next |
-| [`filing-intelligence/`](filing-intelligence/) | Filing Intelligence | Financial Stability | CORE — carries a scale claim that is currently unevidenced |
-| [`contagion-observatory/`](contagion-observatory/) | Contagion Observatory | Financial Stability | CORE — carries a scale claim that is currently unevidenced |
-| [`measured-results/`](measured-results/) | Measured Results | Financial Stability | Supporting — converts volume into contribution |
+| [`3-private-credit-data-provenance/`](3-private-credit-data-provenance/) | Private Credit Data Provenance | Financial Stability | Planned — build this next; strongest single alignment in the workspace |
+| [`4-tokenized-fixed-income-analytics/`](4-tokenized-fixed-income-analytics/) | Tokenized Fixed-Income Analytics | Financial Stability | Planned — build this next |
+| [`2-filing-intelligence/`](2-filing-intelligence/) | Filing Intelligence | Financial Stability | CORE — carries a scale claim that is currently unevidenced |
+| [`1-contagion-observatory/`](1-contagion-observatory/) | Contagion Observatory | Financial Stability | CORE — carries a scale claim that is currently unevidenced |
+| [`7-portfolio-results-rollup/`](7-portfolio-results-rollup/) | Measured Results | Financial Stability | Supporting — converts volume into contribution |
 
 ## What each one is
 
-### 1. Private Credit Data Provenance — [`private-credit-data-provenance/`](private-credit-data-provenance/)
+### 1. Private Credit Data Provenance — [`3-private-credit-data-provenance/`](3-private-credit-data-provenance/)
 
 Extract terms from private credit documents where every extracted value carries a citation back to the source span.
 
@@ -38,7 +38,7 @@ Extract terms from private credit documents where every extracted value carries 
 
 *Target scale:* Private credit term sheets (universe to be stated)
 
-### 2. Tokenized Fixed-Income Analytics — [`tokenized-fixed-income-analytics/`](tokenized-fixed-income-analytics/)
+### 2. Tokenized Fixed-Income Analytics — [`4-tokenized-fixed-income-analytics/`](4-tokenized-fixed-income-analytics/)
 
 Measure liquidity, holder concentration, and redemption latency for tokenized debt from on-chain trade data.
 
@@ -46,7 +46,7 @@ Measure liquidity, holder concentration, and redemption latency for tokenized de
 
 *Target scale:* On-chain tokenized-debt trade data (universe to be stated)
 
-### 3. Filing Intelligence — [`filing-intelligence/`](filing-intelligence/)
+### 3. Filing Intelligence — [`2-filing-intelligence/`](2-filing-intelligence/)
 
 Report what CHANGED in a company's SEC risk disclosures since its prior filing, rather than summarising the filing.
 
@@ -54,7 +54,7 @@ Report what CHANGED in a company's SEC risk disclosures since its prior filing, 
 
 *Target scale:* 600+ U.S. corporate filings (10-K / 10-Q)
 
-### 4. Contagion Observatory — [`contagion-observatory/`](contagion-observatory/)
+### 4. Contagion Observatory — [`1-contagion-observatory/`](1-contagion-observatory/)
 
 Measure which crypto-equity links actually TRANSMIT stress, and simulate what a shock to one asset does to the rest.
 
@@ -62,9 +62,9 @@ Measure which crypto-equity links actually TRANSMIT stress, and simulate what a 
 
 *Target scale:* 7,500+ crypto assets and 6,000+ U.S. equities/ETFs
 
-### 5. Measured Results — [`measured-results/`](measured-results/)
+### 5. Measured Results — [`7-portfolio-results-rollup/`](7-portfolio-results-rollup/)
 
-One measured-results table per built project: baseline, metric, and out-of-sample performance.
+One 7-portfolio-results-rollup table per built project: baseline, metric, and out-of-sample performance.
 
 *Why it earns its place:* Seven projects with no baselines read as volume. Four with measured results read as contribution.
 
@@ -74,15 +74,15 @@ One measured-results table per built project: baseline, metric, and out-of-sampl
 
 ```
 3.0-Financial-Ai-Systems/
-├── filing-intelligence/
-├── contagion-observatory/
-├── private-credit-data-provenance/
-├── tokenized-fixed-income-analytics/
-├── measured-results/
+├── 2-filing-intelligence/
+├── 1-contagion-observatory/
+├── 3-private-credit-data-provenance/
+├── 4-tokenized-fixed-income-analytics/
+├── 7-portfolio-results-rollup/
 │
 │   ── earlier work, promoted out of previous/ ──
-├── portfolio-optimization-engine/
-└── volatility-forecasting/
+├── 6-portfolio-optimization-engine/
+└── 5-volatility-forecasting/
 ```
 
 Every rebuilt project carries the same skeleton: `README.md`, `src/`, `data/`, `results/`, `tests/`, `website/`.
@@ -107,8 +107,8 @@ Nothing was deleted except items the rebuild genuinely supersedes; those remain 
 
 | Folder | What it is | How it may be used |
 |---|---|---|
-| [`portfolio-optimization-engine/`](portfolio-optimization-engine/) | Multi-agent portfolio allocation policy. | Prior original work. |
-| [`volatility-forecasting/`](volatility-forecasting/) | LSTM volatility forecasting. | Prior original work. |
+| [`6-portfolio-optimization-engine/`](6-portfolio-optimization-engine/) | Multi-agent portfolio allocation policy. | Prior original work. |
+| [`5-volatility-forecasting/`](5-volatility-forecasting/) | LSTM volatility forecasting. | Prior original work. |
 
 **Read the third column before citing anything here.** Forks of third-party work, duplicates, retired projects and asset-only folders are labelled as such and are not part of the petition's evidence.
 
