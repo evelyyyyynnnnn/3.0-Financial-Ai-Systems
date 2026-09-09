@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-09-09T18:27:34+00:00",
+  "generated_at": "2026-09-09T19:06:59+00:00",
   "is_synthetic": true,
   "data_source": "each project's own results/latest.json",
   "summary": {
     "n_projects": 21,
-    "n_with_results": 20,
-    "n_never_run": 1,
+    "n_with_results": 21,
+    "n_never_run": 0,
     "n_synthetic_data": 3,
-    "n_real_data": 17,
+    "n_real_data": 18,
     "n_with_site": 20,
-    "total_tests": 612,
+    "total_tests": 617,
     "repos": [
       "1.0-Secure-Ai-Agent-Infrastructure",
       "2.0-Healthcare-Ai-Systems",
@@ -225,19 +225,35 @@
     {
       "repo": "3.0-Financial-Ai-Systems",
       "project": "6-portfolio-optimization-engine",
-      "has_results": false,
-      "generated_at": "",
-      "is_synthetic": null,
-      "data_source": "",
+      "has_results": true,
+      "generated_at": "2026-09-09T19:06:34+00:00",
+      "is_synthetic": false,
+      "data_source": "real daily OHLCV for GLD, IWM, QQQ, SPY, TLT via Yahoo Finance (yfinance), 2010-01-04 to 2023-12-29 (3522 trading days); cached in data/market_data.pkl",
       "n_tests": 3,
       "has_site": false,
-      "headline": []
+      "headline": [
+        {
+          "metric": "DQN Sharpe",
+          "value": -0.3525208924790561,
+          "note": "real ETF data 2010-2023"
+        },
+        {
+          "metric": "SAC Sharpe",
+          "value": -0.47148991565952514,
+          "note": "negative -- the RL agents underperform buy-and-hold, reported as measured"
+        },
+        {
+          "metric": "Assets",
+          "value": 5,
+          "note": "real ETFs via yfinance"
+        }
+      ]
     },
     {
       "repo": "3.0-Financial-Ai-Systems",
       "project": "7-portfolio-results-rollup",
       "has_results": true,
-      "generated_at": "2026-09-09T18:27:34+00:00",
+      "generated_at": "2026-09-09T19:06:59+00:00",
       "is_synthetic": true,
       "data_source": "each project's own results/latest.json",
       "n_tests": 11,
@@ -281,10 +297,10 @@
       "repo": "4.0-Decision-Intelligence-Framework",
       "project": "4-decision-benchmark-suite",
       "has_results": true,
-      "generated_at": "2026-08-31T21:57:57+00:00",
+      "generated_at": "2026-09-09T18:36:24+00:00",
       "is_synthetic": true,
       "data_source": "closed-form benchmark tasks with exact oracles (src/tasks.py)",
-      "n_tests": 19,
+      "n_tests": 24,
       "has_site": true,
       "headline": []
     },
