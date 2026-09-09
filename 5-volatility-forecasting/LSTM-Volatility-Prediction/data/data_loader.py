@@ -231,9 +231,9 @@ class MarketDataLoader:
         self._log_missing_values(features, "feature set before imputation")
         self._log_missing_values(volatility.to_frame(name="volatility"), "volatility series before imputation")
 
-        # Handle missing values
-        features = features.fillna(method='ffill').fillna(method='bfill')
-        volatility = volatility.fillna(method='ffill').fillna(method='bfill')
+        # Handle missing values (pandas 2.x removed fillna(method=...))
+        features = features.ffill().bfill()
+        volatility = volatility.ffill().bfill()
         
         # Scale features if required
         if self.config.scale_features:
