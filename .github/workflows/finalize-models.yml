@@ -1,0 +1,78 @@
+name: finalize-models
+
+# Runs the two projects that could not be finished on a laptop:
+#  - 4-tokenized-fixed-income: retries the on-chain fetch from GitHub's IP,
+#    which may not be blocked the way the author's network is (403).
+#  - 5-volatility-forecasting: trains the PyTorch model on real Yahoo Finance
+#    data (^GSPC realised volatility), which needs a clean environment.
+# Results are uploaded as artifacts; they are reviewed before being committed,
+# so nothing fabricated or unreviewed lands in the evidence.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  tokenized-fixed-income:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 4-tokenized-fixed-income-analytics
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          [ -f requirements.txt ] && pip install -r requirements.txt || true
+          pip install numpy pandas requests pytest
+      - name: Fetch on-chain data from the CI IP (may 403)
+        run: python -m data.fetch || echo "fetch failed on this IP too"
+      - name: Run demo
+        run: python -m src.demo || true
+      - name: Tests
+        run: python -m pytest tests/ -q || true
+      - name: Show what was produced
+        run: |
+          echo "=== results ==="; ls -la results/ || true
+          python - <<'PY'
+          import json, glob, os
+          for f in ("results/latest-real.json", "results/latest.json"):
+              if os.path.exists(f):
+                  d = json.load(open(f))
+                  print(f, "-> is_synthetic:", d.get("is_synthetic"),
+                        "| data_source:", str(d.get("data_source"))[:90])
+                  break
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tokenized-results
+          path: 4-tokenized-fixed-income-analytics/results/*.json
+
+  volatility-forecasting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install (PyTorch CPU + yfinance)
+        working-directory: 5-volatility-forecasting/LSTM-Volatility-Prediction
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Train on real ^GSPC data (short run)
+        working-directory: 5-volatility-forecasting
+        env:
+          VOL_EPOCHS: "20"
+        run: python -m src.demo
+      - name: Show the standard result
+        working-directory: 5-volatility-forecasting
+        run: |
+          echo "=== results ==="; ls -la results/ || true
+          [ -f results/latest-real.json ] && cat results/latest-real.json || echo "no result written"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: volatility-results
+          path: 5-volatility-forecasting/results/*.json
