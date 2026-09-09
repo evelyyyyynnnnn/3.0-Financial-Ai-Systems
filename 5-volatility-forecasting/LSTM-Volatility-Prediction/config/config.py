@@ -1,6 +1,6 @@
 import logging
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
 
 from dotenv import load_dotenv
@@ -26,10 +26,10 @@ class DataConfig:
     
     # Feature engineering
     use_technical_indicators: bool = True
-    technical_indicators: List[str] = [
+    technical_indicators: List[str] = field(default_factory=lambda: [
         "SMA", "EMA", "RSI", "MACD", "BBANDS",
         "ATR", "OBV", "ADX", "CCI", "STOCH"
-    ]
+    ])
     
     # Volatility calculation
     volatility_window: int = 20
@@ -97,11 +97,11 @@ class HyperparameterTuningConfig:
     storage: str = "sqlite:///optuna.db"
     
     # Parameter ranges
-    learning_rate_range: List[float] = [1e-4, 1e-2]
-    hidden_size_range: List[int] = [32, 256]
-    num_layers_range: List[int] = [1, 4]
-    dropout_range: List[float] = [0.0, 0.5]
-    batch_size_range: List[int] = [16, 128]
+    learning_rate_range: List[float] = field(default_factory=lambda: [1e-4, 1e-2])
+    hidden_size_range: List[int] = field(default_factory=lambda: [32, 256])
+    num_layers_range: List[int] = field(default_factory=lambda: [1, 4])
+    dropout_range: List[float] = field(default_factory=lambda: [0.0, 0.5])
+    batch_size_range: List[int] = field(default_factory=lambda: [16, 128])
 
 @dataclass
 class VisualizationConfig:
@@ -119,11 +119,12 @@ class VisualizationConfig:
 
 @dataclass
 class Config:
-    data: DataConfig = DataConfig()
-    model: ModelConfig = ModelConfig()
-    training: TrainingConfig = TrainingConfig()
-    hyperparameter_tuning: HyperparameterTuningConfig = HyperparameterTuningConfig()
-    visualization: VisualizationConfig = VisualizationConfig()
+    data: DataConfig = field(default_factory=DataConfig)
+    model: ModelConfig = field(default_factory=ModelConfig)
+    training: TrainingConfig = field(default_factory=TrainingConfig)
+    hyperparameter_tuning: HyperparameterTuningConfig = field(
+        default_factory=HyperparameterTuningConfig)
+    visualization: VisualizationConfig = field(default_factory=VisualizationConfig)
     
     # Experiment tracking
     use_wandb: bool = True
