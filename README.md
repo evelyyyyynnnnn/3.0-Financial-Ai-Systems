@@ -1,5 +1,7 @@
 # 3.0 — Financial AI Systems
 
+[![tests](https://github.com/evelyyyyynnnnn/3.0-Financial-Ai-Systems/actions/workflows/tests.yml/badge.svg)](https://github.com/evelyyyyynnnnn/3.0-Financial-Ai-Systems/actions/workflows/tests.yml)
+
 The repository carrying the petition. Seven projects with no baselines read as volume; four with measured results read as contribution.
 
 Part of a five-repository portfolio supporting the endeavor described in the

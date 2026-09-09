@@ -1,0 +1,29 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install base scientific stack
+        run: python -m pip install -U pip pytest numpy pandas scipy scikit-learn requests python-docx openpyxl
+      - name: Run every project test suite
+        run: |
+          rc=0
+          for d in */ ; do
+            [ -d "${d}tests" ] || continue
+            # The RL engine needs TensorFlow/gymnasium; excluded from the light test badge.
+            case "$d" in 6-portfolio-optimization-engine/) echo "skip heavy $d"; continue;; esac
+            echo "::group::${d}"
+            ( cd "$d" && { [ -f requirements.txt ] && pip install -q -r requirements.txt || true; } && python -m pytest tests/ -q -p no:cacheprovider ) || rc=1
+            echo "::endgroup::"
+          done
+          exit $rc
