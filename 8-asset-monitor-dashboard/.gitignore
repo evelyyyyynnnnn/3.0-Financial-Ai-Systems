@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.manus-logs/
+.DS_Store
+*.log
