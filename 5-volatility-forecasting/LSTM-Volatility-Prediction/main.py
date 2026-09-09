@@ -122,6 +122,33 @@ def main():
                 split_metrics["mae"],
                 split_metrics["r2"]
             )
+
+        # --- emit a standard result for the portfolio roll-up (real data) ---
+        # The figures are copied verbatim from the training run; nothing is tuned
+        # to look favourable. Written one level up, at the project root, so the
+        # roll-up can discover it.
+        try:
+            import json as _json
+            import pathlib as _pl
+            from datetime import datetime as _dt, timezone as _tz
+            _res = _pl.Path(__file__).resolve().parent.parent / "results"
+            _res.mkdir(exist_ok=True)
+            _out = {
+                "generated_at": _dt.now(_tz.utc).isoformat(timespec="seconds"),
+                "is_synthetic": False,
+                "data_source": (
+                    f"real daily prices for {config.data.ticker} via Yahoo Finance "
+                    f"(yfinance), {config.data.start_date} to {config.data.end_date}; "
+                    f"target is realised volatility ({config.data.volatility_type})"),
+                "model_type": config.model.model_type,
+                "num_epochs": config.training.num_epochs,
+                "metrics": metrics,
+            }
+            (_res / "latest-real.json").write_text(
+                _json.dumps(_out, indent=2) + "\n", encoding="utf8")
+            logger.info("wrote standard result: %s", _res / "latest-real.json")
+        except Exception as _e:  # pragma: no cover
+            logger.warning("could not write standard result: %s", _e)
         
         # Make predictions
         logger.info("Making predictions...")
