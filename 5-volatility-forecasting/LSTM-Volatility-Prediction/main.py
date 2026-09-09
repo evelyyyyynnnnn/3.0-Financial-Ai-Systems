@@ -93,7 +93,13 @@ def main():
         # Load and prepare data
         logger.info("Loading and preparing data...")
         X_train, X_val, X_test, y_train, y_val, y_test = data_loader.get_train_val_test_split()
-        
+
+        # The feature count is set by the data pipeline (OHLCV + technical
+        # indicators), so size the model's input layer from the real data rather
+        # than a hard-coded default that drifts out of sync.
+        config.model.input_size = int(X_train.shape[-1])
+        logger.info("Set model input_size to %d from the data", config.model.input_size)
+
         if args.tune_hyperparameters:
             # Perform hyperparameter tuning
             logger.info("Starting hyperparameter tuning...")
