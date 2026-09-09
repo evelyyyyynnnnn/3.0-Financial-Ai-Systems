@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-09-09T19:06:59+00:00",
+  "generated_at": "2026-09-09T19:31:10+00:00",
   "is_synthetic": true,
   "data_source": "each project's own results/latest.json",
   "summary": {
-    "n_projects": 21,
-    "n_with_results": 21,
+    "n_projects": 22,
+    "n_with_results": 22,
     "n_never_run": 0,
     "n_synthetic_data": 3,
-    "n_real_data": 18,
+    "n_real_data": 19,
     "n_with_site": 20,
     "total_tests": 617,
     "repos": [
@@ -224,6 +224,28 @@
     },
     {
       "repo": "3.0-Financial-Ai-Systems",
+      "project": "5-volatility-forecasting",
+      "has_results": true,
+      "generated_at": "2026-09-09T19:30:14+00:00",
+      "is_synthetic": false,
+      "data_source": "real daily prices for ^GSPC via Yahoo Finance (yfinance), 2010-01-01 to 2023-12-31; target is realised volatility (close_to_close)",
+      "n_tests": 0,
+      "has_site": false,
+      "headline": [
+        {
+          "metric": "Test R2",
+          "value": 0.6114954882644845,
+          "note": "realised-volatility LSTM on real ^GSPC, 2010-2023"
+        },
+        {
+          "metric": "Test RMSE",
+          "value": 0.04127550300689224,
+          "note": "held-out"
+        }
+      ]
+    },
+    {
+      "repo": "3.0-Financial-Ai-Systems",
       "project": "6-portfolio-optimization-engine",
       "has_results": true,
       "generated_at": "2026-09-09T19:06:34+00:00",
@@ -253,7 +275,7 @@
       "repo": "3.0-Financial-Ai-Systems",
       "project": "7-portfolio-results-rollup",
       "has_results": true,
-      "generated_at": "2026-09-09T19:06:59+00:00",
+      "generated_at": "2026-09-09T19:30:48+00:00",
       "is_synthetic": true,
       "data_source": "each project's own results/latest.json",
       "n_tests": 11,
