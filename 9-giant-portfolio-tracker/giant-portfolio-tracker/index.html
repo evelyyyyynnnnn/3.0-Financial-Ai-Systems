@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giant Portfolio Tracker — 13F Holdings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F6F7F9;
+    --surface: #FFFFFF;
+    --surface-2: #FBFCFD;
+    --border: #E3E7ED;
+    --border-strong: #CBD2DC;
+    --ink: #10161F;
+    --ink-soft: #3D4552;
+    --muted: #6B7383;
+    --accent: #0B4F6C;
+    --accent-ink: #08394D;
+    --accent-soft: #E8F1F4;
+    --accent-soft-2: #D7E7EC;
+    --pos: #157F5A;
+    --pos-soft: #E7F5EF;
+    --neg: #B8402A;
+    --neg-soft: #FBEBE7;
+    --radius: 10px;
+    --shadow: 0 1px 2px rgba(16,22,31,0.04), 0 1px 1px rgba(16,22,31,0.03);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .num{ font-family:'IBM Plex Mono', 'SFMono-Regular', Menlo, monospace; font-variant-numeric: tabular-nums; }
+
+  /* ---------- Header ---------- */
+  header.top{
+    position:sticky; top:0; z-index:30;
+    background:rgba(246,247,249,0.92);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .top-inner{
+    max-width:1180px; margin:0 auto; padding:18px 24px 16px;
+  }
+  .brand-row{ display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .brand{ display:flex; align-items:baseline; gap:10px; }
+  .brand h1{
+    font-family:'Fraunces', Georgia, serif;
+    font-weight:600;
+    font-size:26px;
+    letter-spacing:-0.01em;
+    margin:0;
+    color:var(--ink);
+  }
+  .brand .mark{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:30px;height:30px;border-radius:8px;
+    background:var(--accent); color:#fff; font-size:15px; font-weight:600;
+    font-family:'IBM Plex Mono', monospace;
+    flex-shrink:0;
+  }
+  .meta-line{ font-size:12.5px; color:var(--muted); display:flex; gap:14px; align-items:center; flex-wrap:wrap;}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--pos);display:inline-block; box-shadow:0 0 0 3px var(--pos-soft);}
+
+  .controls-row{
+    display:flex; gap:10px; align-items:center; margin-top:16px; flex-wrap:wrap;
+  }
+  .search-wrap{
+    position:relative; flex:1 1 260px; min-width:200px;
+  }
+  .search-wrap input{
+    width:100%; padding:9px 12px 9px 34px;
+    border:1px solid var(--border-strong); border-radius:8px;
+    background:var(--surface); font-size:14px; color:var(--ink);
+    font-family:inherit;
+  }
+  .search-wrap input:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
+  .search-wrap svg{ position:absolute; left:11px; top:50%; transform:translateY(-50%); opacity:0.45;}
+
+  .tabs{ display:flex; border:1px solid var(--border-strong); border-radius:8px; overflow:hidden; background:var(--surface);}
+  .tabs button{
+    border:none; background:transparent; padding:9px 16px; font-size:13.5px; font-weight:500;
+    color:var(--muted); cursor:pointer; font-family:inherit; white-space:nowrap;
+    border-right:1px solid var(--border);
+  }
+  .tabs button:last-child{ border-right:none; }
+  .tabs button.active{ background:var(--accent); color:#fff; }
+
+  select.sort-select{
+    padding:9px 30px 9px 12px; border:1px solid var(--border-strong); border-radius:8px;
+    background:var(--surface) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0 0l5 6 5-6z" fill="%236B7383"/></svg>') no-repeat right 12px center;
+    font-size:13.5px; color:var(--ink-soft); appearance:none; font-family:inherit; cursor:pointer;
+  }
+
+  /* ---------- Layout ---------- */
+  main{ max-width:1180px; margin:0 auto; padding:22px 24px 80px; }
+
+  .stat-strip{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:22px; }
+  .stat-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:14px 16px; box-shadow:var(--shadow);
+  }
+  .stat-card .label{ font-size:11.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); font-weight:500;}
+  .stat-card .value{ font-family:'Fraunces', serif; font-size:24px; font-weight:500; color:var(--ink); margin-top:4px;}
+
+  /* ---------- Investor cards ---------- */
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(340px,1fr)); gap:14px; }
+
+  .inv-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); overflow:hidden; transition:border-color .15s ease;
+  }
+  .inv-card:hover{ border-color: var(--border-strong); }
+  .inv-head{ padding:16px 16px 14px; cursor:pointer; }
+  .inv-head-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+  .inv-name{ font-weight:600; font-size:15.5px; color:var(--ink); line-height:1.3; }
+  .inv-rep{ font-size:12px; color:var(--muted); margin-top:2px; }
+  .inv-rank{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); flex-shrink:0; }
+  .inv-metrics{ display:flex; gap:18px; margin-top:10px; }
+  .inv-metric .m-label{ font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; }
+  .inv-metric .m-value{ font-family:'IBM Plex Mono',monospace; font-size:14.5px; font-weight:500; color:var(--ink); margin-top:2px;}
+
+  .conviction{ display:flex; height:8px; border-radius:5px; overflow:hidden; margin-top:12px; background:var(--border); }
+  .conviction div{ height:100%; }
+
+  .conviction-legend{ display:flex; flex-wrap:wrap; gap:6px 10px; margin-top:8px; }
+  .leg-item{ font-size:11px; color:var(--ink-soft); display:flex; align-items:center; gap:5px;}
+  .leg-dot{ width:7px;height:7px;border-radius:2px; flex-shrink:0;}
+
+  .expand-toggle{ font-size:11.5px; color:var(--accent); font-weight:500; margin-top:10px; display:flex; align-items:center; gap:4px; user-select:none;}
+  .expand-toggle svg{ transition:transform .15s ease; }
+  .inv-card.open .expand-toggle svg{ transform:rotate(180deg); }
+
+  .holdings-panel{ display:none; border-top:1px solid var(--border); background:var(--surface-2);}
+  .inv-card.open .holdings-panel{ display:block; }
+
+  table.hold-table{ width:100%; border-collapse:collapse; font-size:12.8px; }
+  table.hold-table th{
+    text-align:left; padding:8px 12px; font-size:10.5px; text-transform:uppercase; letter-spacing:0.04em;
+    color:var(--muted); font-weight:500; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--surface-2);
+  }
+  table.hold-table td{ padding:7px 12px; border-bottom:1px solid var(--border); color:var(--ink-soft); }
+  table.hold-table tr:last-child td{ border-bottom:none; }
+  table.hold-table td.company{ color:var(--ink); font-weight:500; }
+  .hold-table-wrap{ max-height:320px; overflow-y:auto; }
+  td.num, th.num{ text-align:right; font-family:'IBM Plex Mono',monospace; }
+
+  .chg{ font-weight:500; }
+  .chg.pos{ color:var(--pos); }
+  .chg.neg{ color:var(--neg); }
+  .chg.flat{ color:var(--muted); }
+
+  /* ---------- Top holdings table ---------- */
+  .th-panel{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden;}
+  table.rank-table{ width:100%; border-collapse:collapse; font-size:13.5px;}
+  table.rank-table thead th{
+    text-align:left; padding:12px 16px; background:var(--surface-2); border-bottom:1px solid var(--border);
+    font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); font-weight:500;
+    position:sticky; top:113px;
+  }
+  table.rank-table tbody tr{ cursor:pointer; }
+  table.rank-table tbody tr:hover{ background:var(--accent-soft); }
+  table.rank-table td{ padding:11px 16px; border-bottom:1px solid var(--border); color:var(--ink-soft); }
+  table.rank-table tr:last-child td{ border-bottom:none;}
+  td.rank-num{ font-family:'IBM Plex Mono',monospace; color:var(--muted); width:36px;}
+  td.company-cell{ color:var(--ink); font-weight:500; }
+  .holder-count-badge{
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width:26px; height:20px; padding:0 6px; border-radius:20px;
+    background:var(--accent-soft-2); color:var(--accent-ink); font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px; font-weight:500;
+  }
+  .holders-detail{ display:none; }
+  .holders-detail.open{ display:table-row; }
+  .holders-detail td{ background:var(--surface-2); padding:12px 16px 16px; }
+  .holder-chip{
+    display:inline-block; font-size:12px; padding:4px 10px; margin:3px 4px 0 0;
+    border:1px solid var(--border); border-radius:20px; background:var(--surface); color:var(--ink-soft);
+  }
+
+  .empty-state{ text-align:center; padding:60px 20px; color:var(--muted); font-size:14px; }
+
+  footer{ max-width:1180px; margin:0 auto; padding:30px 24px 50px; color:var(--muted); font-size:12px; line-height:1.7; border-top:1px solid var(--border); margin-top:30px;}
+  footer a{ color:var(--accent); text-decoration:none; }
+  footer a:hover{ text-decoration:underline; }
+
+  .hidden{ display:none !important; }
+
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb{ background:var(--border-strong); border-radius:8px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+
+  @media (max-width: 700px){
+    .stat-strip{ grid-template-columns:repeat(2,1fr); }
+    .grid{ grid-template-columns:1fr; }
+    table.rank-table thead th{ position:static; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand-row">
+      <div class="brand">
+        <span class="mark">GP</span>
+        <h1>Giant Portfolio Tracker</h1>
+      </div>
+      <div class="meta-line">
+        <span><span class="dot"></span> <span id="lastUpdated">Loading…</span></span>
+        <span id="sourceCount"></span>
+      </div>
+    </div>
+    <div class="controls-row">
+      <div class="search-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#10161F" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="#10161F" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="searchInput" type="text" placeholder="Search fund, manager, or company…">
+      </div>
+      <div class="tabs" id="tabSwitch">
+        <button class="active" data-tab="investors">By Investor</button>
+        <button data-tab="holdings">By Holding</button>
+      </div>
+      <select class="sort-select" id="sortSelect">
+        <option value="value_desc">Sort: Portfolio value ↓</option>
+        <option value="value_asc">Sort: Portfolio value ↑</option>
+        <option value="name_asc">Sort: Name A–Z</option>
+        <option value="count_desc">Sort: # Holdings ↓</option>
+      </select>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="stat-strip" id="statStrip"></div>
+
+  <div id="investorsView">
+    <div class="grid" id="investorGrid"></div>
+  </div>
+
+  <div id="holdingsView" class="hidden">
+    <div class="th-panel">
+      <table class="rank-table">
+        <thead>
+          <tr>
+            <th style="width:36px;">#</th>
+            <th>Company</th>
+            <th style="width:110px;">Held by</th>
+            <th style="width:150px;" class="num">Combined value</th>
+          </tr>
+        </thead>
+        <tbody id="holdingsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="empty-state hidden" id="emptyState">No matches. Try a different search term.</div>
+</main>
+
+<footer>
+  <strong>About this data.</strong> Holdings are compiled from institutional 13F filings, tracked per investor/fund in a Notion database ("Big Giant Portfolio" → Investor Portfolio Holdings) and rendered here as a static snapshot.
+  This page reads a single <code>data.json</code> file — to reflect changes from the source, regenerate <code>data.json</code> from Notion and redeploy (e.g. through the same Notion → GitHub → Vercel pipeline used for your other trackers) on whatever cadence the source refreshes (13F filings update quarterly; if the Notion database is edited more often, redeploy after each edit). No page code needs to change, only the data file.
+  <br><br>
+  Percent-of-portfolio, share counts, and reported prices reflect the last filing captured in the source database. "Change %" reflects the filing-over-filing change reported in that source.
+</footer>
+
+<script>
+let DATA = null;
+let openInvestor = null;
+let openHolding = null;
+
+const fmtUSD = (n) => {
+  if (n >= 1e9) return '$' + (n/1e9).toFixed(2) + 'B';
+  if (n >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return '$' + (n/1e3).toFixed(1) + 'K';
+  return '$' + n.toFixed(0);
+};
+const fmtShares = (n) => {
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(0) + 'K';
+  return n.toFixed(0);
+};
+
+const ACCENT_SHADES = ['#0B4F6C','#1C6E8C','#2F8FA8','#5CAAB8','#8CC5CB','#BEDDE0','#DCEBEC'];
+
+function chgClass(chg){
+  if(!chg) return 'flat';
+  const v = parseFloat(chg);
+  if (isNaN(v)) return 'flat';
+  if (v > 0.05) return 'pos';
+  if (v < -0.05) return 'neg';
+  return 'flat';
+}
+function chgLabel(chg){
+  if(!chg) return '—';
+  return chg;
+}
+
+function renderStats(){
+  const totalValue = DATA.investors.reduce((a,i)=>a+i.total_value,0);
+  const totalHoldingsRows = DATA.investors.reduce((a,i)=>a+i.holdings_count,0);
+  const el = document.getElementById('statStrip');
+  el.innerHTML = `
+    <div class="stat-card"><div class="label">Tracked investors</div><div class="value">${DATA.investors.length}</div></div>
+    <div class="stat-card"><div class="label">Combined 13F value</div><div class="value">${fmtUSD(totalValue)}</div></div>
+    <div class="stat-card"><div class="label">Holdings tracked</div><div class="value">${totalHoldingsRows.toLocaleString()}</div></div>
+    <div class="stat-card"><div class="label">Distinct companies</div><div class="value">${DATA.top_companies.length}</div></div>
+  `;
+}
+
+function investorMatches(inv, q){
+  if(!q) return true;
+  q = q.toLowerCase();
+  if(inv.name.toLowerCase().includes(q)) return true;
+  if(inv.representative && inv.representative.toLowerCase().includes(q)) return true;
+  if(inv.fund_type && inv.fund_type.toLowerCase().includes(q)) return true;
+  if((inv.search_keywords||[]).some(k=>k.toLowerCase().includes(q))) return true;
+  return inv.holdings.some(h=>h.company.toLowerCase().includes(q));
+}
+
+function renderInvestorCard(inv, idx){
+  const top5 = inv.holdings.slice(0,5);
+  const barSegs = top5.map((h,i)=>`<div style="width:${Math.max(h.pct,0.5)}%; background:${ACCENT_SHADES[i]||'#DCEBEC'}"></div>`).join('');
+  const legend = top5.map((h,i)=>`<span class="leg-item"><span class="leg-dot" style="background:${ACCENT_SHADES[i]||'#DCEBEC'}"></span>${h.company} · ${h.pct}%</span>`).join('');
+
+  const rows = inv.holdings.map(h=>`
+    <tr>
+      <td class="company">${h.company}</td>
+      <td class="num">${h.pct}%</td>
+      <td class="num">${fmtShares(h.shares)}</td>
+      <td class="num">${fmtUSD(h.value)}</td>
+      <td class="num">$${h.price.toLocaleString(undefined,{maximumFractionDigits:2})}</td>
+      <td class="num chg ${chgClass(h.chg)}">${chgLabel(h.chg)}</td>
+    </tr>`).join('');
+
+  const isOpen = openInvestor === inv.name;
+
+  return `
+  <div class="inv-card ${isOpen?'open':''}" data-name="${inv.name}">
+    <div class="inv-head" onclick="toggleInvestor('${inv.name.replace(/'/g,"\\'")}')">
+      <div class="inv-head-top">
+        <div>
+          <div class="inv-name">${inv.name}</div>
+          ${inv.representative ? `<div class="inv-rep">${inv.representative}${inv.fund_type ? ' · '+inv.fund_type : ''}</div>` : (inv.fund_type ? `<div class="inv-rep">${inv.fund_type}</div>` : '')}
+        </div>
+        <div class="inv-rank">#${idx+1}</div>
+      </div>
+      <div class="inv-metrics">
+        <div class="inv-metric"><div class="m-label">13F Value</div><div class="m-value">${fmtUSD(inv.total_value)}</div></div>
+        <div class="inv-metric"><div class="m-label">Holdings</div><div class="m-value">${inv.holdings_count}</div></div>
+        <div class="inv-metric"><div class="m-label">Top pick</div><div class="m-value" style="font-family:'IBM Plex Sans';font-size:13px;">${top5[0]?top5[0].company:'—'}</div></div>
+      </div>
+      <div class="conviction">${barSegs}</div>
+      <div class="conviction-legend">${legend}</div>
+      <div class="expand-toggle">
+        ${isOpen?'Hide full holdings':'View full holdings ('+inv.holdings_count+')'}
+        <svg width="9" height="6" viewBox="0 0 9 6" fill="none"><path d="M1 1l3.5 3.5L8 1" stroke="#0B4F6C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <div class="holdings-panel">
+      <div class="hold-table-wrap">
+        <table class="hold-table">
+          <thead><tr><th>Company</th><th class="num">% of Port.</th><th class="num">Shares</th><th class="num">Value</th><th class="num">Price</th><th class="num">Chg %</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleInvestor(name){
+  openInvestor = (openInvestor === name) ? null : name;
+  renderInvestors();
+}
+window.toggleInvestor = toggleInvestor;
+
+function getSortedInvestors(){
+  const q = document.getElementById('searchInput').value.trim();
+  const sortMode = document.getElementById('sortSelect').value;
+  let list = DATA.investors.filter(inv=>investorMatches(inv,q));
+  if(sortMode==='value_desc') list.sort((a,b)=>b.total_value-a.total_value);
+  if(sortMode==='value_asc') list.sort((a,b)=>a.total_value-b.total_value);
+  if(sortMode==='name_asc') list.sort((a,b)=>a.name.localeCompare(b.name));
+  if(sortMode==='count_desc') list.sort((a,b)=>b.holdings_count-a.holdings_count);
+  return list;
+}
+
+function renderInvestors(){
+  const list = getSortedInvestors();
+  const grid = document.getElementById('investorGrid');
+  document.getElementById('emptyState').classList.toggle('hidden', list.length>0);
+  grid.innerHTML = list.map((inv,i)=>renderInvestorCard(inv,i)).join('');
+}
+
+function getFilteredHoldings(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  let list = DATA.top_companies;
+  if(q){
+    list = list.filter(c => c.company.toLowerCase().includes(q) || c.investors.some(n=>n.toLowerCase().includes(q)));
+  }
+  return list;
+}
+
+function toggleHolding(idx){
+  openHolding = (openHolding === idx) ? null : idx;
+  renderHoldings();
+}
+window.toggleHolding = toggleHolding;
+
+function renderHoldings(){
+  const list = getFilteredHoldings();
+  document.getElementById('emptyState').classList.toggle('hidden', list.length>0);
+  const body = document.getElementById('holdingsBody');
+  body.innerHTML = list.map((c,i)=>{
+    const isOpen = openHolding === i;
+    const chips = c.investors.map(n=>`<span class="holder-chip">${n}</span>`).join('');
+    return `
+    <tr onclick="toggleHolding(${i})">
+      <td class="rank-num">${i+1}</td>
+      <td class="company-cell">${c.company}</td>
+      <td><span class="holder-count-badge">${c.investor_count}</span></td>
+      <td class="num">${fmtUSD(c.total_value)}</td>
+    </tr>
+    <tr class="holders-detail ${isOpen?'open':''}"><td colspan="4">${chips}</td></tr>
+    `;
+  }).join('');
+}
+
+function switchTab(tab){
+  document.querySelectorAll('#tabSwitch button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  document.getElementById('investorsView').classList.toggle('hidden', tab!=='investors');
+  document.getElementById('holdingsView').classList.toggle('hidden', tab!=='holdings');
+  document.getElementById('sortSelect').style.visibility = tab==='investors' ? 'visible':'hidden';
+  renderAll();
+}
+
+function renderAll(){
+  const activeTab = document.querySelector('#tabSwitch button.active').dataset.tab;
+  if(activeTab==='investors') renderInvestors(); else renderHoldings();
+}
+
+function init(){
+  document.getElementById('tabSwitch').addEventListener('click', e=>{
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    switchTab(btn.dataset.tab);
+  });
+  document.getElementById('searchInput').addEventListener('input', renderAll);
+  document.getElementById('sortSelect').addEventListener('change', renderAll);
+
+  fetch('data.json').then(r=>r.json()).then(data=>{
+    DATA = data;
+    const d = new Date(data.generated_at);
+    document.getElementById('lastUpdated').textContent = 'Updated ' + d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});
+    document.getElementById('sourceCount').textContent = data.investors.length + ' funds · ' + data.top_companies.length + ' companies';
+    renderStats();
+    renderAll();
+  }).catch(err=>{
+    document.getElementById('lastUpdated').textContent = 'Could not load data.json — see console';
+    console.error(err);
+  });
+}
+init();
+</script>
+</body>
+</html>
