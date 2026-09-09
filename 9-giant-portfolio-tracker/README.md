@@ -1,3 +1,9 @@
+# Giant Portfolio Tracker
+
+> An applied **product**, not a research project — a live portfolio-holdings tracker included as evidence of applied financial-engineering breadth. It is **not** counted in this repository's real-data / test figures (those describe research subprojects 1–7). It surfaces public 13F-style investor holdings from Notion-backed databases and deploys on Vercel.
+
+---
+
 # Giant Portfolio Tracker — setup
 
 ## One-time setup
