@@ -27,15 +27,15 @@ EXTRACTORS = {
         ("Corpus size", _get(d, "corpus", "n_cases"), "cases"),
     ],
     "llm-audit-agent": lambda d: [
-        ("Agent macro-F1, hard tier",
-         _get(d, "comparison", "per_tier", "hard", "agent_f1"),
-         "baseline scores 0.000 here"),
-        ("Agent macro-F1, seed tier",
-         _get(d, "comparison", "per_tier", "seed", "agent_f1"),
-         "baseline scores 1.000 — the agent regresses"),
-        ("Review-load change",
+        ("Review items cut",
          _get(d, "comparison", "workload", "delta", "review_reduction_pct"),
-         "percent, at equal corpus"),
+         "percent (105 -> 59), but 6 more findings missed"),
+        ("False alarms cut",
+         _get(d, "comparison", "workload", "delta", "false_alarm_reduction_pct"),
+         "percent (68 -> 28)"),
+        ("Best detector macro-F1",
+         (d.get("comparison", {}).get("leaderboard") or [{}])[0].get("macro_f1"),
+         "held by the rule baseline -- the agent does not beat it"),
     ],
     "agent-verification-harness": lambda d: [
         ("Precision", _get(d, "grounding", "precision"), "on flagged claims"),
@@ -88,10 +88,10 @@ EXTRACTORS = {
         ("Tokens analysed", _get(d, "universe_size"), "synthetic"),
     ],
     "filing-intelligence": lambda d: [
-        ("Material changes recovered", _get(d, "scoring", "recall"), "of labelled"),
-        ("False alarms on unchanged pairs",
-         _get(d, "scoring", "false_alarms_on_unchanged_pairs"), ""),
-        ("Filings pulled from EDGAR", 0, "the client is unexercised"),
+        ("Filings pulled from EDGAR",
+         sum(1 for p in d.get("provenance", []) if p.get("status") == "ok"),
+         "real 10-K pairs (manifest: URLs, hashes); no accuracy claimed -- "
+         "real pairs carry no labelled change list"),
     ],
     "contagion-observatory": lambda d: [
         ("Edge recall", _get(d, "best", "recall"), "of constructed edges"),

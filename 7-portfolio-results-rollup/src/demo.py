@@ -25,38 +25,51 @@ def run() -> dict:
         "claims_status": [
             {"claim": "600+ filings analysed; ~70% cut in processing time",
              "project": "filing-intelligence",
-             "status": "not evidenced",
-             "detail": "0 filings pulled from EDGAR; no human baseline measured, "
-                       "so no reduction percentage is computed anywhere."},
+             "status": "partially addressed",
+             "detail": "Real 10-K filings are now retrieved from SEC EDGAR with a data "
+                       "manifest (URLs, sha256, retrieval times) and Item 1A is "
+                       "extracted per filing. No processing-time reduction is claimed "
+                       "here: real filing pairs carry no human-annotated change list, "
+                       "so no baseline or percentage is computed."},
             {"claim": "7,500+ crypto and 6,000+ equities",
              "project": "contagion-observatory",
-             "status": "not evidenced",
-             "detail": "18 synthetic assets. The résumé supports this claim from "
-                       "other work; this repository does not."},
+             "status": "not evidenced in this repo",
+             "detail": "This repo now runs on real Fama-French 10-industry daily "
+                       "returns (756 trading days, 90 candidate pairs) from the "
+                       "Kenneth R. French Data Library, with a manifest. The "
+                       "7,500-crypto / 6,000-equity scale is from other work and is "
+                       "not reproduced here."},
             {"claim": "1.2M on-chain transactions; ChainTrust-Bench adopted by two "
                       "fintech startups",
              "project": "chaintrust-bench",
              "status": "partially addressed",
-             "detail": "The benchmark now exists under that name with 17 authored "
-                       "cases and a two-tier design. No mined corpus, no DOI, no "
-                       "release, no adopters."},
+             "detail": "The benchmark now runs on 121 real SmartBugs-curated contracts "
+                       "across seven vulnerability classes, not authored cases. There "
+                       "is still no 1.2M-transaction corpus, no DOI or release, and no "
+                       "adopters."},
             {"claim": "LLM audit agents cut manual audit workload 65%",
              "project": "llm-audit-agent",
-             "status": "contradicted by the run",
-             "detail": "Measured review-load change is 0.0% with the stub backend, "
-                       "and the agent currently loses to the rule-based baseline "
-                       "overall. No language model has been run against the corpus."},
+             "status": "partially addressed",
+             "detail": "A real open language model (qwen2.5-coder:7b via Ollama) has "
+                       "now been run: the agent re-checks each finding and drops the "
+                       "ones it cannot verify (2 confirmed, 2 dropped on the worked "
+                       "example). No 65% workload reduction is measured, and on the "
+                       "121-case SmartBugs corpus the agent does not beat the "
+                       "rule-based baseline on macro-F1."},
             {"claim": "12,000 ICU patients, 58,000 waveform-hours, 22% false-alert cut",
              "project": "icu-early-warning",
-             "status": "not evidenced",
-             "detail": "400 synthetic patients, 4 synthetic waveform-hours. Measured "
-                       "false-alert reduction is 8.7% at matched sensitivity, on "
-                       "synthetic data."},
+             "status": "partially addressed",
+             "detail": "Runs on the real PhysioNet MIMIC-IV demo (~100 ICU stays -- a "
+                       "demonstration, not a study). At matched sensitivity, "
+                       "calibrated logistic risk cuts false alerts 19.4% for "
+                       "hypotension (6.5% for hypoxemia) and improves calibration "
+                       "(ECE 0.42 -> 0.045). The 12,000-patient / 58,000-hour scale is "
+                       "from other work, not this demo."},
             {"claim": "PyHealth / RHealth extensions used by external research groups",
              "project": "pyhealth-rhealth-extension",
              "status": "partially addressed",
              "detail": "An installable package now exists. It is not published to "
-                       "PyPI, so it has no downloads and no users."},
+                       "PyPI, so it has no downloads and no external users."},
         ],
     }
     (ROOT / "results").mkdir(exist_ok=True)
