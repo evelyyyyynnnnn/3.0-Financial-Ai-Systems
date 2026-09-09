@@ -1,0 +1,27 @@
+{
+  "generated_at": "2026-09-09T19:30:14+00:00",
+  "is_synthetic": false,
+  "data_source": "real daily prices for ^GSPC via Yahoo Finance (yfinance), 2010-01-01 to 2023-12-31; target is realised volatility (close_to_close)",
+  "model_type": "lstm",
+  "num_epochs": 20,
+  "metrics": {
+    "train": {
+      "mse": 0.0005855510668195985,
+      "rmse": 0.02419816246783211,
+      "mae": 0.016518912891566682,
+      "r2": 0.8776593414994581
+    },
+    "val": {
+      "mse": 0.0020911282234887217,
+      "rmse": 0.045728855479759405,
+      "mae": 0.03012945027895264,
+      "r2": 0.9312256286683236
+    },
+    "test": {
+      "mse": 0.0017036671484719705,
+      "rmse": 0.04127550300689224,
+      "mae": 0.030872780527995348,
+      "r2": 0.6114954882644845
+    }
+  }
+}

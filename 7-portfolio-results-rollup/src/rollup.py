@@ -99,6 +99,11 @@ EXTRACTORS = {
         ("True edges", _get(d, "universe", "n_true_edges"),
          f"of {_get(d, 'universe', 'n_candidate_pairs')} pairs"),
     ],
+    "volatility-forecasting": lambda d: [
+        ("Test R2", _get(d, "metrics", "test", "r2"),
+         "realised-volatility LSTM on real ^GSPC, 2010-2023"),
+        ("Test RMSE", _get(d, "metrics", "test", "rmse"), "held-out"),
+    ],
     "portfolio-optimization-engine": lambda d: [
         ("DQN Sharpe", _get(d, "agents", "dqn", "sharpe_ratio"),
          "real ETF data 2010-2023"),
