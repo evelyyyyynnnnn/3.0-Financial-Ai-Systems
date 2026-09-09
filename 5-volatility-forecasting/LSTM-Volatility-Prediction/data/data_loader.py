@@ -45,6 +45,19 @@ class MarketDataLoader:
                 logger.error("Failed to download data from yfinance: %s", err)
                 raise
 
+            # Modern yfinance returns MultiIndex columns (e.g. ('Close', '^GSPC'))
+            # even for a single ticker; flatten to the OHLCV level the pipeline
+            # expects so validation and feature engineering see plain names.
+            if isinstance(data.columns, pd.MultiIndex):
+                ohlcv = {"Open", "High", "Low", "Close", "Volume", "Adj Close"}
+                if ohlcv & set(data.columns.get_level_values(0)):
+                    data.columns = data.columns.get_level_values(0)
+                elif ohlcv & set(data.columns.get_level_values(1)):
+                    data.columns = data.columns.get_level_values(1)
+                else:
+                    data.columns = data.columns.get_level_values(0)
+                data = data.loc[:, ~data.columns.duplicated()]
+
             if data.empty:
                 msg = (
                     f"No data returned for ticker {self.config.ticker} "
