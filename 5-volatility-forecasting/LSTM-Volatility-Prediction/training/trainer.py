@@ -325,7 +325,11 @@ class VolatilityTrainer:
     
     def load_model(self):
         """Load the model"""
-        checkpoint = torch.load(os.path.join(self.config.training.checkpoint_dir, 'best_model.pth'))
+        # weights_only defaults to True in PyTorch 2.6+; this checkpoint is one we
+        # just wrote ourselves (it stores the Config), so loading it fully is safe.
+        checkpoint = torch.load(
+            os.path.join(self.config.training.checkpoint_dir, 'best_model.pth'),
+            weights_only=False)
         self.model.load_state_dict(checkpoint['model_state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         if self.scheduler and checkpoint['scheduler_state_dict']:
