@@ -99,6 +99,14 @@ EXTRACTORS = {
         ("True edges", _get(d, "universe", "n_true_edges"),
          f"of {_get(d, 'universe', 'n_candidate_pairs')} pairs"),
     ],
+    "portfolio-optimization-engine": lambda d: [
+        ("DQN Sharpe", _get(d, "agents", "dqn", "sharpe_ratio"),
+         "real ETF data 2010-2023"),
+        ("SAC Sharpe", _get(d, "agents", "sac", "sharpe_ratio"),
+         "negative -- the RL agents underperform buy-and-hold, reported as measured"),
+        ("Assets", len((d.get("provenance", {}) or {}).get("tickers") or []) or None,
+         "real ETFs via yfinance"),
+    ],
 }
 
 

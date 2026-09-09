@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-09-09T19:06:34+00:00",
+  "is_synthetic": false,
+  "data_source": "real daily OHLCV for GLD, IWM, QQQ, SPY, TLT via Yahoo Finance (yfinance), 2010-01-04 to 2023-12-29 (3522 trading days); cached in data/market_data.pkl",
+  "provenance": {
+    "available": true,
+    "tickers": [
+      "GLD",
+      "IWM",
+      "QQQ",
+      "SPY",
+      "TLT"
+    ],
+    "n_days": 3522,
+    "first_date": "2010-01-04",
+    "last_date": "2023-12-29"
+  },
+  "agents": {
+    "dqn": {
+      "sharpe_ratio": -0.3525208924790561,
+      "sortino_ratio": -0.4541743902501292,
+      "calmar_ratio": -0.03874534307808093,
+      "max_drawdown": -0.27473819396686994,
+      "total_return": -0.13705623617959195
+    },
+    "sac": {
+      "sharpe_ratio": -0.47148991565952514,
+      "sortino_ratio": -0.6021252563360778,
+      "calmar_ratio": -0.03670631264552086,
+      "max_drawdown": -0.40179219958891815,
+      "total_return": -0.18507019344572495
+    }
+  },
+  "note": "Deep-RL portfolio agents (DQN, SAC) trained and evaluated on real market data. Both underperform a buy-and-hold baseline over this period (negative Sharpe); the figures are reported as measured, not tuned to look favourable."
+}
