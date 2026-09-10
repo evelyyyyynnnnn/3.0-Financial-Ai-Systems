@@ -1,17 +1,26 @@
 # Must stay at the repository root — GitHub Actions only reads workflows here.
+#
+# Manual only, deliberately. Two reasons this is not on a schedule:
+#
+#   1. The default run (`python -m src.demo`) scores an authored corpus and is
+#      deterministic — a monthly commit of it would change only a timestamp.
+#   2. The real run has never been performed. docs/DATA.md records the scale as
+#      "not yet run", and results/README.md requires a dated run-log entry for
+#      any figure that gets cited. A cron that starts committing real pulls
+#      before a person has done one and logged it inverts that order.
+#
+# Run it from the Actions tab when you want a real pull. GitHub's runners can
+# reach www.sec.gov, which is the point: local networks often cannot.
 name: Refresh filing intelligence
 
 on:
-  schedule:
-    # 10:00 UTC on the 3rd of each month. 10-K/10-Q filings land on quarterly
-    # and annual cycles, so monthly is already ahead of the source.
-    - cron: "0 10 3 * *"
   workflow_dispatch:
     inputs:
-      tickers:
-        description: "Space-separated tickers (blank = refresh the existing universe)"
+      refresh:
+        description: "Re-download filings already in the cache"
+        type: boolean
         required: false
-        default: ""
+        default: false
 
 permissions:
   contents: write
@@ -19,6 +28,9 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 2-filing-intelligence
     steps:
       - uses: actions/checkout@v4
 
@@ -26,27 +38,36 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Pull filings and rebuild dataset
-        working-directory: previous/project-2/filing-intelligence
+      - name: Fetch the real 10-K filings from EDGAR
         env:
-          # SEC requires a contact string on every request. Set SEC_USER_AGENT
-          # as a repository secret, e.g. "Jane Doe jane@example.com".
-          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          # SEC's fair-access policy requires a User-Agent naming a real
+          # contact. Set DATAKIT_UA as a repository secret, e.g.
+          # "Jane Doe jane@example.com" — without it EDGAR answers 403.
+          DATAKIT_UA: ${{ secrets.DATAKIT_UA }}
         run: |
-          if [ -n "${{ inputs.tickers }}" ]; then
-            python pipeline/build_dataset.py --tickers ${{ inputs.tickers }}
+          if [ "${{ inputs.refresh }}" = "true" ]; then
+            python -m data.fetch --refresh
           else
-            python pipeline/build_dataset.py
+            python -m data.fetch
           fi
 
-      - name: Commit if the dataset changed
+      - name: Verify the cache against its manifest
+        run: python -m data.fetch --verify
+
+      - name: Diff the real filings
+        run: python -m src.demo --real
+
+      - name: Commit if the results changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- previous/project-2/filing-intelligence/data/data.json; then
-            echo "No change to data.json — nothing to commit."
+          # Only the results are committed. The fetched documents stay out of
+          # the repository by data/.gitignore, per this project's own rule on
+          # never committing raw source data.
+          if git diff --quiet -- results/latest-real.json; then
+            echo "No change to results/latest-real.json — nothing to commit."
           else
-            git add previous/project-2/filing-intelligence/data/data.json
+            git add results/latest-real.json
             git commit -m "chore: refresh filing intelligence $(date -u +'%Y-%m-%d')"
             git push
           fi
