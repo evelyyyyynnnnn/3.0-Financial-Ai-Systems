@@ -4,3 +4,6 @@
 refresh_data.py
 README.md
 .gitignore
+edgar_13f.py
+test_edgar_13f.py
+backfill_report_date.py
