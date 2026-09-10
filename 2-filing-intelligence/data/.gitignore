@@ -1,0 +1,7 @@
+# Fetched EDGAR cache. DATA.md rule 1 in this project: commit manifests,
+# checksums, and the code that reproduces the pull — never the raw documents.
+# Everything below is re-downloadable with `python -m data.fetch`, and the
+# 10-K documents in particular are large enough to bloat the repository.
+company_tickers.json
+*/submissions.json
+*/*.htm
