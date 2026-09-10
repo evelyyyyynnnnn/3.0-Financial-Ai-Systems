@@ -1,0 +1,105 @@
+# Pulls 13F holdings from SEC EDGAR into Notion, then rebuilds the site's
+# data.json from Notion and commits it. Notion stays the readable, editable
+# copy; EDGAR is the source of truth for the numbers.
+#
+# Requires two repository secrets:
+#   NOTION_TOKEN    - Notion integration token, shared with both databases
+#   SEC_USER_AGENT  - contact string, e.g. "Evelyn Du you@example.com".
+#                     EDGAR rejects requests that do not identify themselves.
+
+name: Refresh 13F holdings from EDGAR
+
+on:
+  schedule:
+    # 13F is due 45 days after each quarter end: Feb 14, May 15, Aug 14, Nov 14.
+    # Running on the 16th leaves a margin for funds that file on the deadline
+    # itself and for EDGAR's own indexing lag.
+    - cron: "0 9 16 2,5,8,11 *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Fetch and report only - write nothing to Notion"
+        type: boolean
+        default: true
+      investor:
+        description: "Only funds whose name contains this (blank = all)"
+        type: string
+        default: ""
+      backfill_q1_2026:
+        description: "One-time: stamp existing undated rows as 2026-03-31 first"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      # The parser is the part that can silently corrupt the numbers, so it is
+      # pinned by tests that run before anything is written.
+      - name: Test the 13F parser
+        working-directory: 9-giant-portfolio-tracker
+        run: python -m unittest test_edgar_13f -v
+
+      # Run once, before the first EDGAR pull. Until the existing rows carry a
+      # Report Date they cannot serve as the prior quarter, so every position
+      # would come back classified as a new Buy with no Change %.
+      - name: Backfill Report Date on existing rows
+        if: ${{ inputs.backfill_q1_2026 }}
+        working-directory: 9-giant-portfolio-tracker
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python backfill_report_date.py --dry-run
+          else
+            python backfill_report_date.py
+          fi
+
+      - name: Pull 13F holdings from EDGAR into Notion
+        working-directory: 9-giant-portfolio-tracker
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+        run: |
+          args=""
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            args="$args --dry-run"
+          fi
+          if [ -n "${{ inputs.investor }}" ]; then
+            args="$args --investor '${{ inputs.investor }}'"
+          fi
+          eval python edgar_13f.py $args
+
+      - name: Rebuild data.json from Notion
+        if: ${{ inputs.dry_run != true }}
+        working-directory: 9-giant-portfolio-tracker
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: python refresh_data.py
+
+      - name: Commit and push if data.json changed
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- 9-giant-portfolio-tracker/data.json; then
+            echo "No changes to data.json - nothing to commit."
+          else
+            git add 9-giant-portfolio-tracker/data.json
+            git commit -m "chore: refresh 13F holdings $(date -u +'%Y-%m-%d')"
+            git push
+          fi

@@ -40,6 +40,12 @@ def prop_number(props, name):
     val = p.get("number")
     return float(val) if val is not None else 0.0
 
+def prop_date(props, name):
+    """Start date of a date property, or "" when it is empty."""
+    p = props.get(name) or {}
+    d = p.get("date") or {}
+    return d.get("start") or ""
+
 def prop_text(props, name):
     """Handles rich_text, title, and select property types."""
     p = props.get(name) or {}
@@ -85,6 +91,31 @@ def _query_all_pages(token, data_source_id):
     return pages
 
 
+def latest_quarter_only(rows):
+    """Keep each investor's most recent Report Date and drop older quarters.
+
+    The database keeps history - every quarter appends a fresh set of rows - but
+    the site shows one snapshot. Without this filter a fund that has filed twice
+    would have both quarters summed into its total, roughly doubling it and
+    corrupting the cross-fund company aggregate as well.
+
+    Filtering per investor rather than globally matters because funds file at
+    different times within the 45-day window: a global cutoff would make every
+    fund that has not filed yet disappear from the site until it does.
+    """
+    newest = {}
+    for r in rows:
+        d = r.get("report_date", "")
+        inv = r["investor"]
+        # `not in` rather than a default of "": rows predating the Report Date
+        # column have d == "", and comparing "" > "" would leave the investor
+        # out of the map entirely and blow up the lookup below. Every row in the
+        # database is in exactly that state until the backfill has run.
+        if inv not in newest or d > newest[inv]:
+            newest[inv] = d
+    return [r for r in rows if r.get("report_date", "") == newest[r["investor"]]]
+
+
 def fetch_all_rows(token):
     """Rows from the 'Investor Portfolio Holdings' data source."""
     rows = []
@@ -98,10 +129,11 @@ def fetch_all_rows(token):
             "value": prop_number(props, "Value"),
             "price": prop_number(props, "Reported Price"),
             "chg": prop_text(props, "Change %"),
+            "report_date": prop_date(props, "Report Date"),
         }
         if row["investor"] and row["company"]:
             rows.append(row)
-    return rows
+    return latest_quarter_only(rows)
 
 
 def fetch_directory(token):
@@ -195,6 +227,9 @@ def build_site_data(rows, directory):
         "source_note": (
             'Investor/Institution 13F holdings, sourced from Notion '
             '"Big Giant Portfolio" database'
+        ),
+        "report_dates": sorted(
+            {r["report_date"] for r in rows if r.get("report_date")}
         ),
         "investors": investors,
         "top_companies": top_companies,
