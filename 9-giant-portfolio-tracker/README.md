@@ -51,10 +51,10 @@ the job skips any row without one.
 
 ## History
 
-`Report Date` on the holdings database is the quarter end a filing reports on
+`Date` on the holdings database is the quarter end a filing reports on
 (Q1 = Mar 31, not the May filing date). Every refresh appends a new set of rows
 rather than overwriting, so quarters accumulate and `Change %` / `Reduce/Add`
-are computed against the prior one. Sort or filter by `Report Date` instead of
+are computed against the prior one. Sort or filter by `Date` instead of
 reordering rows; `refresh_data.py` publishes only each fund's newest quarter, so
 the site shows one snapshot while the database keeps the history.
 
@@ -102,7 +102,7 @@ files the browser needs sit side by side at the top level.
   edgar_13f.py             pulls SEC EDGAR 13F filings into Notion
   test_edgar_13f.py        offline tests for the parser and the math
   refresh_data.py          pulls Notion, rewrites data.json
-  backfill_report_date.py  one-time: stamps existing rows as Q1 2026
+  set_date.py              stamps the Date column on both databases
   .vercelignore            keeps scripts and docs out of the published site
 ```
 
