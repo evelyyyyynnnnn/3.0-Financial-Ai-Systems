@@ -25,6 +25,10 @@ on:
         description: "Only funds whose name contains this (blank = all)"
         type: string
         default: ""
+      backfill_q1_2026:
+        description: "One-time: stamp existing undated rows as 2026-03-31 first"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -49,6 +53,21 @@ jobs:
       - name: Test the 13F parser
         working-directory: 9-giant-portfolio-tracker
         run: python -m unittest test_edgar_13f -v
+
+      # Run once, before the first EDGAR pull. Until the existing rows carry a
+      # Report Date they cannot serve as the prior quarter, so every position
+      # would come back classified as a new Buy with no Change %.
+      - name: Backfill Report Date on existing rows
+        if: ${{ inputs.backfill_q1_2026 }}
+        working-directory: 9-giant-portfolio-tracker
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python backfill_report_date.py --dry-run
+          else
+            python backfill_report_date.py
+          fi
 
       - name: Pull 13F holdings from EDGAR into Notion
         working-directory: 9-giant-portfolio-tracker
