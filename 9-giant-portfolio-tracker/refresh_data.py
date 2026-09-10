@@ -4,7 +4,7 @@ Refresh data.json for the Giant Portfolio Tracker from Notion.
 
 Pulls every row of the "Investor Portfolio Holdings" data source (inside the
 "Big Giant Portfolio" page), groups it by Investor/Institution, and writes
-out giant-portfolio-tracker/data.json in the shape the site's index.html
+out data.json next to this script, in the shape the site's index.html
 expects.
 
 Requires:
@@ -14,7 +14,7 @@ Requires:
                              Holdings" database.
 
 Usage:
-    python scripts/refresh_data.py
+    python refresh_data.py
 """
 
 import os
@@ -28,9 +28,9 @@ import requests
 HOLDINGS_DATA_SOURCE_ID = "d4057fe8-abca-447f-adc8-b1013d014c52"
 DIRECTORY_DATA_SOURCE_ID = "22fa9897-a214-44b7-8e2b-189e3e438580"
 NOTION_VERSION = "2025-09-03"
-OUTPUT_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "giant-portfolio-tracker", "data.json"
-)
+# data.json sits beside this script, at the folder Vercel serves as the site
+# root, so index.html can load it with a relative fetch('data.json').
+OUTPUT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.json")
 PAGE_SIZE = 100
 
 # ---- Notion property extraction helpers -----------------------------------
