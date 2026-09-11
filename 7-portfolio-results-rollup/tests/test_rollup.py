@@ -107,3 +107,37 @@ def test_live_portfolio_is_readable():
     found = discover()
     assert len(found) >= 4
     assert any(p.has_results for p in found)
+
+
+# --- provenance must survive whatever the project chose to call the field ---
+#
+# A run whose data source is not shown reads, to a reviewer, exactly like a run
+# that has none. llm-audit-agent records its provenance under "corpus", which
+# the collector used to drop on the floor.
+
+def test_source_is_read_from_the_corpus_field_too():
+    from src.collect import _source_of
+
+    assert _source_of({"corpus": "SmartBugs curated, via real-corpus.jsonl"}) \
+        == "SmartBugs curated, via real-corpus.jsonl"
+
+
+def test_data_source_still_wins_when_both_are_present():
+    from src.collect import _source_of
+
+    assert _source_of({"data_source": "the real one", "corpus": "other"}) \
+        == "the real one"
+
+
+def test_blank_and_missing_sources_read_as_empty():
+    from src.collect import _source_of
+
+    assert _source_of({"data_source": "   "}) == ""
+    assert _source_of({}) == ""
+
+
+def test_a_nested_corpus_object_still_yields_its_name():
+    from src.collect import _source_of
+
+    assert _source_of({"corpus": {"name": "SmartBugs curated"}}) \
+        == "SmartBugs curated"

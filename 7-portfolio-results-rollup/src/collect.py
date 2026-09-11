@@ -41,6 +41,24 @@ class ProjectResult:
                 "n_tests": self.n_tests, "has_site": self.has_site}
 
 
+# Not every project calls the field data_source. llm-audit-agent records its
+# provenance under "corpus", and a run whose provenance is simply not shown is
+# indistinguishable, to a reader, from one that has none.
+SOURCE_KEYS = ("data_source", "corpus", "dataset", "source")
+
+
+def _source_of(data: dict) -> str:
+    for key in SOURCE_KEYS:
+        v = data.get(key)
+        if isinstance(v, str) and v.strip():
+            return v.strip()
+        if isinstance(v, dict):
+            inner = v.get("data_source") or v.get("source") or v.get("name")
+            if isinstance(inner, str) and inner.strip():
+                return inner.strip()
+    return ""
+
+
 def _count_tests(project: pathlib.Path) -> int:
     """Count test functions without importing anything."""
     n = 0
@@ -81,6 +99,6 @@ def discover(root: pathlib.Path | None = None) -> list:
                     pr.payload = data
                     pr.generated_at = data.get("generated_at", "")
                     pr.is_synthetic = data.get("is_synthetic")
-                    pr.data_source = data.get("data_source", "")
+                    pr.data_source = _source_of(data)
             out.append(pr)
     return out
