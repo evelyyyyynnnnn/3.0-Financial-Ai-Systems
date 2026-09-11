@@ -3,7 +3,7 @@ from __future__ import annotations
 import json, pathlib, sys
 from datetime import datetime, timezone
 from .collect import discover
-from .rollup import headline, portfolio_summary
+from .rollup import headline_with_error, portfolio_summary, withheld
 from .report import render as render_readme
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -14,9 +14,13 @@ def run() -> dict:
     summary = portfolio_summary(projects)
     rows = []
     for p in projects:
+        figures, err = headline_with_error(p.project, p.payload)
         rows.append({**p.as_dict(),
                      "headline": [{"metric": k, "value": v, "note": n}
-                                  for k, v, n in headline(p.project, p.payload)]})
+                                  for k, v, n in figures],
+                     "headline_error": err,
+                     "withheld": [{"topic": t, "because": r}
+                                  for t, r in withheld(p.payload)]})
     results = {
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "is_synthetic": True,
@@ -103,6 +107,11 @@ def main() -> int:
         print(f"  {mark}{p['project']:<34}{p['n_tests']:>3} tests")
         for h in p["headline"]:
             print(f"        {h['metric']:<34}{h['value']}")
+        if p.get("headline_error"):
+            print(f"        !! extractor failed: {p['headline_error']}",
+                  file=sys.stderr)
+        for w in p.get("withheld") or []:
+            print(f"        (withheld) {w['topic']}")
     print("\npetition claims vs what the portfolio can show:")
     for c in r["claims_status"]:
         print(f"  [{c['status']}] {c['claim'][:72]}")

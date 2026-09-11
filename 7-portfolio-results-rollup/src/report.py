@@ -102,6 +102,32 @@ def render(results: dict) -> str:
         add("| _(none reported)_ | | | |")
     add("")
 
+    withheld_rows = [(p["project"], w) for p in rows
+                     for w in (p.get("withheld") or [])]
+    if withheld_rows:
+        add("## What these projects decline to report, and why")
+        add("")
+        add("A metric that is absent and a metric that was deliberately withheld")
+        add("look identical to a reader. These were withheld: the real data has no")
+        add("answer key, so the number would have had no denominator. The reason is")
+        add("worth more than the number would have been.")
+        add("")
+        for project, w in withheld_rows:
+            add(f"**`{project}` — {w['topic']}**  ")
+            add(f"{w['because']}")
+            add("")
+
+    failed = [p for p in rows if p.get("headline_error")]
+    if failed:
+        add("## Extractors that failed on this run")
+        add("")
+        add("These projects have a recorded run the roll-up could not read. A")
+        add("failure here is a bug in this project, not evidence about theirs.")
+        add("")
+        for p in failed:
+            add(f"- `{p['project']}` — `{p['headline_error']}`")
+        add("")
+
     add("## Petition claims vs. what this portfolio can show")
     add("")
     add("The point of this table is the gap. A claim listed as *partially")

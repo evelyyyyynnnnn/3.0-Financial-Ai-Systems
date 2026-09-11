@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-11T13:11:52+00:00",
+  "generated_at": "2026-09-11T13:17:40+00:00",
   "is_synthetic": true,
   "data_source": "each project's own results/latest.json",
   "summary": {
@@ -9,7 +9,7 @@
     "n_synthetic_data": 3,
     "n_real_data": 19,
     "n_with_site": 20,
-    "total_tests": 626,
+    "total_tests": 632,
     "repos": [
       "1.0-Secure-Ai-Agent-Infrastructure",
       "2.0-Healthcare-Ai-Systems",
@@ -44,7 +44,9 @@
           "value": 12,
           "note": ""
         }
-      ]
+      ],
+      "headline_error": null,
+      "withheld": []
     },
     {
       "repo": "1.0-Secure-Ai-Agent-Infrastructure",
@@ -61,7 +63,9 @@
           "value": 121,
           "note": "cases"
         }
-      ]
+      ],
+      "headline_error": null,
+      "withheld": []
     },
     {
       "repo": "1.0-Secure-Ai-Agent-Infrastructure",
@@ -88,7 +92,9 @@
           "value": 0.2805,
           "note": "held by the rule baseline -- the agent does not beat it"
         }
-      ]
+      ],
+      "headline_error": null,
+      "withheld": []
     },
     {
       "repo": "2.0-Healthcare-Ai-Systems",
@@ -99,7 +105,30 @@
       "data_source": "MTS-Dialog, real doctor-patient consultation transcripts; see data/MANIFEST.json for hashes and retrieval times",
       "n_tests": 32,
       "has_site": true,
-      "headline": []
+      "headline": [
+        {
+          "metric": "Real consultations scored",
+          "value": 1076,
+          "note": "MTS-Dialog doctor-patient transcripts"
+        },
+        {
+          "metric": "Transcripts on which no cue fired",
+          "value": 0.6794,
+          "note": "share -- the lexicon is silent on most real consultations"
+        },
+        {
+          "metric": "Distinct cues that fired at all",
+          "value": 25,
+          "note": "the rest of the lexicon never matched"
+        }
+      ],
+      "headline_error": null,
+      "withheld": [
+        {
+          "topic": "validity",
+          "because": "MTS-Dialog is annotated for clinical note sections, not for communication quality. Correlation with clinician-assigned empathy ratings cannot be computed because no such ratings exist for these conversations."
+        }
+      ]
     },
     {
       "repo": "2.0-Healthcare-Ai-Systems",
@@ -126,7 +155,9 @@
           "value": 19.36,
           "note": "percent, at matched 80% sensitivity"
         }
-      ]
+      ],
+      "headline_error": null,
+      "withheld": []
     },
     {
       "repo": "2.0-Healthcare-Ai-Systems",
@@ -137,7 +168,34 @@
       "data_source": "PhysioNet BIDMC PPG and Respiration Dataset (open access); see data/MANIFEST.json for file hashes and retrieval times",
       "n_tests": 33,
       "has_site": true,
-      "headline": []
+      "headline": [
+        {
+          "metric": "Median beat-rate error vs the bedside monitor",
+          "value": 0.084,
+          "note": "bpm, against an independent device's own algorithm"
+        },
+        {
+          "metric": "Records agreeing within 5 bpm",
+          "value": 9,
+          "note": "of 10 BIDMC records"
+        },
+        {
+          "metric": "Worst-record error",
+          "value": 6.372,
+          "note": "bpm"
+        }
+      ],
+      "headline_error": null,
+      "withheld": [
+        {
+          "topic": "artifact scoring",
+          "because": "BIDMC does not annotate artifact locations, so rejection precision and recall have no answer key on this dataset"
+        },
+        {
+          "topic": "pressure values",
+          "because": "PLETH is a photoplethysmogram, not an arterial line; a systolic pressure in mmHg is not something this signal measures"
+        }
+      ]
     },
     {
       "repo": "2.0-Healthcare-Ai-Systems",
@@ -159,7 +217,9 @@
           "value": 14,
           "note": "public API"
         }
-      ]
+      ],
+      "headline_error": null,
+      "withheld": []
     },
     {
       "repo": "3.0-Financial-Ai-Systems",
@@ -170,7 +230,30 @@
       "data_source": "real daily value-weighted returns of the Fama-French 10 industry portfolios (Kenneth R. French Data Library; see data/MANIFEST.json for the URL, sha256 and retrieval time)",
       "n_tests": 41,
       "has_site": true,
-      "headline": []
+      "headline": [
+        {
+          "metric": "Trading days of real returns",
+          "value": 756,
+          "note": "2023-07-27 to 2026-07-31"
+        },
+        {
+          "metric": "Tail lift, unlinked pairs, raw",
+          "value": 3.167,
+          "note": "how much co-crashing the raw series appear to show"
+        },
+        {
+          "metric": "Tail lift, same pairs, after removing the common factor",
+          "value": 1.807,
+          "note": "most of the apparent contagion was the market moving together"
+        }
+      ],
+      "headline_error": null,
+      "withheld": [
+        {
+          "topic": "recovery",
+          "because": "the real transmission graph is unknown -- that is the question, not the answer -- so edge-recovery precision has no denominator"
+        }
+      ]
     },
     {
       "repo": "3.0-Financial-Ai-Systems",
@@ -187,6 +270,13 @@
           "value": 5,
           "note": "real 10-K pairs (manifest: URLs, hashes); no accuracy claimed -- real pairs carry no labelled change list"
         }
+      ],
+      "headline_error": null,
+      "withheld": [
+        {
+          "topic": "accuracy",
+          "because": "real filing pairs carry no human-annotated list of material changes, so there is no denominator for precision or recall"
+        }
       ]
     },
     {
@@ -198,7 +288,30 @@
       "data_source": "real BDC 10-K filings from SEC EDGAR; see data/MANIFEST.json for URLs, hashes and retrieval times",
       "n_tests": 30,
       "has_site": true,
-      "headline": []
+      "headline": [
+        {
+          "metric": "Cited spans that contain their value",
+          "value": 0.9444,
+          "note": "share -- checkable without an answer key, unlike accuracy"
+        },
+        {
+          "metric": "Values extracted",
+          "value": 18,
+          "note": ""
+        },
+        {
+          "metric": "Fields abstained on",
+          "value": 12,
+          "note": "declined rather than guessed"
+        }
+      ],
+      "headline_error": null,
+      "withheld": [
+        {
+          "topic": "accuracy",
+          "because": "nobody has annotated a real BDC schedule of investments with the values an extractor should return, so precision and recall have no denominator"
+        }
+      ]
     },
     {
       "repo": "3.0-Financial-Ai-Systems",
@@ -220,7 +333,9 @@
           "value": 6,
           "note": "synthetic"
         }
-      ]
+      ],
+      "headline_error": null,
+      "withheld": []
     },
     {
       "repo": "3.0-Financial-Ai-Systems",
@@ -242,7 +357,9 @@
           "value": 0.04127550300689224,
           "note": "held-out"
         }
-      ]
+      ],
+      "headline_error": null,
+      "withheld": []
     },
     {
       "repo": "3.0-Financial-Ai-Systems",
@@ -269,18 +386,22 @@
           "value": 5,
           "note": "real ETFs via yfinance"
         }
-      ]
+      ],
+      "headline_error": null,
+      "withheld": []
     },
     {
       "repo": "3.0-Financial-Ai-Systems",
       "project": "7-portfolio-results-rollup",
       "has_results": true,
-      "generated_at": "2026-09-11T13:10:55+00:00",
+      "generated_at": "2026-09-11T13:17:02+00:00",
       "is_synthetic": true,
       "data_source": "each project's own results/latest.json",
-      "n_tests": 15,
+      "n_tests": 21,
       "has_site": true,
-      "headline": []
+      "headline": [],
+      "headline_error": null,
+      "withheld": []
     },
     {
       "repo": "4.0-Decision-Intelligence-Framework",
@@ -291,7 +412,25 @@
       "data_source": "Statlog German Credit Data (UCI); see data/MANIFEST.json for the URL, hash and retrieval time",
       "n_tests": 33,
       "has_site": true,
-      "headline": []
+      "headline": [
+        {
+          "metric": "Decisions replayed to the same action",
+          "value": 1000,
+          "note": "of 1000 on real UCI credit records"
+        },
+        {
+          "metric": "Tampered record detected at index",
+          "value": 3,
+          "note": "one field edited in a hash-chained ledger"
+        },
+        {
+          "metric": "Largest disagreement between occlusion and exact Shapley",
+          "value": 2.70996,
+          "note": "two attribution methods on the same decision"
+        }
+      ],
+      "headline_error": null,
+      "withheld": []
     },
     {
       "repo": "4.0-Decision-Intelligence-Framework",
@@ -302,7 +441,30 @@
       "data_source": "real daily returns of the 10 Fama-French industry portfolios (value-weighted); see data/MANIFEST.json for the URL, hash and retrieval time",
       "n_tests": 33,
       "has_site": true,
-      "headline": []
+      "headline": [
+        {
+          "metric": "Out-of-sample optimism, deterministic",
+          "value": 0.021026,
+          "note": "CVaR the plan promised minus the CVaR it delivered"
+        },
+        {
+          "metric": "Out-of-sample optimism, robust (box)",
+          "value": 0.002463,
+          "note": "the point of robust optimisation, measured"
+        },
+        {
+          "metric": "Assets",
+          "value": 10,
+          "note": "real Fama-French industries"
+        }
+      ],
+      "headline_error": null,
+      "withheld": [
+        {
+          "topic": "staffing",
+          "because": "there is no public series of per-unit hospital staffing demand to download; a proxy would not make it a staffing study."
+        }
+      ]
     },
     {
       "repo": "4.0-Decision-Intelligence-Framework",
@@ -313,7 +475,25 @@
       "data_source": "PhysioNet MIMIC-IV clinical database demo (open access); see data/MANIFEST.json for file hashes and retrieval times",
       "n_tests": 26,
       "has_site": true,
-      "headline": []
+      "headline": [
+        {
+          "metric": "Operating points on the Pareto front held by the model",
+          "value": 0.8769,
+          "note": "share, model vs the single-vital baseline"
+        },
+        {
+          "metric": "Knee-point sensitivity",
+          "value": 0.7929,
+          "note": "at 24.609 false alerts per 100 stays"
+        },
+        {
+          "metric": "Observations",
+          "value": 5303,
+          "note": "a demonstration on the MIMIC-IV demo, not a study"
+        }
+      ],
+      "headline_error": null,
+      "withheld": []
     },
     {
       "repo": "4.0-Decision-Intelligence-Framework",
@@ -324,7 +504,20 @@
       "data_source": "closed-form benchmark tasks with exact oracles (src/tasks.py)",
       "n_tests": 24,
       "has_site": true,
-      "headline": []
+      "headline": [
+        {
+          "metric": "Irreducible regret against the clairvoyant oracle",
+          "value": 44.8138,
+          "note": "the floor no policy can beat -- reported so the table is readable"
+        },
+        {
+          "metric": "Calibration error, empirical-fractile newsvendor",
+          "value": 0.6195,
+          "note": "a policy can be near-optimal and badly calibrated at once"
+        }
+      ],
+      "headline_error": null,
+      "withheld": []
     },
     {
       "repo": "5.0-Ai-Engineering-Toolkit",
@@ -335,7 +528,25 @@
       "data_source": "SEC EDGAR XBRL company-concept API -- values as filed, each carrying the accession number of the filing it was reported in; see data/MANIFEST.json for hashes",
       "n_tests": 33,
       "has_site": true,
-      "headline": []
+      "headline": [
+        {
+          "metric": "Filers traced to the character span they were filed in",
+          "value": 2,
+          "note": "SEC EDGAR XBRL, as filed"
+        },
+        {
+          "metric": "Fetches that failed and are recorded as failures",
+          "value": 1,
+          "note": "not silently dropped"
+        },
+        {
+          "metric": "Package exports",
+          "value": 12,
+          "note": "spanlineage, not published"
+        }
+      ],
+      "headline_error": null,
+      "withheld": []
     },
     {
       "repo": "5.0-Ai-Engineering-Toolkit",
@@ -346,7 +557,25 @@
       "data_source": "SEC EDGAR XBRL company-concept API -- every answer is a filed value; see data/MANIFEST.json for hashes",
       "n_tests": 35,
       "has_site": true,
-      "headline": []
+      "headline": [
+        {
+          "metric": "Questions built from filed values",
+          "value": 24,
+          "note": "every answer checkable against SEC EDGAR"
+        },
+        {
+          "metric": "Accuracy spread between best and worst answerer",
+          "value": 0.0833,
+          "note": "the harness separates behaviours"
+        },
+        {
+          "metric": "Fabrication rate, the careful answerer",
+          "value": 0.125,
+          "note": "stubs, not language models -- see no_model_caveat"
+        }
+      ],
+      "headline_error": null,
+      "withheld": []
     },
     {
       "repo": "5.0-Ai-Engineering-Toolkit",
@@ -357,7 +586,30 @@
       "data_source": "Fama-French daily research factors, and a daily price index cumulated from the Ken French daily market total return (Mkt-RF + RF), base 100 -- a real, reproducible market price path, not raw single-stock closes (Stooq per-ticker closes were unavailable: it now returns a bot-check page); see data/MANIFEST.json for URLs, hashes and retrieval times",
       "n_tests": 42,
       "has_site": true,
-      "headline": []
+      "headline": [
+        {
+          "metric": "Days of real factor history",
+          "value": 26296,
+          "note": "1926-07-01 to 2026-07-31"
+        },
+        {
+          "metric": "Best Sharpe found by searching a grid",
+          "value": 0.9462,
+          "note": "of 199 strategies tried -- a selection-bias demonstration, not a strategy"
+        },
+        {
+          "metric": "Lookahead detector, forward correlation of the planted leak",
+          "value": 1.0,
+          "note": "caught: a feature that copies next period's return"
+        }
+      ],
+      "headline_error": null,
+      "withheld": [
+        {
+          "topic": "survivorship",
+          "because": "a survivorship audit needs the returns of the names that died, and no free source publishes point-in-time index membership with delisted constituents. A ticker that returns no data has not necessarily been delisted, so treating a fetch failure as a delisting would manufacture the very bias the check measures."
+        }
+      ]
     },
     {
       "repo": "5.0-Ai-Engineering-Toolkit",
@@ -368,7 +620,25 @@
       "data_source": "Fama-French 10-industry value-weighted daily returns (Kenneth R. French Data Library); see data/MANIFEST.json for the URL, sha256 and retrieval time",
       "n_tests": 38,
       "has_site": true,
-      "headline": []
+      "headline": [
+        {
+          "metric": "Observations",
+          "value": 2600,
+          "note": "2016-03-30 to 2026-07-31"
+        },
+        {
+          "metric": "Cornish-Fisher VaR, equal-weight",
+          "value": 0.015461,
+          "note": "vs 0.017332 Gaussian -- the tail correction is the point"
+        },
+        {
+          "metric": "Industries",
+          "value": 10,
+          "note": "real Fama-French returns"
+        }
+      ],
+      "headline_error": null,
+      "withheld": []
     }
   ],
   "claims_status": [
