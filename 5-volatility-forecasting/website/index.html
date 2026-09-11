@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Volatility Forecasting</title>
+<meta name="description" content="A sequence model for realised volatility on real S&amp;P 500 prices — and the lookahead leak that made its first result unusable.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#FCFCFD; --surface:#FFFFFF; --surface-2:#F4F5F8;
+  --ink:#16191F; --ink-2:#40474F; --muted:#6C7480;
+  --line:#E2E5EA; --line-2:#EFF1F4;
+  --accent:#1D5B70; --accent-2:#E6F0F3;
+  --ok:#2C6B4F; --ok-bg:#E5F1EA;
+  --warn:#8A6212; --warn-bg:#F7EFDC;
+  --demo:#6E4B8F; --demo-bg:#F0EAF6;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme=light]){
+    --bg:#0F1216; --surface:#161A20; --surface-2:#1C212A;
+    --ink:#E9ECF0; --ink-2:#BEC5CE; --muted:#8A939F;
+    --line:#282F38; --line-2:#20262E;
+    --accent:#72B3CB; --accent-2:#18272E;
+    --ok:#7BC09F; --ok-bg:#15251E;
+    --warn:#D8AD5E; --warn-bg:#292216;
+    --demo:#B79AD6; --demo-bg:#241C2E;
+  }
+}
+:root[data-theme=dark]{
+  --bg:#0F1216; --surface:#161A20; --surface-2:#1C212A;
+  --ink:#E9ECF0; --ink-2:#BEC5CE; --muted:#8A939F;
+  --line:#282F38; --line-2:#20262E;
+  --accent:#72B3CB; --accent-2:#18272E;
+  --ok:#7BC09F; --ok-bg:#15251E;
+  --warn:#D8AD5E; --warn-bg:#292216;
+  --demo:#B79AD6; --demo-bg:#241C2E;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+    "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:15.5px;line-height:1.62;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px 88px}
+h1,h2,h3{font-family:Spectral,Georgia,"Songti SC",serif;margin:0;text-wrap:balance}
+h1{font-size:clamp(28px,4.2vw,42px);font-weight:700;letter-spacing:-.015em;line-height:1.14}
+h2{font-size:clamp(20px,2.5vw,25px);font-weight:600;letter-spacing:-.01em}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+a{color:var(--accent)}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.88em}
+.stack{display:flex;flex-direction:column;gap:14px}
+.stack-lg{display:flex;flex-direction:column;gap:22px}
+section{margin-top:52px}
+
+header.mast{border-bottom:1px solid var(--line);padding:44px 0 26px;margin-bottom:8px;
+  display:flex;flex-direction:column;gap:15px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--ink-2);font-size:16.5px;max-width:66ch}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;padding:3px 9px;border-radius:4px;background:var(--surface-2);
+  color:var(--muted);font-weight:500;white-space:nowrap}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}
+.tag.demo{background:var(--demo-bg);color:var(--demo)}
+.tag.warn{background:var(--warn-bg);color:var(--warn)}
+
+.banner{display:flex;gap:13px;align-items:flex-start;background:var(--demo-bg);
+  border-radius:9px;padding:15px 18px;margin-top:26px}
+.banner .bi{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--demo);flex:none;padding-top:3px;font-weight:600}
+.banner p{font-size:14.2px;color:var(--ink-2)}
+
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.metric{background:var(--surface);padding:15px 16px;display:flex;flex-direction:column;gap:5px}
+.metric .mk{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);line-height:1.35}
+.metric .mv{font-family:Spectral,Georgia,serif;font-size:26px;font-weight:600;
+  font-variant-numeric:tabular-nums;line-height:1.1;color:var(--accent)}
+.metric .mn{font-size:12.4px;color:var(--muted);line-height:1.4}
+
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.8px;min-width:520px}
+th{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);font-weight:500;padding:11px 14px;
+  border-bottom:1px solid var(--line);background:var(--surface-2)}
+td{padding:10px 14px;border-bottom:1px solid var(--line-2);vertical-align:top;line-height:1.5}
+td.n{font-variant-numeric:tabular-nums;text-align:right}
+tr:last-child td{border-bottom:0}
+
+pre{margin:0;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 17px;overflow-x:auto;font-family:"IBM Plex Mono",monospace;
+  font-size:12.8px;line-height:1.62;color:var(--ink-2)}
+ul.tight{margin:0;padding-left:19px;display:flex;flex-direction:column;gap:7px}
+ul.tight li::marker{color:var(--muted)}
+.note{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
+  padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.foot{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:9px}
+figure{margin:0}
+svg.chart{display:block;width:100%;height:auto}
+@media (max-width:600px){.wrap{padding:0 17px 68px}.banner{flex-direction:column;gap:7px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="mast">
+  <div class="eyebrow">3.0-Financial-Ai-Systems &middot; Financial Stability</div>
+  <h1>Volatility Forecasting</h1>
+  <p class="lede">A sequence model for realised volatility on real S&amp;P 500 prices — and the lookahead leak that made its first result unusable.</p>
+  <div class="tags"><span class="tag ">real market data</span><span class="tag ">LSTM</span><span class="tag ">lookahead audit</span><span class="tag demo">result withheld</span></div>
+</header>
+<div class="banner">
+  <span class="bi">Data</span>
+  <p>Real daily ^GSPC prices from Yahoo Finance, 2010-2023. The committed metrics are WITHHELD: they were produced before a lookahead leak in the feature scaler was found and fixed, so they say nothing about held-out performance. The model must be retrained before any figure on this page is quoted.</p>
+</div>
+<div class="metrics"><div class="metric"><span class="mk">Test R2</span><span class="mv">withheld</span><span class="mn">pending a retrain</span></div><div class="metric"><span class="mk">Leak found</span><span class="mv">yes</span><span class="mn">scaler fitted across the split</span></div><div class="metric"><span class="mk">Training tensor moved by</span><span class="mv">0.99</span><span class="mn">on a [0, 1] scale, from future data alone</span></div><div class="metric"><span class="mk">Tests</span><span class="mv">5</span><span class="mn">all offline, no framework needed</span></div></div>
+
+<section>
+  <h2>Why there is no number here yet</h2>
+  <p>this run predates the lookahead fix in LSTM-Volatility-Prediction/data/data_loader.py. The feature scaler was fitted with fit_transform over the whole 2010-2023 series, so the test period&#x27;s minimum and maximum were inside every training feature; shifting only the last 10% of the series moved the training tensor by 0.99 on a [0, 1] scale. An R2 measured that way is not evidence about held-out performance. The model has to be retrained on the fixed pipeline before any figure here is quoted; the superseded numbers are kept below as a record of what was run, not as a result.</p>
+</section>
+
+
+<section>
+  <h2>The leak, stated as a test</h2>
+  <p>The feature scaler was fitted with <code>fit_transform</code> over the whole
+  2010&ndash;2023 series, before the chronological split. A MinMax scaler fitted that
+  way carries the minimum and maximum of the <em>test</em> period into every
+  training feature.</p>
+  <p>The check is blunt and does not need a model. Take the price series, multiply
+  the last 10% of it &mdash; which is test data &mdash; by ten, and rebuild the
+  training tensor. If the split is a split, the training tensor cannot move:</p>
+  <pre><code>baseline, *_ = split(price_frame())
+shocked,  *_ = split(price_frame(tail_shock=10.0))
+assert np.allclose(baseline, shocked)</code></pre>
+  <p>It moved by <strong>0.99</strong> on a [0,&nbsp;1] scale. The scaler is now
+  fitted only on the rows the training split can reach
+  (<code>train_size + window_size</code>), and the assertion above is
+  <code>tests/test_no_lookahead.py</code>.</p>
+</section>
+
+<section>
+  <h2>What the old numbers should have prompted</h2>
+  <p>The superseded run reported validation R&sup2; <em>above</em> training R&sup2;,
+  and both far above test R&sup2;. A validation score that beats the training score
+  is not a good sign; it is a question. Here the answer was that the scaler had
+  seen the whole series.</p>
+</section>
+
+<div class="tw"><table><thead><tr><th>Split</th><th>R2</th><th>RMSE</th><th>MAE</th><th>MSE</th></tr></thead><tbody><tr><td>train</td><td class="n">0.8777</td><td class="n">0.02420</td><td class="n">0.01652</td><td class="n">0.000586</td></tr><tr><td>val</td><td class="n">0.9312</td><td class="n">0.04573</td><td class="n">0.03013</td><td class="n">0.002091</td></tr><tr><td>test</td><td class="n">0.6115</td><td class="n">0.04128</td><td class="n">0.03087</td><td class="n">0.001704</td></tr></tbody></table></div>
+
+<section>
+  <p class="note">The table above is the <strong>superseded</strong> run, kept as a
+  record of what was executed on 2026-09-09. It is not a result and must not be
+  cited.</p>
+</section>
+
+
+<section>
+  <h2>What this project does not establish</h2>
+  <ul>
+    <li>It does not establish that the model forecasts volatility. No metric from
+    the fixed pipeline exists yet.</li>
+    <li>Realised volatility is strongly autocorrelated, so a high R&sup2; against it
+    is weak evidence on its own; the comparison that matters is against a
+    previous-value baseline, which has not been run.</li>
+    <li>One index, one period, one architecture. Nothing here generalises.</li>
+  </ul>
+  <p class="note">Reproduce: <code>python -m src.demo   # needs TensorFlow and network access to Yahoo Finance</code></p>
+</section>
+
+<div class="foot">
+  <p>3.0-Financial-Ai-Systems &middot; volatility-forecasting &middot; part of a five-repository portfolio on optimization-driven,
+     system-level decision frameworks.</p>
+  <p>Every figure on this page was produced by running <code>python -m src.demo</code> in this
+     project and reading <code>results.json</code>. Nothing here is hand-entered. The run used clearly-labelled synthetic data; swap in the real source and the same pipeline reports real numbers.</p>
+</div>
+</div>
+</body>
+</html>

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-11T13:17:40+00:00",
+  "generated_at": "2026-09-11T22:41:46+00:00",
   "is_synthetic": true,
   "data_source": "each project's own results/latest.json",
   "summary": {
@@ -8,8 +8,8 @@
     "n_never_run": 0,
     "n_synthetic_data": 3,
     "n_real_data": 19,
-    "n_with_site": 20,
-    "total_tests": 632,
+    "n_with_site": 22,
+    "total_tests": 643,
     "repos": [
       "1.0-Secure-Ai-Agent-Infrastructure",
       "2.0-Healthcare-Ai-Systems",
@@ -344,47 +344,41 @@
       "generated_at": "2026-09-09T19:30:14+00:00",
       "is_synthetic": false,
       "data_source": "real daily prices for ^GSPC via Yahoo Finance (yfinance), 2010-01-01 to 2023-12-31; target is realised volatility (close_to_close)",
-      "n_tests": 0,
-      "has_site": false,
-      "headline": [
-        {
-          "metric": "Test R2",
-          "value": 0.6114954882644845,
-          "note": "realised-volatility LSTM on real ^GSPC, 2010-2023"
-        },
-        {
-          "metric": "Test RMSE",
-          "value": 0.04127550300689224,
-          "note": "held-out"
-        }
-      ],
+      "n_tests": 5,
+      "has_site": true,
+      "headline": [],
       "headline_error": null,
-      "withheld": []
+      "withheld": [
+        {
+          "topic": "metrics",
+          "because": "this run predates the lookahead fix in LSTM-Volatility-Prediction/data/data_loader.py. The feature scaler was fitted with fit_transform over the whole 2010-2023 series, so the test period's minimum and maximum were inside every training feature; shifting only the last 10% of the series moved the training tensor by 0.99 on a [0, 1] scale. An R2 measured that way is not evidence about held-out performance. The model has to be retrained on the fixed pipeline before any figure here is quoted; the superseded numbers are kept below as a record of what was run, not as a result."
+        }
+      ]
     },
     {
       "repo": "3.0-Financial-Ai-Systems",
       "project": "6-portfolio-optimization-engine",
       "has_results": true,
-      "generated_at": "2026-09-09T19:06:34+00:00",
+      "generated_at": "2026-09-11T22:41:21+00:00",
       "is_synthetic": false,
       "data_source": "real daily OHLCV for GLD, IWM, QQQ, SPY, TLT via Yahoo Finance (yfinance), 2010-01-04 to 2023-12-29 (3522 trading days); cached in data/market_data.pkl",
-      "n_tests": 3,
-      "has_site": false,
+      "n_tests": 9,
+      "has_site": true,
       "headline": [
         {
           "metric": "DQN Sharpe",
           "value": -0.3525208924790561,
-          "note": "real ETF data 2010-2023"
+          "note": "IN-SAMPLE -- the declared train/test split was read by no code"
         },
         {
           "metric": "SAC Sharpe",
           "value": -0.47148991565952514,
-          "note": "negative -- the RL agents underperform buy-and-hold, reported as measured"
+          "note": "in-sample; both agents lose money on their own training data"
         },
         {
-          "metric": "Assets",
-          "value": 5,
-          "note": "real ETFs via yfinance"
+          "metric": "Buy-and-hold SPY Sharpe, same period",
+          "value": 0.6725426917051445,
+          "note": "total return 4.455186632973433 -- the baseline the agents were said to underperform, now computed"
         }
       ],
       "headline_error": null,
@@ -394,7 +388,7 @@
       "repo": "3.0-Financial-Ai-Systems",
       "project": "7-portfolio-results-rollup",
       "has_results": true,
-      "generated_at": "2026-09-11T13:17:02+00:00",
+      "generated_at": "2026-09-11T22:36:11+00:00",
       "is_synthetic": true,
       "data_source": "each project's own results/latest.json",
       "n_tests": 21,

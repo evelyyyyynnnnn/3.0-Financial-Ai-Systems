@@ -4,7 +4,7 @@
 > below is read from the file that project's own demo wrote, and this
 > page is rewritten from the same run that writes `latest.json`.
 
-**Run date:** `2026-09-11T13:17:40+00:00`
+**Run date:** `2026-09-11T22:41:46+00:00`
 
 ## Portfolio at a glance
 
@@ -15,8 +15,8 @@
 | Never run | 0 |
 | Running on **real** data | 19 |
 | Running on synthetic or authored data | 3 |
-| With a published website | 20 |
-| Test functions across the portfolio | 632 |
+| With a published website | 22 |
+| Test functions across the portfolio | 643 |
 
 Repositories walked: `1.0-Secure-Ai-Agent-Infrastructure`, `2.0-Healthcare-Ai-Systems`, `3.0-Financial-Ai-Systems`, `4.0-Decision-Intelligence-Framework`, `5.0-Ai-Engineering-Toolkit`.
 
@@ -35,8 +35,8 @@ Repositories walked: `1.0-Secure-Ai-Agent-Infrastructure`, `2.0-Healthcare-Ai-Sy
 | `3.0-Financial-Ai-Systems` | `2-filing-intelligence` | 2026-09-07 | real | 33 | yes |
 | `3.0-Financial-Ai-Systems` | `3-private-credit-data-provenance` | 2026-09-07 | real | 30 | yes |
 | `3.0-Financial-Ai-Systems` | `4-tokenized-fixed-income-analytics` | 2026-08-31 | synthetic / authored | 34 | yes |
-| `3.0-Financial-Ai-Systems` | `5-volatility-forecasting` | 2026-09-09 | real | 0 | no |
-| `3.0-Financial-Ai-Systems` | `6-portfolio-optimization-engine` | 2026-09-09 | real | 3 | no |
+| `3.0-Financial-Ai-Systems` | `5-volatility-forecasting` | 2026-09-09 | real | 5 | yes |
+| `3.0-Financial-Ai-Systems` | `6-portfolio-optimization-engine` | 2026-09-11 | real | 9 | yes |
 | `3.0-Financial-Ai-Systems` | `7-portfolio-results-rollup` | 2026-09-11 | synthetic / authored | 21 | yes |
 | `4.0-Decision-Intelligence-Framework` | `1-decision-audit-framework` | 2026-09-06 | real | 33 | yes |
 | `4.0-Decision-Intelligence-Framework` | `2-optimization-under-uncertainty` | 2026-09-07 | real | 33 | yes |
@@ -112,11 +112,9 @@ not measured, however often it may appear elsewhere.
 | `3-private-credit-data-provenance` | Fields abstained on | 12 | declined rather than guessed |
 | `4-tokenized-fixed-income-analytics` | Stress latency ratio | 5.152 | redemption queue lengthening |
 | `4-tokenized-fixed-income-analytics` | Tokens analysed | 6 | synthetic |
-| `5-volatility-forecasting` | Test R2 | 0.6115 | realised-volatility LSTM on real ^GSPC, 2010-2023 |
-| `5-volatility-forecasting` | Test RMSE | 0.04128 | held-out |
-| `6-portfolio-optimization-engine` | DQN Sharpe | -0.3525 | real ETF data 2010-2023 |
-| `6-portfolio-optimization-engine` | SAC Sharpe | -0.4715 | negative -- the RL agents underperform buy-and-hold, reported as measured |
-| `6-portfolio-optimization-engine` | Assets | 5 | real ETFs via yfinance |
+| `6-portfolio-optimization-engine` | DQN Sharpe | -0.3525 | IN-SAMPLE -- the declared train/test split was read by no code |
+| `6-portfolio-optimization-engine` | SAC Sharpe | -0.4715 | in-sample; both agents lose money on their own training data |
+| `6-portfolio-optimization-engine` | Buy-and-hold SPY Sharpe, same period | 0.6725 | total return 4.455186632973433 -- the baseline the agents were said to underperform, now computed |
 | `1-decision-audit-framework` | Decisions replayed to the same action | 1,000 | of 1000 on real UCI credit records |
 | `1-decision-audit-framework` | Tampered record detected at index | 3 | one field edited in a hash-chained ledger |
 | `1-decision-audit-framework` | Largest disagreement between occlusion and exact Shapley | 2.71 | two attribution methods on the same decision |
@@ -165,6 +163,9 @@ real filing pairs carry no human-annotated list of material changes, so there is
 
 **`3-private-credit-data-provenance` — accuracy**  
 nobody has annotated a real BDC schedule of investments with the values an extractor should return, so precision and recall have no denominator
+
+**`5-volatility-forecasting` — metrics**  
+this run predates the lookahead fix in LSTM-Volatility-Prediction/data/data_loader.py. The feature scaler was fitted with fit_transform over the whole 2010-2023 series, so the test period's minimum and maximum were inside every training feature; shifting only the last 10% of the series moved the training tensor by 0.99 on a [0, 1] scale. An R2 measured that way is not evidence about held-out performance. The model has to be retrained on the fixed pipeline before any figure here is quoted; the superseded numbers are kept below as a record of what was run, not as a result.
 
 **`2-optimization-under-uncertainty` — staffing**  
 there is no public series of per-unit hospital staffing demand to download; a proxy would not make it a staffing study.
