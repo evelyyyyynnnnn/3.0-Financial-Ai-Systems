@@ -6,13 +6,36 @@ import re
 
 
 def _get(d: dict, *path, default=None):
+    """Walk a results payload by key, and by index into a list."""
     cur = d
     for k in path:
         if isinstance(cur, dict) and k in cur:
             cur = cur[k]
+        elif isinstance(cur, list) and isinstance(k, int) and -len(cur) <= k < len(cur):
+            cur = cur[k]
         else:
             return default
     return cur
+
+
+# A project that cannot honestly compute a metric on real data says so in its
+# own results, under "<topic>_withheld_because" or "<topic>_suppressed_because".
+# To a reader, a withheld metric and an absent one look identical unless the
+# roll-up says which it is -- and the reason is usually more informative than
+# the number would have been.
+WITHHELD_SUFFIXES = ("_withheld_because", "_suppressed_because")
+
+
+def withheld(payload: dict) -> list:
+    """Return [(topic, reason)] for every metric the project declined to report."""
+    out = []
+    for key, reason in (payload or {}).items():
+        for suffix in WITHHELD_SUFFIXES:
+            if key.endswith(suffix) and isinstance(reason, str) and reason.strip():
+                topic = key[: -len(suffix)].replace("_", " ")
+                out.append((topic, reason.strip()))
+                break
+    return sorted(out)
 
 
 # Each entry says how to read one project's headline result. Keeping these in
@@ -62,9 +85,14 @@ EXTRACTORS = {
          "percent, at matched 80% sensitivity"),
     ],
     "physiological-waveform-pipeline": lambda d: [
-        ("Artifact rejection F1", _get(d, "rejection", "f1"), "vs injected truth"),
-        ("Specificity", _get(d, "rejection", "specificity"), "clean windows kept"),
-        ("Waveform-hours", _get(d, "dataset", "waveform_hours"), "synthetic"),
+        ("Median beat-rate error vs the bedside monitor",
+         _get(d, "beat_detection_vs_monitor", "median_difference_bpm"),
+         "bpm, against an independent device's own algorithm"),
+        ("Records agreeing within 5 bpm",
+         _get(d, "beat_detection_vs_monitor", "within_5_bpm"),
+         f"of {_get(d, 'beat_detection_vs_monitor', 'n_records_compared')} BIDMC records"),
+        ("Worst-record error",
+         _get(d, "beat_detection_vs_monitor", "max_absolute_difference_bpm"), "bpm"),
     ],
     "pyhealth-rhealth-extension": lambda d: [
         ("Leakage inflation", _get(d, "leakage", "inflation_pct"),
@@ -72,15 +100,21 @@ EXTRACTORS = {
         ("Package exports", _get(d, "package", "exports"), "public API"),
     ],
     "clinical-empathy-analysis": lambda d: [
-        ("LOO correlation", _get(d, "evaluation", "model_loo", "pearson_r"),
-         "circular — see the project page"),
-        ("Transcripts", _get(d, "corpus", "n_transcripts"), "authored"),
+        ("Real consultations scored", _get(d, "n_transcripts"),
+         "MTS-Dialog doctor-patient transcripts"),
+        ("Transcripts on which no cue fired",
+         _get(d, "score_distribution", "share_with_no_cue"),
+         "share -- the lexicon is silent on most real consultations"),
+        ("Distinct cues that fired at all", _get(d, "n_distinct_cues_fired"),
+         "the rest of the lexicon never matched"),
     ],
     "private-credit-data-provenance": lambda d: [
-        ("Value accuracy", _get(d, "values", "accuracy"), "circular"),
-        ("Span accuracy, exact", _get(d, "spans_exact", "span_accuracy"), ""),
-        ("Invented values", _get(d, "values", "wrong_or_invented"),
-         "on genuinely absent fields"),
+        ("Cited spans that contain their value",
+         _get(d, "provenance_check", "span_support_rate"),
+         "share -- checkable without an answer key, unlike accuracy"),
+        ("Values extracted", _get(d, "provenance_check", "extracted_values"), ""),
+        ("Fields abstained on", _get(d, "provenance_check", "abstentions"),
+         "declined rather than guessed"),
     ],
     "tokenized-fixed-income-analytics": lambda d: [
         ("Stress latency ratio", _get(d, "stress", "median_latency_ratio"),
@@ -94,10 +128,14 @@ EXTRACTORS = {
          "real pairs carry no labelled change list"),
     ],
     "contagion-observatory": lambda d: [
-        ("Edge recall", _get(d, "best", "recall"), "of constructed edges"),
-        ("Edge precision", _get(d, "best", "precision"), "the honest cost"),
-        ("True edges", _get(d, "universe", "n_true_edges"),
-         f"of {_get(d, 'universe', 'n_candidate_pairs')} pairs"),
+        ("Trading days of real returns", _get(d, "universe", "n_days"),
+         f"{_get(d, 'universe', 'first_date')} to {_get(d, 'universe', 'last_date')}"),
+        ("Tail lift, unlinked pairs, raw",
+         (d.get("tail_raw") or [{}])[0].get("tail_lift"),
+         "how much co-crashing the raw series appear to show"),
+        ("Tail lift, same pairs, after removing the common factor",
+         (d.get("tail_residual") or [{}])[0].get("tail_lift"),
+         "most of the apparent contagion was the market moving together"),
     ],
     "volatility-forecasting": lambda d: [
         ("Test R2", _get(d, "metrics", "test", "r2"),
@@ -112,18 +150,106 @@ EXTRACTORS = {
         ("Assets", len((d.get("provenance", {}) or {}).get("tickers") or []) or None,
          "real ETFs via yfinance"),
     ],
+    "optimization-under-uncertainty": lambda d: [
+        ("Out-of-sample optimism, deterministic",
+         next((r["optimism"] for r in d.get("optimism", [])
+               if r.get("method", "").startswith("deterministic")), None),
+         "CVaR the plan promised minus the CVaR it delivered"),
+        ("Out-of-sample optimism, robust (box)",
+         next((r["optimism"] for r in d.get("optimism", [])
+               if r.get("method", "").startswith("robust")), None),
+         "the point of robust optimisation, measured"),
+        ("Assets", _get(d, "portfolio", "n_assets"), "real Fama-French industries"),
+    ],
+    "quant-productivity-toolkit": lambda d: [
+        ("Days of real factor history", _get(d, "factors", "n_days"),
+         f"{_get(d, 'factors', 'first')} to {_get(d, 'factors', 'last')}"),
+        ("Best Sharpe found by searching a grid",
+         _get(d, "selection", "best", "sharpe"),
+         f"of {_get(d, 'selection', 'n_strategies_tried')} strategies tried -- "
+         "a selection-bias demonstration, not a strategy"),
+        ("Lookahead detector, forward correlation of the planted leak",
+         _get(d, "lookahead", "cases", 0, "max_forward_corr"),
+         "caught: a feature that copies next period's return"),
+    ],
+    "decision-audit-framework": lambda d: [
+        ("Decisions replayed to the same action",
+         _get(d, "replay", "reproduced"),
+         f"of {_get(d, 'replay', 'n')} on real UCI credit records"),
+        ("Tampered record detected at index", _get(d, "tamper", "detected_at"),
+         "one field edited in a hash-chained ledger"),
+        ("Largest disagreement between occlusion and exact Shapley",
+         _get(d, "max_disagreement"),
+         "two attribution methods on the same decision"),
+    ],
+    "icu-triage-optimization": lambda d: [
+        ("Operating points on the Pareto front held by the model",
+         _get(d, "pooled", "front_share_model"),
+         "share, model vs the single-vital baseline"),
+        ("Knee-point sensitivity", _get(d, "knee", "sensitivity"),
+         f"at {_get(d, 'knee', 'false_alerts_per_100')} false alerts per 100 stays"),
+        ("Observations", _get(d, "n_observations"),
+         "a demonstration on the MIMIC-IV demo, not a study"),
+    ],
+    "decision-benchmark-suite": lambda d: [
+        ("Irreducible regret against the clairvoyant oracle",
+         _get(d, "oracle_gap", "irreducible_regret"),
+         "the floor no policy can beat -- reported so the table is readable"),
+        ("Calibration error, empirical-fractile newsvendor",
+         _get(d, "newsvendor", "policies", "empirical fractile", "calibration", "ece"),
+         "a policy can be near-optimal and badly calibrated at once"),
+    ],
+    "data-provenance-library": lambda d: [
+        ("Filers traced to the character span they were filed in",
+         len(d.get("companies") or []) or None, "SEC EDGAR XBRL, as filed"),
+        ("Fetches that failed and are recorded as failures",
+         len(d.get("failures") or []) or None, "not silently dropped"),
+        ("Package exports", _get(d, "package", "exports"),
+         f"{_get(d, 'package', 'name')}, not published"),
+    ],
+    "llm-eval-calibration-harness": lambda d: [
+        ("Questions built from filed values", _get(d, "suite", "n_questions"),
+         "every answer checkable against SEC EDGAR"),
+        ("Accuracy spread between best and worst answerer",
+         _get(d, "separation", "spread"),
+         "the harness separates behaviours"),
+        ("Fabrication rate, the careful answerer",
+         _get(d, "models", "careful", "fabrication_rate"),
+         "stubs, not language models -- see no_model_caveat"),
+    ],
+    "risk-portfolio-saas": lambda d: [
+        ("Observations", _get(d, "observations"),
+         f"{_get(d, 'window', 'first')} to {_get(d, 'window', 'last')}"),
+        ("Cornish-Fisher VaR, equal-weight",
+         _get(d, "reports", "EQUAL-WEIGHT", "risk", "var_cornish_fisher"),
+         f"vs {_get(d, 'reports', 'EQUAL-WEIGHT', 'risk', 'var_gaussian')} Gaussian "
+         "-- the tail correction is the point"),
+        ("Industries", _get(d, "n_tickers"), "real Fama-French returns"),
+    ],
 }
 
 
-def headline(project: str, payload: dict) -> list:
+def headline_with_error(project: str, payload: dict) -> tuple:
+    """Return (rows, error). A shape change must not read as 'nothing measured'.
+
+    The original swallowed every exception and returned an empty list, so a
+    project whose results file changed shape looked exactly like a project that
+    measured nothing -- which is how four real-data projects came to show blank
+    rows. The error now travels with the result and is rendered.
+    """
     # Folders may carry an ordering prefix like "1-"; match on the bare name too.
-    fn = EXTRACTORS.get(project) or EXTRACTORS.get(re.sub(r"^\d+-", "", project))
+    bare = re.sub(r"^\d+-", "", project)
+    fn = EXTRACTORS.get(project) or EXTRACTORS.get(bare)
     if not fn or not payload:
-        return []
+        return [], None
     try:
-        return [(k, v, n) for k, v, n in fn(payload) if v is not None]
-    except Exception:
-        return []
+        return [(k, v, n) for k, v, n in fn(payload) if v is not None], None
+    except Exception as exc:
+        return [], f"{type(exc).__name__}: {exc}"
+
+
+def headline(project: str, payload: dict) -> list:
+    return headline_with_error(project, payload)[0]
 
 
 def portfolio_summary(projects: list) -> dict:

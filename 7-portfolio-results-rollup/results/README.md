@@ -4,7 +4,7 @@
 > below is read from the file that project's own demo wrote, and this
 > page is rewritten from the same run that writes `latest.json`.
 
-**Run date:** `2026-09-11T13:11:52+00:00`
+**Run date:** `2026-09-11T13:17:40+00:00`
 
 ## Portfolio at a glance
 
@@ -16,7 +16,7 @@
 | Running on **real** data | 19 |
 | Running on synthetic or authored data | 3 |
 | With a published website | 20 |
-| Test functions across the portfolio | 626 |
+| Test functions across the portfolio | 632 |
 
 Repositories walked: `1.0-Secure-Ai-Agent-Infrastructure`, `2.0-Healthcare-Ai-Systems`, `3.0-Financial-Ai-Systems`, `4.0-Decision-Intelligence-Framework`, `5.0-Ai-Engineering-Toolkit`.
 
@@ -37,7 +37,7 @@ Repositories walked: `1.0-Secure-Ai-Agent-Infrastructure`, `2.0-Healthcare-Ai-Sy
 | `3.0-Financial-Ai-Systems` | `4-tokenized-fixed-income-analytics` | 2026-08-31 | synthetic / authored | 34 | yes |
 | `3.0-Financial-Ai-Systems` | `5-volatility-forecasting` | 2026-09-09 | real | 0 | no |
 | `3.0-Financial-Ai-Systems` | `6-portfolio-optimization-engine` | 2026-09-09 | real | 3 | no |
-| `3.0-Financial-Ai-Systems` | `7-portfolio-results-rollup` | 2026-09-11 | synthetic / authored | 15 | yes |
+| `3.0-Financial-Ai-Systems` | `7-portfolio-results-rollup` | 2026-09-11 | synthetic / authored | 21 | yes |
 | `4.0-Decision-Intelligence-Framework` | `1-decision-audit-framework` | 2026-09-06 | real | 33 | yes |
 | `4.0-Decision-Intelligence-Framework` | `2-optimization-under-uncertainty` | 2026-09-07 | real | 33 | yes |
 | `4.0-Decision-Intelligence-Framework` | `3-icu-triage-optimization` | 2026-09-06 | real | 26 | yes |
@@ -92,12 +92,24 @@ not measured, however often it may appear elsewhere.
 | `3-llm-audit-agent` | Review items cut | 43.81 | percent (105 -> 59), but 6 more findings missed |
 | `3-llm-audit-agent` | False alarms cut | 58.82 | percent (68 -> 28) |
 | `3-llm-audit-agent` | Best detector macro-F1 | 0.2805 | held by the rule baseline -- the agent does not beat it |
+| `1-clinical-empathy-analysis` | Real consultations scored | 1,076 | MTS-Dialog doctor-patient transcripts |
+| `1-clinical-empathy-analysis` | Transcripts on which no cue fired | 0.6794 | share -- the lexicon is silent on most real consultations |
+| `1-clinical-empathy-analysis` | Distinct cues that fired at all | 25 | the rest of the lexicon never matched |
 | `2-icu-early-warning` | AUROC, hypotension | 0.783 | 4-hour horizon |
 | `2-icu-early-warning` | Calibration ECE | 0.06092 | after isotonic |
 | `2-icu-early-warning` | False-alert reduction | 19.36 | percent, at matched 80% sensitivity |
+| `3-physiological-waveform-pipeline` | Median beat-rate error vs the bedside monitor | 0.084 | bpm, against an independent device's own algorithm |
+| `3-physiological-waveform-pipeline` | Records agreeing within 5 bpm | 9 | of 10 BIDMC records |
+| `3-physiological-waveform-pipeline` | Worst-record error | 6.372 | bpm |
 | `4-pyhealth-rhealth-extension` | Leakage inflation | 81.57 | percent AUROC, row split vs subject split |
 | `4-pyhealth-rhealth-extension` | Package exports | 14 | public API |
+| `1-contagion-observatory` | Trading days of real returns | 756 | 2023-07-27 to 2026-07-31 |
+| `1-contagion-observatory` | Tail lift, unlinked pairs, raw | 3.167 | how much co-crashing the raw series appear to show |
+| `1-contagion-observatory` | Tail lift, same pairs, after removing the common factor | 1.807 | most of the apparent contagion was the market moving together |
 | `2-filing-intelligence` | Filings pulled from EDGAR | 5 | real 10-K pairs (manifest: URLs, hashes); no accuracy claimed -- real pairs carry no labelled change list |
+| `3-private-credit-data-provenance` | Cited spans that contain their value | 0.9444 | share -- checkable without an answer key, unlike accuracy |
+| `3-private-credit-data-provenance` | Values extracted | 18 |  |
+| `3-private-credit-data-provenance` | Fields abstained on | 12 | declined rather than guessed |
 | `4-tokenized-fixed-income-analytics` | Stress latency ratio | 5.152 | redemption queue lengthening |
 | `4-tokenized-fixed-income-analytics` | Tokens analysed | 6 | synthetic |
 | `5-volatility-forecasting` | Test R2 | 0.6115 | realised-volatility LSTM on real ^GSPC, 2010-2023 |
@@ -105,6 +117,60 @@ not measured, however often it may appear elsewhere.
 | `6-portfolio-optimization-engine` | DQN Sharpe | -0.3525 | real ETF data 2010-2023 |
 | `6-portfolio-optimization-engine` | SAC Sharpe | -0.4715 | negative -- the RL agents underperform buy-and-hold, reported as measured |
 | `6-portfolio-optimization-engine` | Assets | 5 | real ETFs via yfinance |
+| `1-decision-audit-framework` | Decisions replayed to the same action | 1,000 | of 1000 on real UCI credit records |
+| `1-decision-audit-framework` | Tampered record detected at index | 3 | one field edited in a hash-chained ledger |
+| `1-decision-audit-framework` | Largest disagreement between occlusion and exact Shapley | 2.71 | two attribution methods on the same decision |
+| `2-optimization-under-uncertainty` | Out-of-sample optimism, deterministic | 0.02103 | CVaR the plan promised minus the CVaR it delivered |
+| `2-optimization-under-uncertainty` | Out-of-sample optimism, robust (box) | 0.002463 | the point of robust optimisation, measured |
+| `2-optimization-under-uncertainty` | Assets | 10 | real Fama-French industries |
+| `3-icu-triage-optimization` | Operating points on the Pareto front held by the model | 0.8769 | share, model vs the single-vital baseline |
+| `3-icu-triage-optimization` | Knee-point sensitivity | 0.7929 | at 24.609 false alerts per 100 stays |
+| `3-icu-triage-optimization` | Observations | 5,303 | a demonstration on the MIMIC-IV demo, not a study |
+| `4-decision-benchmark-suite` | Irreducible regret against the clairvoyant oracle | 44.81 | the floor no policy can beat -- reported so the table is readable |
+| `4-decision-benchmark-suite` | Calibration error, empirical-fractile newsvendor | 0.6195 | a policy can be near-optimal and badly calibrated at once |
+| `1-data-provenance-library` | Filers traced to the character span they were filed in | 2 | SEC EDGAR XBRL, as filed |
+| `1-data-provenance-library` | Fetches that failed and are recorded as failures | 1 | not silently dropped |
+| `1-data-provenance-library` | Package exports | 12 | spanlineage, not published |
+| `2-llm-eval-calibration-harness` | Questions built from filed values | 24 | every answer checkable against SEC EDGAR |
+| `2-llm-eval-calibration-harness` | Accuracy spread between best and worst answerer | 0.0833 | the harness separates behaviours |
+| `2-llm-eval-calibration-harness` | Fabrication rate, the careful answerer | 0.125 | stubs, not language models -- see no_model_caveat |
+| `3-quant-productivity-toolkit` | Days of real factor history | 26,296 | 1926-07-01 to 2026-07-31 |
+| `3-quant-productivity-toolkit` | Best Sharpe found by searching a grid | 0.9462 | of 199 strategies tried -- a selection-bias demonstration, not a strategy |
+| `3-quant-productivity-toolkit` | Lookahead detector, forward correlation of the planted leak | 1 | caught: a feature that copies next period's return |
+| `4-risk-portfolio-saas` | Observations | 2,600 | 2016-03-30 to 2026-07-31 |
+| `4-risk-portfolio-saas` | Cornish-Fisher VaR, equal-weight | 0.01546 | vs 0.017332 Gaussian -- the tail correction is the point |
+| `4-risk-portfolio-saas` | Industries | 10 | real Fama-French returns |
+
+## What these projects decline to report, and why
+
+A metric that is absent and a metric that was deliberately withheld
+look identical to a reader. These were withheld: the real data has no
+answer key, so the number would have had no denominator. The reason is
+worth more than the number would have been.
+
+**`1-clinical-empathy-analysis` — validity**  
+MTS-Dialog is annotated for clinical note sections, not for communication quality. Correlation with clinician-assigned empathy ratings cannot be computed because no such ratings exist for these conversations.
+
+**`3-physiological-waveform-pipeline` — artifact scoring**  
+BIDMC does not annotate artifact locations, so rejection precision and recall have no answer key on this dataset
+
+**`3-physiological-waveform-pipeline` — pressure values**  
+PLETH is a photoplethysmogram, not an arterial line; a systolic pressure in mmHg is not something this signal measures
+
+**`1-contagion-observatory` — recovery**  
+the real transmission graph is unknown -- that is the question, not the answer -- so edge-recovery precision has no denominator
+
+**`2-filing-intelligence` — accuracy**  
+real filing pairs carry no human-annotated list of material changes, so there is no denominator for precision or recall
+
+**`3-private-credit-data-provenance` — accuracy**  
+nobody has annotated a real BDC schedule of investments with the values an extractor should return, so precision and recall have no denominator
+
+**`2-optimization-under-uncertainty` — staffing**  
+there is no public series of per-unit hospital staffing demand to download; a proxy would not make it a staffing study.
+
+**`3-quant-productivity-toolkit` — survivorship**  
+a survivorship audit needs the returns of the names that died, and no free source publishes point-in-time index membership with delisted constituents. A ticker that returns no data has not necessarily been delisted, so treating a fetch failure as a delisting would manufacture the very bias the check measures.
 
 ## Petition claims vs. what this portfolio can show
 
