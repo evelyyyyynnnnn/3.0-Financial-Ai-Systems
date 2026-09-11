@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio Optimization Engine</title>
+<meta name="description" content="Deep-RL portfolio agents on fourteen years of real ETF prices. They lose money, and they lose it on the data they trained on.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#FCFCFD; --surface:#FFFFFF; --surface-2:#F4F5F8;
+  --ink:#16191F; --ink-2:#40474F; --muted:#6C7480;
+  --line:#E2E5EA; --line-2:#EFF1F4;
+  --accent:#1D5B70; --accent-2:#E6F0F3;
+  --ok:#2C6B4F; --ok-bg:#E5F1EA;
+  --warn:#8A6212; --warn-bg:#F7EFDC;
+  --demo:#6E4B8F; --demo-bg:#F0EAF6;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme=light]){
+    --bg:#0F1216; --surface:#161A20; --surface-2:#1C212A;
+    --ink:#E9ECF0; --ink-2:#BEC5CE; --muted:#8A939F;
+    --line:#282F38; --line-2:#20262E;
+    --accent:#72B3CB; --accent-2:#18272E;
+    --ok:#7BC09F; --ok-bg:#15251E;
+    --warn:#D8AD5E; --warn-bg:#292216;
+    --demo:#B79AD6; --demo-bg:#241C2E;
+  }
+}
+:root[data-theme=dark]{
+  --bg:#0F1216; --surface:#161A20; --surface-2:#1C212A;
+  --ink:#E9ECF0; --ink-2:#BEC5CE; --muted:#8A939F;
+  --line:#282F38; --line-2:#20262E;
+  --accent:#72B3CB; --accent-2:#18272E;
+  --ok:#7BC09F; --ok-bg:#15251E;
+  --warn:#D8AD5E; --warn-bg:#292216;
+  --demo:#B79AD6; --demo-bg:#241C2E;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+    "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:15.5px;line-height:1.62;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px 88px}
+h1,h2,h3{font-family:Spectral,Georgia,"Songti SC",serif;margin:0;text-wrap:balance}
+h1{font-size:clamp(28px,4.2vw,42px);font-weight:700;letter-spacing:-.015em;line-height:1.14}
+h2{font-size:clamp(20px,2.5vw,25px);font-weight:600;letter-spacing:-.01em}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+a{color:var(--accent)}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.88em}
+.stack{display:flex;flex-direction:column;gap:14px}
+.stack-lg{display:flex;flex-direction:column;gap:22px}
+section{margin-top:52px}
+
+header.mast{border-bottom:1px solid var(--line);padding:44px 0 26px;margin-bottom:8px;
+  display:flex;flex-direction:column;gap:15px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--ink-2);font-size:16.5px;max-width:66ch}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;padding:3px 9px;border-radius:4px;background:var(--surface-2);
+  color:var(--muted);font-weight:500;white-space:nowrap}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}
+.tag.demo{background:var(--demo-bg);color:var(--demo)}
+.tag.warn{background:var(--warn-bg);color:var(--warn)}
+
+.banner{display:flex;gap:13px;align-items:flex-start;background:var(--demo-bg);
+  border-radius:9px;padding:15px 18px;margin-top:26px}
+.banner .bi{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--demo);flex:none;padding-top:3px;font-weight:600}
+.banner p{font-size:14.2px;color:var(--ink-2)}
+
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.metric{background:var(--surface);padding:15px 16px;display:flex;flex-direction:column;gap:5px}
+.metric .mk{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);line-height:1.35}
+.metric .mv{font-family:Spectral,Georgia,serif;font-size:26px;font-weight:600;
+  font-variant-numeric:tabular-nums;line-height:1.1;color:var(--accent)}
+.metric .mn{font-size:12.4px;color:var(--muted);line-height:1.4}
+
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.8px;min-width:520px}
+th{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);font-weight:500;padding:11px 14px;
+  border-bottom:1px solid var(--line);background:var(--surface-2)}
+td{padding:10px 14px;border-bottom:1px solid var(--line-2);vertical-align:top;line-height:1.5}
+td.n{font-variant-numeric:tabular-nums;text-align:right}
+tr:last-child td{border-bottom:0}
+
+pre{margin:0;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 17px;overflow-x:auto;font-family:"IBM Plex Mono",monospace;
+  font-size:12.8px;line-height:1.62;color:var(--ink-2)}
+ul.tight{margin:0;padding-left:19px;display:flex;flex-direction:column;gap:7px}
+ul.tight li::marker{color:var(--muted)}
+.note{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
+  padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.foot{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:9px}
+figure{margin:0}
+svg.chart{display:block;width:100%;height:auto}
+@media (max-width:600px){.wrap{padding:0 17px 68px}.banner{flex-direction:column;gap:7px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="mast">
+  <div class="eyebrow">3.0-Financial-Ai-Systems &middot; Financial Stability</div>
+  <h1>Portfolio Optimization Engine</h1>
+  <p class="lede">Deep-RL portfolio agents on fourteen years of real ETF prices. They lose money, and they lose it on the data they trained on.</p>
+  <div class="tags"><span class="tag ">real market data</span><span class="tag ">DQN / SAC</span><span class="tag ">negative result</span><span class="tag demo">in-sample</span></div>
+</header>
+<div class="banner">
+  <span class="bi">Data</span>
+  <p>Real daily OHLCV for GLD, IWM, QQQ, SPY and TLT from Yahoo Finance, 2010-2023, cached in data/market_data.pkl. The agent figures are IN-SAMPLE: the train/test split was declared in the config and read by no code, so the environment served the whole series to both training and evaluation. The split is now honoured; the agents have not yet been retrained under it.</p>
+</div>
+<div class="metrics"><div class="metric"><span class="mk">Best agent Sharpe</span><span class="mv">-0.353</span><span class="mn">in-sample</span></div><div class="metric"><span class="mk">Buy-and-hold SPY Sharpe</span><span class="mv">+0.673</span><span class="mn">same period, same formula</span></div><div class="metric"><span class="mk">Agent total return</span><span class="mv">-13.7%</span><span class="mn">in-sample</span></div><div class="metric"><span class="mk">Buy-and-hold total return</span><span class="mv">+446%</span><span class="mn">the thing they had to beat</span></div></div>
+
+<section>
+  <h2>The result</h2>
+  <p>Both agents lose money. A buy-and-hold position in SPY over the same fourteen
+  years returned <strong>+446%</strong> at a Sharpe of +0.67; the better of the two
+  agents returned <strong>&minus;14%</strong> at a Sharpe of &minus;0.35. Rebalancing
+  daily to equal weights &mdash; a strategy with no model in it at all &mdash; beat
+  both by a wider margin still.</p>
+  <p>This is reported because it is what the run produced. Deep reinforcement
+  learning is not obviously the right tool for asset allocation, and a portfolio of
+  projects in which every method works is not a portfolio anyone should believe.</p>
+</section>
+
+<div class="tw"><table><thead><tr><th>Strategy</th><th>Sharpe</th><th>Sortino</th><th>Total return</th><th>Max drawdown</th></tr></thead><tbody><tr><td>DQN  (in-sample)</td><td class="n">-0.353</td><td class="n">-0.454</td><td class="n">-0.137</td><td class="n">-0.275</td></tr><tr><td>SAC  (in-sample)</td><td class="n">-0.471</td><td class="n">-0.602</td><td class="n">-0.185</td><td class="n">-0.402</td></tr><tr><td>buy-and-hold SPY</td><td class="n">+0.673</td><td class="n">+0.826</td><td class="n">+4.455</td><td class="n">-0.337</td></tr><tr><td>equal-weight, rebalanced daily</td><td class="n">+0.754</td><td class="n">+0.978</td><td class="n">+3.121</td><td class="n">-0.255</td></tr></tbody></table></div>
+
+<section>
+  <h2>Why the agent numbers are worse than they look</h2>
+  <p>They are <strong>in-sample</strong>. The configuration declared</p>
+  <pre><code>data:
+  train_test_split: 0.8</code></pre>
+  <p>in all three YAML files, and no code anywhere read it. <code>PortfolioEnv</code>
+  loaded the entire 2010&ndash;2023 series, and <code>evaluate()</code> built the same
+  environment from the same config &mdash; so the agents were scored on the data they
+  were trained on. Losing money on your own training data is a stronger negative
+  result than losing it out of sample.</p>
+  <p>The environment now takes <code>split="train"</code> / <code>"test"</code>,
+  <code>evaluate()</code> defaults to the held-out slice, and
+  <code>tests/test_split_is_honoured.py</code> fails if a config declares a split
+  the code does not read. The agents have not been retrained under the fix.</p>
+</section>
+
+<section>
+  <h2>The baseline was an assertion until now</h2>
+  <p>The committed result said both agents &ldquo;underperform a buy-and-hold
+  baseline&rdquo;. No buy-and-hold figure existed anywhere in the repository, so
+  nothing had been compared. <code>src/baselines.py</code> now computes two passive
+  strategies over the train, test and full windows, importing the <em>same</em>
+  metric functions <code>main.py</code> scores the agents with &mdash; a baseline
+  measured with a different Sharpe formula would not be a comparison.</p>
+</section>
+
+<div class="tw"><table><thead><tr><th>Strategy, held-out window only</th><th>Sharpe</th><th>Sortino</th><th>Total return</th><th>Max drawdown</th></tr></thead><tbody><tr><td>buy-and-hold SPY</td><td class="n">+0.433</td><td class="n">+0.627</td><td class="n">+0.253</td><td class="n">-0.245</td></tr><tr><td>equal-weight, rebalanced daily</td><td class="n">+0.143</td><td class="n">+0.217</td><td class="n">+0.088</td><td class="n">-0.255</td></tr></tbody></table></div>
+
+<section>
+  <p class="note">The held-out window is what a retrained agent will have to beat.
+  No agent figure exists for it yet.</p>
+</section>
+
+
+<section>
+  <h2>What this project does <em>not</em> establish</h2>
+  <ul>
+    <li>It does not establish that deep RL cannot allocate a portfolio. Two
+    architectures, one asset universe, one period, one hyperparameter setting.</li>
+    <li>It does not establish an out-of-sample result of any kind. The agents have
+    never been evaluated on held-out data.</li>
+    <li>The passive baselines are not a strategy recommendation; they are the floor
+    a method has to clear before it is worth discussing.</li>
+  </ul>
+  <p class="note">Reproduce the baselines: <code>python -m src.baselines</code>.
+  Rebuild this page: <code>python -m src.site</code>. Retrain:
+  <code>python src/main.py --config src/config/sb3_dqn.yaml</code> (needs
+  stable-baselines3 and PyTorch).</p>
+</section>
+
+<div class="foot">
+  <p>3.0-Financial-Ai-Systems &middot; portfolio-optimization-engine &middot; part of a five-repository portfolio on optimization-driven,
+     system-level decision frameworks.</p>
+  <p>Every figure on this page was produced by running <code>python -m src.demo</code> in this
+     project and reading <code>results.json</code>. Nothing here is hand-entered. The run used clearly-labelled synthetic data; swap in the real source and the same pipeline reports real numbers.</p>
+</div>
+</div>
+</body>
+</html>

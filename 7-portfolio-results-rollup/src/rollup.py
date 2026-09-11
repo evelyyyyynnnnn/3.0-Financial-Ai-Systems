@@ -144,11 +144,13 @@ EXTRACTORS = {
     ],
     "portfolio-optimization-engine": lambda d: [
         ("DQN Sharpe", _get(d, "agents", "dqn", "sharpe_ratio"),
-         "real ETF data 2010-2023"),
+         "IN-SAMPLE -- the declared train/test split was read by no code"),
         ("SAC Sharpe", _get(d, "agents", "sac", "sharpe_ratio"),
-         "negative -- the RL agents underperform buy-and-hold, reported as measured"),
-        ("Assets", len((d.get("provenance", {}) or {}).get("tickers") or []) or None,
-         "real ETFs via yfinance"),
+         "in-sample; both agents lose money on their own training data"),
+        ("Buy-and-hold SPY Sharpe, same period",
+         _get(d, "baselines", "full", "buy-and-hold SPY", "sharpe_ratio"),
+         f"total return {_get(d, 'baselines', 'full', 'buy-and-hold SPY', 'total_return')}"
+         " -- the baseline the agents were said to underperform, now computed"),
     ],
     "optimization-under-uncertainty": lambda d: [
         ("Out-of-sample optimism, deterministic",

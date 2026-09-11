@@ -235,19 +235,43 @@ class MarketDataLoader:
         features = features.ffill().bfill()
         volatility = volatility.ffill().bfill()
         
-        # Scale features if required
+        # Scale features if required.
+        #
+        # The scaler is fitted ONLY on the rows the training split can see. It
+        # used to be fitted on the whole series, which put the test period's
+        # minimum and maximum into every training feature -- a lookahead leak,
+        # and a large one: shifting only the last 10% of the series moved the
+        # training tensor by 0.99 on a [0, 1] scale. tests/test_no_lookahead.py
+        # pins this.
         if self.config.scale_features:
+            fit_rows = self._train_row_count(len(features))
+            self.scaler.fit(features.iloc[:fit_rows])
             features = pd.DataFrame(
-                self.scaler.fit_transform(features),
+                self.scaler.transform(features),
                 columns=features.columns,
                 index=features.index
             )
+            self.scaler_fitted_on_rows = fit_rows
         
         # Create sequences
         X, y = self._create_sequences(features, volatility)
         
         self.processed_data = (X, y)
         return X, y
+
+    def _train_row_count(self, n_rows: int) -> int:
+        """How many leading rows the training split is allowed to look at.
+
+        Sequence i spans feature rows i .. i+window_size-1 and predicts the
+        target at row i+window_size, so the last training sequence
+        (i = train_size-1) reaches row train_size + window_size - 1. Anything
+        beyond that row belongs to validation or test and must not inform a
+        statistic used to transform the training data.
+        """
+        ws = self.config.window_size
+        n_sequences = max(n_rows - ws, 0)
+        train_size = int(n_sequences * self.config.train_ratio)
+        return min(train_size + ws, n_rows)
 
     def _log_missing_values(self, data: pd.DataFrame, context: str):
         """Log warnings for missing values in the provided dataframe."""
