@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-09T19:31:10+00:00",
+  "generated_at": "2026-09-11T13:11:52+00:00",
   "is_synthetic": true,
   "data_source": "each project's own results/latest.json",
   "summary": {
@@ -9,7 +9,7 @@
     "n_synthetic_data": 3,
     "n_real_data": 19,
     "n_with_site": 20,
-    "total_tests": 617,
+    "total_tests": 626,
     "repos": [
       "1.0-Secure-Ai-Agent-Infrastructure",
       "2.0-Healthcare-Ai-Systems",
@@ -52,8 +52,8 @@
       "has_results": true,
       "generated_at": "2026-09-06T23:54:22+00:00",
       "is_synthetic": false,
-      "data_source": "/Users/evelyndu/Desktop/Github-Website/1.0-Secure-Ai-Agent-Infrastructure/chaintrust-bench/data/real-corpus.jsonl",
-      "n_tests": 27,
+      "data_source": "SmartBugs curated corpus (annotated by its own authors), normalised into data/real-corpus.jsonl",
+      "n_tests": 30,
       "has_site": true,
       "headline": [
         {
@@ -69,7 +69,7 @@
       "has_results": true,
       "generated_at": "2026-09-01T22:18:55+00:00",
       "is_synthetic": false,
-      "data_source": "",
+      "data_source": "SmartBugs curated, via real-corpus.jsonl in chaintrust-bench",
       "n_tests": 18,
       "has_site": true,
       "headline": [
@@ -135,7 +135,7 @@
       "generated_at": "2026-09-06T23:56:50+00:00",
       "is_synthetic": false,
       "data_source": "PhysioNet BIDMC PPG and Respiration Dataset (open access); see data/MANIFEST.json for file hashes and retrieval times",
-      "n_tests": 31,
+      "n_tests": 33,
       "has_site": true,
       "headline": []
     },
@@ -275,10 +275,10 @@
       "repo": "3.0-Financial-Ai-Systems",
       "project": "7-portfolio-results-rollup",
       "has_results": true,
-      "generated_at": "2026-09-09T19:30:48+00:00",
+      "generated_at": "2026-09-11T13:10:55+00:00",
       "is_synthetic": true,
       "data_source": "each project's own results/latest.json",
-      "n_tests": 11,
+      "n_tests": 15,
       "has_site": true,
       "headline": []
     },
