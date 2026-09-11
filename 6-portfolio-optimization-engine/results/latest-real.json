@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-09T19:06:34+00:00",
+  "generated_at": "2026-09-11T22:41:21+00:00",
   "is_synthetic": false,
   "data_source": "real daily OHLCV for GLD, IWM, QQQ, SPY, TLT via Yahoo Finance (yfinance), 2010-01-04 to 2023-12-29 (3522 trading days); cached in data/market_data.pkl",
   "provenance": {
@@ -31,5 +31,74 @@
       "total_return": -0.18507019344572495
     }
   },
-  "note": "Deep-RL portfolio agents (DQN, SAC) trained and evaluated on real market data. Both underperform a buy-and-hold baseline over this period (negative Sharpe); the figures are reported as measured, not tuned to look favourable."
+  "agents_are_in_sample": true,
+  "agents_in_sample_because": "config['data']['train_test_split'] was declared in every YAML config and read by no code, so PortfolioEnv loaded the whole 2010-2023 series and evaluate() built the same environment. These figures are therefore training-set scores, not held-out evaluation. The environment now takes split='train'/'test' and evaluate() defaults to 'test'; the agents must be retrained and re-evaluated before any number here is described as out-of-sample.",
+  "baselines": {
+    "train": {
+      "buy-and-hold SPY": {
+        "sharpe_ratio": 0.731129087638168,
+        "sortino_ratio": 0.8655220774524899,
+        "calmar_ratio": 0.41456732271918484,
+        "max_drawdown": -0.3371726811476648,
+        "total_return": 3.326174028070498
+      },
+      "equal-weight, rebalanced daily": {
+        "sharpe_ratio": 0.9451223974692907,
+        "sortino_ratio": 1.1812696510548053,
+        "calmar_ratio": 0.5972255387291524,
+        "max_drawdown": -0.21069179518099487,
+        "total_return": 2.7635998084992903
+      }
+    },
+    "test": {
+      "buy-and-hold SPY": {
+        "sharpe_ratio": 0.43292005151397683,
+        "sortino_ratio": 0.6269221784726212,
+        "calmar_ratio": 0.34587031067427754,
+        "max_drawdown": -0.24496388981682263,
+        "total_return": 0.25349718561674317
+      },
+      "equal-weight, rebalanced daily": {
+        "sharpe_ratio": 0.14348004866181777,
+        "sortino_ratio": 0.21716197783758062,
+        "calmar_ratio": 0.12486630951442007,
+        "max_drawdown": -0.25547937177044444,
+        "total_return": 0.08828714276771876
+      }
+    },
+    "full": {
+      "buy-and-hold SPY": {
+        "sharpe_ratio": 0.6725426917051445,
+        "sortino_ratio": 0.8255741298857731,
+        "calmar_ratio": 0.3822676922234574,
+        "max_drawdown": -0.3371726811476648,
+        "total_return": 4.455186632973433
+      },
+      "equal-weight, rebalanced daily": {
+        "sharpe_ratio": 0.7535678724234524,
+        "sortino_ratio": 0.9775452116240049,
+        "calmar_ratio": 0.4172018039909822,
+        "max_drawdown": -0.255479371770443,
+        "total_return": 3.1208420661966594
+      }
+    }
+  },
+  "baseline_windows": {
+    "train": {
+      "first_date": "2010-01-04",
+      "last_date": "2021-03-12",
+      "n_days": 2817
+    },
+    "test": {
+      "first_date": "2021-03-15",
+      "last_date": "2023-12-29",
+      "n_days": 705
+    },
+    "full": {
+      "first_date": "2010-01-04",
+      "last_date": "2023-12-29",
+      "n_days": 3522
+    }
+  },
+  "note": "Deep-RL portfolio agents (DQN, SAC) trained and evaluated on real market data. Both lose money in-sample while buy-and-hold SPY returned +446% over the same period; the figures are reported as measured, not tuned to look favourable. The comparison is now computed in src/baselines.py rather than asserted in prose."
 }

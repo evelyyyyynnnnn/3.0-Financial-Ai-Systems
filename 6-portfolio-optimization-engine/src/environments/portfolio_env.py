@@ -13,10 +13,20 @@ class PortfolioEnv(gym.Env):
     A custom OpenAI Gym environment for portfolio optimization using reinforcement learning.
     """
     
-    def __init__(self, config: Dict):
+    def __init__(self, config, split: str = "all"):
         super().__init__()
         
         self.config = config
+        # Which slice of history this environment is allowed to see.
+        #
+        # config['data']['train_test_split'] was declared in all three YAML
+        # configs and read by nothing: every environment loaded the whole
+        # 2010-2023 series, so evaluate() scored the agents on the data they
+        # were trained on. Passing split="test" is what makes an evaluation
+        # held out. "all" reproduces the old behaviour and says so.
+        if split not in ("all", "train", "test"):
+            raise ValueError(f"split must be 'all', 'train' or 'test', not {split!r}")
+        self.split = split
         self.window_size = config['market_environment']['window_size']
         self.assets = config['market_environment']['assets']
         self.n_assets = len(self.assets)
@@ -100,8 +110,36 @@ class PortfolioEnv(gym.Env):
         )
         self.data = self.data.loc[self.returns.index]
         
+        self._apply_split()
+
         # Set the current step to the beginning of the data
         self.current_step = self.window_size
+
+    def _apply_split(self):
+        """Keep only the part of history this environment may see.
+
+        Indicators are computed on the full series first, then sliced: every
+        indicator here is backward-looking, so this gives the test window its
+        warm-up without letting it see its own future.
+        """
+        if self.split == "all":
+            self.split_window = {"split": "all", "n_days": int(len(self.returns)),
+                                 "first_date": str(self.returns.index[0])[:10],
+                                 "last_date": str(self.returns.index[-1])[:10]}
+            return
+
+        ratio = float(self.config["data"].get("train_test_split", 0.8))
+        cut = int(len(self.returns) * ratio)
+        if self.split == "train":
+            keep = self.returns.index[:cut]
+        else:
+            keep = self.returns.index[cut:]
+
+        self.returns = self.returns.loc[keep]
+        self.data = self.data.loc[keep]
+        self.split_window = {"split": self.split, "n_days": int(len(keep)),
+                             "first_date": str(keep[0])[:10],
+                             "last_date": str(keep[-1])[:10]}
         
     def _calculate_technical_indicators(self):
         """Calculate technical indicators for each asset."""

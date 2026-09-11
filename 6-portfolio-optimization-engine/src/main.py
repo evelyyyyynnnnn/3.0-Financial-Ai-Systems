@@ -7,6 +7,12 @@ from datetime import datetime, timezone
 from typing import Dict, Optional
 
 from environments.portfolio_env import PortfolioEnv
+try:                                    # run as `python -m src.main`
+    from .metrics import (calculate_calmar_ratio, calculate_max_drawdown,
+                          calculate_sharpe_ratio, calculate_sortino_ratio)
+except ImportError:                     # run with src/ on sys.path
+    from metrics import (calculate_calmar_ratio, calculate_max_drawdown,
+                         calculate_sharpe_ratio, calculate_sortino_ratio)
 from environments.wrappers import DiscreteActionWrapper
 from agents.ppo_agent import PPOAgent
 from agents.sb3_agent import SB3Agent, SB3AgentConfig
@@ -40,9 +46,14 @@ def log_training_snapshot(algorithm: str, timestep: int, metrics: Dict):
     with open(log_path, 'a') as f:
         f.write(json.dumps(record) + '\n')
 
-def make_env(config: Dict, algorithm: str):
-    """Instantiate the portfolio environment with optional wrappers."""
-    env = PortfolioEnv(config)
+def make_env(config: Dict, algorithm: str, split: str = "all"):
+    """Instantiate the portfolio environment with optional wrappers.
+
+    `split` decides which slice of history the environment may see. Training
+    should pass "train" and evaluation "test"; "all" is the pre-split behaviour
+    and produces an in-sample score, not an evaluation.
+    """
+    env = PortfolioEnv(config, split=split)
     if algorithm.lower() == 'dqn':
         env = DiscreteActionWrapper.from_config(env, config['agent'])
     return env
@@ -55,7 +66,7 @@ def train(config: Dict):
     model_prefix = f"models/{algorithm.lower()}"
     
     if library == 'custom' and algorithm.upper() == 'PPO':
-        env = make_env(config, algorithm)
+        env = make_env(config, algorithm, split="train")
         state_dim = env.observation_space.shape
         action_dim = env.action_space.shape[0]
         agent = PPOAgent(state_dim, action_dim, config)
@@ -139,8 +150,8 @@ def train(config: Dict):
             log_training_snapshot(algorithm, total_timesteps, snapshot)
         agent.save_weights(f'{model_prefix}_final')
     else:
-        env = make_env(config, algorithm)
-        eval_env = make_env(config, algorithm)
+        env = make_env(config, algorithm, split="train")
+        eval_env = make_env(config, algorithm, split="train")
         sb3_config = SB3AgentConfig(
             algorithm=algorithm,
             policy=config['agent'].get('policy', 'MlpPolicy'),
@@ -148,7 +159,7 @@ def train(config: Dict):
         )
         agent = SB3Agent(env, eval_env, sb3_config)
         agent.train(total_timesteps=total_timesteps)
-        eval_rollout_env = make_env(config, algorithm)
+        eval_rollout_env = make_env(config, algorithm, split="train")
         observation, _ = eval_rollout_env.reset()
         done = False
         portfolio_values = []
@@ -172,13 +183,17 @@ def train(config: Dict):
             log_training_snapshot(algorithm, total_timesteps, snapshot)
         agent.save(f'{model_prefix}_sb3')
 
-def evaluate(config: Dict, model_path: str):
-    """Evaluate a trained agent."""
+def evaluate(config: Dict, model_path: str, eval_split: str = "test"):
+    """Evaluate a trained agent on held-out history.
+
+    Defaults to the test slice. Passing "all" reproduces the in-sample score
+    the committed results/dqn_evaluation.json and sac_evaluation.json carry.
+    """
     algorithm = config['agent']['algorithm']
     library = config['agent'].get('library', 'custom').lower()
     visualizer = PortfolioVisualizer(config)
 
-    env = make_env(config, algorithm)
+    env = make_env(config, algorithm, split=eval_split)
 
     if library == 'custom' and algorithm.upper() == 'PPO':
         state_dim = env.observation_space.shape
@@ -203,7 +218,7 @@ def evaluate(config: Dict, model_path: str):
             dates.append(info.get('date', datetime.now()))
             state = next_state
     else:
-        eval_env = make_env(config, algorithm)
+        eval_env = make_env(config, algorithm, split=eval_split)
         sb3_config = SB3AgentConfig(
             algorithm=algorithm,
             policy=config['agent'].get('policy', 'MlpPolicy'),
@@ -275,50 +290,6 @@ def evaluate(config: Dict, model_path: str):
             indent=2
         )
     print(f"Saved evaluation metrics to {results_path}")
-
-def calculate_sharpe_ratio(returns: np.ndarray, risk_free_rate: float = 0.02) -> float:
-    """Calculate the Sharpe ratio."""
-    if returns.size == 0:
-        return 0.0
-    excess_returns = returns - risk_free_rate / 252
-    std = np.std(excess_returns)
-    if std < 1e-8:
-        return 0.0
-    return np.sqrt(252) * np.mean(excess_returns) / std
-
-def calculate_sortino_ratio(returns: np.ndarray, risk_free_rate: float = 0.02) -> float:
-    """Calculate the Sortino ratio."""
-    if returns.size == 0:
-        return 0.0
-    excess_returns = returns - risk_free_rate / 252
-    downside_returns = excess_returns[excess_returns < 0]
-    if downside_returns.size == 0:
-        return 0.0
-    std = np.std(downside_returns)
-    if std < 1e-8:
-        return 0.0
-    return np.sqrt(252) * np.mean(excess_returns) / std
-
-def calculate_calmar_ratio(returns: np.ndarray) -> float:
-    """Calculate the Calmar ratio."""
-    if returns.size == 0:
-        return 0.0
-    cumulative_returns = np.cumprod(1 + returns)
-    max_drawdown = calculate_max_drawdown(cumulative_returns)
-    if len(cumulative_returns) < 2:
-        return 0.0
-    annual_return = (cumulative_returns[-1] / cumulative_returns[0]) ** (252 / len(returns)) - 1
-    if np.isclose(max_drawdown, 0.0):
-        return 0.0
-    return annual_return / abs(max_drawdown)
-
-def calculate_max_drawdown(values: np.ndarray) -> float:
-    """Calculate the maximum drawdown."""
-    if values.size == 0:
-        return 0.0
-    peak = np.maximum.accumulate(values)
-    drawdown = (values - peak) / peak
-    return np.min(drawdown)
 
 def calculate_var(returns: np.ndarray, confidence: float = 0.95) -> float:
     """Calculate Value at Risk."""

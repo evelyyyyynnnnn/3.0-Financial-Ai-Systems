@@ -1,27 +1,31 @@
 {
-  "generated_at": "2026-09-09T19:30:14+00:00",
-  "is_synthetic": false,
-  "data_source": "real daily prices for ^GSPC via Yahoo Finance (yfinance), 2010-01-01 to 2023-12-31; target is realised volatility (close_to_close)",
-  "model_type": "lstm",
-  "num_epochs": 20,
-  "metrics": {
-    "train": {
-      "mse": 0.0005855510668195985,
-      "rmse": 0.02419816246783211,
-      "mae": 0.016518912891566682,
-      "r2": 0.8776593414994581
-    },
-    "val": {
-      "mse": 0.0020911282234887217,
-      "rmse": 0.045728855479759405,
-      "mae": 0.03012945027895264,
-      "r2": 0.9312256286683236
-    },
-    "test": {
-      "mse": 0.0017036671484719705,
-      "rmse": 0.04127550300689224,
-      "mae": 0.030872780527995348,
-      "r2": 0.6114954882644845
-    }
+ "generated_at": "2026-09-09T19:30:14+00:00",
+ "is_synthetic": false,
+ "data_source": "real daily prices for ^GSPC via Yahoo Finance (yfinance), 2010-01-01 to 2023-12-31; target is realised volatility (close_to_close)",
+ "model_type": "lstm",
+ "num_epochs": 20,
+ "metrics_reported": false,
+ "metrics_withheld_because": "this run predates the lookahead fix in LSTM-Volatility-Prediction/data/data_loader.py. The feature scaler was fitted with fit_transform over the whole 2010-2023 series, so the test period's minimum and maximum were inside every training feature; shifting only the last 10% of the series moved the training tensor by 0.99 on a [0, 1] scale. An R2 measured that way is not evidence about held-out performance. The model has to be retrained on the fixed pipeline before any figure here is quoted; the superseded numbers are kept below as a record of what was run, not as a result.",
+ "superseded_metrics": {
+  "train": {
+   "mse": 0.0005855510668195985,
+   "rmse": 0.02419816246783211,
+   "mae": 0.016518912891566682,
+   "r2": 0.8776593414994581
+  },
+  "val": {
+   "mse": 0.0020911282234887217,
+   "rmse": 0.045728855479759405,
+   "mae": 0.03012945027895264,
+   "r2": 0.9312256286683236
+  },
+  "test": {
+   "mse": 0.0017036671484719705,
+   "rmse": 0.04127550300689224,
+   "mae": 0.030872780527995348,
+   "r2": 0.6114954882644845
   }
+ },
+ "superseded_metrics_note": "produced 2026-09-09 by the leaky pipeline. Note the shape that should have prompted the question: validation R2 (0.931) exceeded training R2 (0.878) and both far exceeded test R2 (0.611).",
+ "rerun_command": "python -m src.demo   # needs TensorFlow and network access to Yahoo Finance"
 }

@@ -1,0 +1,77 @@
+{
+  "data_source": "the project's own cached real download, data/market_data.pkl",
+  "tickers": [
+    "GLD",
+    "IWM",
+    "QQQ",
+    "SPY",
+    "TLT"
+  ],
+  "train_test_split": 0.8,
+  "metric_definitions": "imported from src/metrics.py, the same functions main.py scores the agents with",
+  "windows": {
+    "train": {
+      "first_date": "2010-01-04",
+      "last_date": "2021-03-12",
+      "n_days": 2817,
+      "baselines": {
+        "buy-and-hold SPY": {
+          "sharpe_ratio": 0.731129087638168,
+          "sortino_ratio": 0.8655220774524899,
+          "calmar_ratio": 0.41456732271918484,
+          "max_drawdown": -0.3371726811476648,
+          "total_return": 3.326174028070498
+        },
+        "equal-weight, rebalanced daily": {
+          "sharpe_ratio": 0.9451223974692907,
+          "sortino_ratio": 1.1812696510548053,
+          "calmar_ratio": 0.5972255387291524,
+          "max_drawdown": -0.21069179518099487,
+          "total_return": 2.7635998084992903
+        }
+      }
+    },
+    "test": {
+      "first_date": "2021-03-15",
+      "last_date": "2023-12-29",
+      "n_days": 705,
+      "baselines": {
+        "buy-and-hold SPY": {
+          "sharpe_ratio": 0.43292005151397683,
+          "sortino_ratio": 0.6269221784726212,
+          "calmar_ratio": 0.34587031067427754,
+          "max_drawdown": -0.24496388981682263,
+          "total_return": 0.25349718561674317
+        },
+        "equal-weight, rebalanced daily": {
+          "sharpe_ratio": 0.14348004866181777,
+          "sortino_ratio": 0.21716197783758062,
+          "calmar_ratio": 0.12486630951442007,
+          "max_drawdown": -0.25547937177044444,
+          "total_return": 0.08828714276771876
+        }
+      }
+    },
+    "full": {
+      "first_date": "2010-01-04",
+      "last_date": "2023-12-29",
+      "n_days": 3522,
+      "baselines": {
+        "buy-and-hold SPY": {
+          "sharpe_ratio": 0.6725426917051445,
+          "sortino_ratio": 0.8255741298857731,
+          "calmar_ratio": 0.3822676922234574,
+          "max_drawdown": -0.3371726811476648,
+          "total_return": 4.455186632973433
+        },
+        "equal-weight, rebalanced daily": {
+          "sharpe_ratio": 0.7535678724234524,
+          "sortino_ratio": 0.9775452116240049,
+          "calmar_ratio": 0.4172018039909822,
+          "max_drawdown": -0.255479371770443,
+          "total_return": 3.1208420661966594
+        }
+      }
+    }
+  }
+}
