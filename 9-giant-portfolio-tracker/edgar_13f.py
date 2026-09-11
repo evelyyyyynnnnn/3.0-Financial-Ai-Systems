@@ -403,7 +403,7 @@ def prior_shares(rows: list[dict], select_key: str, before: str) -> dict[str, fl
         props = page.get("properties", {})
         if prop_text(props, "Investor/Institution") != select_key:
             continue
-        date_prop = (props.get("Report Date") or {}).get("date") or {}
+        date_prop = (props.get("Date") or {}).get("date") or {}
         start = date_prop.get("start")
         if start and start < before:
             dated.setdefault(start, []).append(props)
@@ -425,7 +425,7 @@ def create_holding(row: dict, select_key: str, headers: dict) -> None:
         "Shares": {"number": row["shares"]},
         "Value": {"number": row["value"]},
         "Reported Price": {"number": row["price"]},
-        "Report Date": {"date": {"start": row["report_date"]}},
+        "Date": {"date": {"start": row["report_date"]}},
     }
     if row["change_pct"] is not None:
         props["Change %"] = {
@@ -498,7 +498,7 @@ def main() -> int:
             p
             for p in holdings
             if prop_text(p.get("properties", {}), "Investor/Institution") == entry["select_key"]
-            and ((p.get("properties", {}).get("Report Date") or {}).get("date") or {}).get("start")
+            and ((p.get("properties", {}).get("Date") or {}).get("date") or {}).get("start")
             == filing.period
         ]
         if already:

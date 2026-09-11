@@ -25,6 +25,9 @@
     --neg: #B8402A;
     --neg-soft: #FBEBE7;
     --radius: 10px;
+    /* Height of the sticky page header. Set from JS on load and on resize:
+       the controls row wraps at narrow widths, so this is not a constant. */
+    --header-h: 113px;
     --shadow: 0 1px 2px rgba(16,22,31,0.04), 0 1px 1px rgba(16,22,31,0.03);
   }
   *{box-sizing:border-box;}
@@ -143,7 +146,7 @@
   table.hold-table{ width:100%; border-collapse:collapse; font-size:12.8px; }
   table.hold-table th{
     text-align:left; padding:8px 12px; font-size:10.5px; text-transform:uppercase; letter-spacing:0.04em;
-    color:var(--muted); font-weight:500; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--surface-2);
+    color:var(--muted); font-weight:500; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--surface-2); z-index:2;
   }
   table.hold-table td{ padding:7px 12px; border-bottom:1px solid var(--border); color:var(--ink-soft); }
   table.hold-table tr:last-child td{ border-bottom:none; }
@@ -157,12 +160,22 @@
   .chg.flat{ color:var(--muted); }
 
   /* ---------- Top holdings table ---------- */
-  .th-panel{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden;}
+  .th-panel{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    /* `hidden` here made this panel the nearest scrollport, which silently
+       disabled position:sticky on the table header below - it scrolled away
+       with the page instead of pinning. `clip` still clips to the rounded
+       corners but creates no scroll container, so sticky works. The `hidden`
+       first line is the fallback for browsers without `clip`. */
+    overflow:hidden;
+    overflow:clip;
+  }
   table.rank-table{ width:100%; border-collapse:collapse; font-size:13.5px;}
   table.rank-table thead th{
     text-align:left; padding:12px 16px; background:var(--surface-2); border-bottom:1px solid var(--border);
     font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); font-weight:500;
-    position:sticky; top:113px;
+    position:sticky; top:var(--header-h); z-index:5;
   }
   table.rank-table tbody tr{ cursor:pointer; }
   table.rank-table tbody tr:hover{ background:var(--accent-soft); }
@@ -444,7 +457,20 @@ function renderAll(){
   if(activeTab==='investors') renderInvestors(); else renderHoldings();
 }
 
+function trackHeaderHeight(){
+  const header = document.querySelector('header.top');
+  if(!header) return;
+  const apply = () => document.documentElement.style.setProperty(
+    '--header-h', header.offsetHeight + 'px');
+  apply();
+  // The header grows when the controls row wraps, which depends on width and
+  // on the font once it loads - so watch it rather than measuring only once.
+  if(window.ResizeObserver) new ResizeObserver(apply).observe(header);
+  else window.addEventListener('resize', apply);
+}
+
 function init(){
+  trackHeaderHeight();
   document.getElementById('tabSwitch').addEventListener('click', e=>{
     const btn = e.target.closest('button');
     if(!btn) return;

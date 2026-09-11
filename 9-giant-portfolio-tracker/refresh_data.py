@@ -92,7 +92,7 @@ def _query_all_pages(token, data_source_id):
 
 
 def latest_quarter_only(rows):
-    """Keep each investor's most recent Report Date and drop older quarters.
+    """Keep each investor's most recent Date and drop older quarters.
 
     The database keeps history - every quarter appends a fresh set of rows - but
     the site shows one snapshot. Without this filter a fund that has filed twice
@@ -107,7 +107,7 @@ def latest_quarter_only(rows):
     for r in rows:
         d = r.get("report_date", "")
         inv = r["investor"]
-        # `not in` rather than a default of "": rows predating the Report Date
+        # `not in` rather than a default of "": rows predating the Date
         # column have d == "", and comparing "" > "" would leave the investor
         # out of the map entirely and blow up the lookup below. Every row in the
         # database is in exactly that state until the backfill has run.
@@ -129,7 +129,7 @@ def fetch_all_rows(token):
             "value": prop_number(props, "Value"),
             "price": prop_number(props, "Reported Price"),
             "chg": prop_text(props, "Change %"),
-            "report_date": prop_date(props, "Report Date"),
+            "report_date": prop_date(props, "Date"),
         }
         if row["investor"] and row["company"]:
             rows.append(row)
