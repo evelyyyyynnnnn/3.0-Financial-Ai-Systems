@@ -141,3 +141,88 @@ def test_a_nested_corpus_object_still_yields_its_name():
 
     assert _source_of({"corpus": {"name": "SmartBugs curated"}}) \
         == "SmartBugs curated"
+
+
+# --- a withheld metric must not read as a missing one -------------------------
+
+def test_withheld_reads_both_spellings_projects_use():
+    from src.rollup import withheld
+
+    got = withheld({
+        "recovery_withheld_because": "the real graph is unknown",
+        "pressure_values_suppressed_because": "PLETH is not an arterial line",
+    })
+
+    assert got == [("pressure values", "PLETH is not an arterial line"),
+                   ("recovery", "the real graph is unknown")]
+
+
+def test_withheld_ignores_blank_and_non_string_reasons():
+    from src.rollup import withheld
+
+    assert withheld({"x_withheld_because": "   "}) == []
+    assert withheld({"x_withheld_because": None}) == []
+    assert withheld({"reported": True, "n": 3}) == []
+
+
+# --- an extractor that breaks must say so, not report silence -----------------
+
+def test_a_broken_extractor_reports_the_error_instead_of_nothing(monkeypatch):
+    from src import rollup
+
+    def explode(_payload):
+        raise KeyError("moved")
+
+    monkeypatch.setitem(rollup.EXTRACTORS, "made-up-project", explode)
+    figures, err = rollup.headline_with_error("made-up-project", {"a": 1})
+
+    assert figures == []
+    assert err is not None and "KeyError" in err
+
+
+def test_a_healthy_extractor_reports_no_error():
+    from src.rollup import headline_with_error
+
+    figures, err = headline_with_error(
+        "1-data-provenance-library",
+        {"companies": [{"ticker": "AAPL"}], "failures": [],
+         "package": {"name": "spanlineage", "exports": 12}})
+
+    assert err is None
+    assert ("Package exports", 12, "spanlineage, not published") in figures
+
+
+def test_get_walks_into_lists_by_index():
+    from src.rollup import _get
+
+    payload = {"lookahead": {"cases": [{"max_forward_corr": 1.0}]}}
+
+    assert _get(payload, "lookahead", "cases", 0, "max_forward_corr") == 1.0
+    assert _get(payload, "lookahead", "cases", 9, "max_forward_corr") is None
+
+
+# --- the property that made this worth doing ---------------------------------
+
+def test_no_project_with_a_real_run_is_silent_without_saying_why():
+    """A blank row reads as 'measured nothing'. Four real-data projects were
+    blank only because their results changed shape. Each project must now show
+    a figure or state what it withheld -- except the roll-up, which measures
+    nothing of its own and says so."""
+    import pathlib
+    import pytest
+    from src.collect import PORTFOLIO_ROOT, discover
+    from src.rollup import headline_with_error, withheld
+
+    if not (PORTFOLIO_ROOT / "1.0-Secure-Ai-Agent-Infrastructure").is_dir():
+        pytest.skip("the sibling repositories are not checked out here")
+
+    silent = []
+    for p in discover():
+        if not p.has_results or p.project.endswith("portfolio-results-rollup"):
+            continue
+        figures, err = headline_with_error(p.project, p.payload)
+        assert err is None, f"{p.project}: {err}"
+        if not figures and not withheld(p.payload):
+            silent.append(p.project)
+
+    assert silent == [], f"no figure and no stated reason: {silent}"
