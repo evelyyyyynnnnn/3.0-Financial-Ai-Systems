@@ -4,6 +4,7 @@ import json, pathlib, sys
 from datetime import datetime, timezone
 from .collect import discover
 from .rollup import headline, portfolio_summary
+from .report import render as render_readme
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
@@ -75,6 +76,10 @@ def run() -> dict:
     (ROOT / "results").mkdir(exist_ok=True)
     (ROOT / "results" / "latest.json").write_text(
         json.dumps(results, indent=2) + "\n", encoding="utf8")
+    # results/README.md is the file ground rule 1 points a reader at, so it
+    # is written from this run rather than maintained by hand.
+    (ROOT / "results" / "README.md").write_text(
+        render_readme(results), encoding="utf8")
     return results
 
 
