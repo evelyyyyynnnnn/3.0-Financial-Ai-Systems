@@ -26,7 +26,58 @@ from .onchain import (RPC, TOKENS, block_number_source, block_source,
 ROOT = pathlib.Path(__file__).resolve().parent
 
 BLOCKS_PER_DAY = 7200          # 12-second slots
-CHUNK_BLOCKS = 5_000           # under the usual public-node limit
+
+# A starting guess, not a constant. Public endpoints cap how many blocks one
+# eth_getLogs may span and they do not agree on the cap or on how they report
+# hitting it: one answers 403, one answers 400 Bad Request, one says plainly
+# "eth_getLogs is limited to 0 - 50 blocks range". 5,000 was chosen from a
+# comment in somebody's docs and is far above what several public nodes allow,
+# which is why a walk could lose nine ranges in ten. The walk now discovers the
+# real cap by halving a refused range instead of assuming one.
+CHUNK_BLOCKS = 5_000
+MIN_CHUNK_BLOCKS = 25         # below this, the endpoint is refusing for some
+                              # other reason and halving again just wastes time
+
+
+def walk_token(f, sym, address, start, head, chunk, refresh, verbose=True):
+    """Fetch [start, head] for one token, halving any range the node refuses.
+
+    Returns (blocks_retrieved, missing_ranges, smallest_chunk_used).
+
+    A refused range is split and retried rather than abandoned, because the
+    refusal is usually about the SPAN, not the blocks: the same blocks come
+    back fine in two halves. A range still refused at MIN_CHUNK_BLOCKS is
+    recorded in missing_ranges -- never dropped, because the loader has to be
+    able to tell a hole from a quiet market.
+    """
+    pending = [(start, head)]
+    missing, got_blocks, smallest = [], 0, chunk
+    while pending:
+        lo, hi = pending.pop(0)
+        width = hi - lo + 1
+        if width > chunk:                      # first pass: cut to chunk size
+            pending = [(a, min(a + chunk - 1, hi))
+                       for a in range(lo, hi + 1, chunk)] + pending
+            continue
+        try:
+            f.get(logs_source(sym, address, lo, hi), refresh=refresh)
+            got_blocks += width
+            smallest = min(smallest, width)
+        except FetchError as exc:
+            if width > MIN_CHUNK_BLOCKS:
+                mid = lo + width // 2
+                pending.insert(0, (mid, hi))
+                pending.insert(0, (lo, mid - 1))
+                chunk = max(MIN_CHUNK_BLOCKS, width // 2)
+                if verbose:
+                    print(f"  blocks {lo}-{hi} refused; retrying in halves "
+                          f"(chunk now {chunk})", file=sys.stderr)
+                continue
+            missing.append((lo, hi))
+            if verbose:
+                print(f"  blocks {lo}-{hi}: gave up at {width} blocks ({exc})",
+                      file=sys.stderr)
+    return got_blocks, missing, smallest
 
 
 def main(argv=None) -> int:
@@ -39,6 +90,10 @@ def main(argv=None) -> int:
                     help="how far back to walk the chain (default 90)")
     ap.add_argument("--tokens", default=",".join(TOKENS),
                     help="comma-separated symbols to fetch")
+    ap.add_argument("--chunk", type=int, default=CHUNK_BLOCKS,
+                    help=f"blocks per eth_getLogs call (default {CHUNK_BLOCKS}). "
+                         f"A refused range is halved automatically, so this is "
+                         f"a starting guess; lower it to skip the discovery.")
     ap.add_argument("--pace", type=float, default=0.6,
                     help="seconds between requests (default 0.6). A public node "
                          "throttles eth_getLogs well before it throttles a "
@@ -54,7 +109,7 @@ def main(argv=None) -> int:
             print(f"{sym:<7} {meta['address']}  {meta['note']}")
         print(f"\neth_getLogs over the last {args.days} days "
               f"(~{args.days * BLOCKS_PER_DAY:,} blocks) in "
-              f"{CHUNK_BLOCKS:,}-block chunks, per token")
+              f"{args.chunk:,}-block chunks (halved on refusal), per token")
         print("no price is available from a Transfer event; the run reports "
               "concentration and activity only")
         return 0
@@ -85,38 +140,31 @@ def main(argv=None) -> int:
         f.get(block_source(start, "lo"), refresh=args.refresh)
         f.get(block_source(head, "hi"), refresh=args.refresh)
 
+        want_blocks = head - start + 1
         for sym in want:
             meta = TOKENS[sym]
             print(f"\n{sym} ({meta['address']})")
-            chunk = 0
-            skipped: list = []
-            lo = start
-            while lo <= head:
-                hi = min(lo + CHUNK_BLOCKS - 1, head)
-                src = logs_source(sym, meta["address"], lo, hi, chunk)
-                try:
-                    f.get(src, refresh=args.refresh)
-                except FetchError as exc:
-                    # A node that refuses one range should not end the walk.
-                    skipped.append((lo, hi))
-                    print(f"  blocks {lo}-{hi}: skipped ({exc})", file=sys.stderr)
-                chunk += 1
-                lo = hi + 1
-                if chunk % 20 == 0:
-                    print(f"  {chunk} chunks, at block {lo:,}")
-            got = chunk - len(skipped)
-            print(f"  {got} of {chunk} chunks retrieved"
-                  + (f"; {len(skipped)} still missing" if skipped else ""))
+            got_blocks, skipped, smallest = walk_token(
+                f, sym, meta["address"], start, head, args.chunk, args.refresh)
+            missing_blocks = sum(b - a + 1 for a, b in skipped)
+            frac = (got_blocks / want_blocks) if want_blocks else 0.0
+            print(f"  {got_blocks:,} of {want_blocks:,} blocks retrieved "
+                  f"({frac:.1%}); smallest accepted range {smallest:,} blocks"
+                  + (f"; {missing_blocks:,} blocks still missing" if skipped else ""))
+            # Coverage is counted in BLOCKS, not chunks. Chunk sizes vary now,
+            # so "9 of 11 chunks" no longer describes how much of the window
+            # actually arrived -- and how much arrived is the only thing that
+            # decides whether these numbers may be quoted.
             coverage[sym] = {
                 "requested_blocks": [start, head],
-                "chunk_size": CHUNK_BLOCKS,
-                "chunks_requested": chunk,
-                "chunks_retrieved": got,
-                "fraction_retrieved": round(got / chunk, 4) if chunk else 0.0,
+                "blocks_requested": want_blocks,
+                "blocks_retrieved": got_blocks,
+                "fraction_retrieved": round(frac, 4),
+                "smallest_accepted_chunk": smallest,
                 "missing_ranges": [[a, b] for a, b in skipped],
             }
             if skipped:
-                total_missing.append((sym, len(skipped), chunk))
+                total_missing.append((sym, missing_blocks, want_blocks))
     except NetworkBlocked as e:
         print(f"\nBLOCKED: {e}", file=sys.stderr)
         return 2
@@ -138,12 +186,14 @@ def main(argv=None) -> int:
 
     print(f"\nwrote {f.manifest_path}")
     if total_missing:
-        worst = ", ".join(f"{s} {n}/{t}" for s, n, t in total_missing)
+        worst = ", ".join(f"{s} {n:,}/{t:,} blocks" for s, n, t in total_missing)
         print(f"\nINCOMPLETE: chunks still missing ({worst}).")
         print("  Cached chunks are kept, so simply running this again fetches "
               "only what is missing.")
-        print("  If it keeps happening, slow down (--pace 2) or point "
-              "ETH_RPC_URL at your own endpoint.")
+        print("  Ranges refused down to the floor are a hard cap on this "
+              "endpoint, not throttling -- slowing down will not help.")
+        print("  Point ETH_RPC_URL at an endpoint you hold a key for; a keyed "
+              "endpoint accepts wide ranges and covers the window in one pass.")
         print("  The measurement below will run on what WAS retrieved and will "
               "say so; it will not present a partial window as a full one.")
     print("run `python -m src.demo --real` to measure concentration on the tape")

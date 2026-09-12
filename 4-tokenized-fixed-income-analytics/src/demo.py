@@ -115,9 +115,17 @@ def run_real() -> dict:
         "price_metrics_reported": False,
         "price_metrics_withheld_because": meta["price_metrics_withheld_because"],
         "holder_register_caveat": meta["holder_register_is_window_limited"],
+        "window_is_incomplete": meta.get("window_is_incomplete", False),
+        "window_coverage": meta.get("window_coverage"),
         "provenance": meta["tokens"],
         "tokens": rows,
     }
+    # A partial walk must never read as a full one. The qualifier travels with
+    # the numbers it qualifies, in the file AND on screen -- a caveat that only
+    # exists in a JSON nobody opens is not a caveat.
+    if meta.get("window_is_incomplete"):
+        results["activity_metrics_qualified_because"] = \
+            meta["activity_metrics_qualified_because"]
     (ROOT / "results").mkdir(exist_ok=True)
     (ROOT / "results" / "latest-real.json").write_text(
         json.dumps(results, indent=2) + "\n", encoding="utf8")
@@ -150,6 +158,9 @@ def main_real() -> int:
     print("\nAMIHUD ILLIQUIDITY AND ROLL SPREAD ARE NOT REPORTED: " +
           r["price_metrics_withheld_because"])
     print("\nholder register: " + r["holder_register_caveat"])
+    if r.get("window_is_incomplete"):
+        print("\nWINDOW IS INCOMPLETE -- DO NOT CITE THESE ACTIVITY FIGURES: "
+              + r["activity_metrics_qualified_because"])
     print("wrote results/latest-real.json")
     return 0
 

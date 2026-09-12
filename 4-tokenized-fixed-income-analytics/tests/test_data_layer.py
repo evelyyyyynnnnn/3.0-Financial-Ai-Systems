@@ -251,23 +251,36 @@ def test_an_incomplete_walk_is_recorded_as_incomplete(tmp_path):
 
 def test_the_walk_records_what_it_asked_for_not_only_what_it_got():
     """Without the requested range, nothing downstream can tell a short window
-    from a window with holes."""
+    from a window with holes.
+
+    Counted in blocks rather than chunks: chunk sizes are no longer fixed, so
+    "9 of 11 chunks" would not say how much of the window arrived, and how much
+    arrived is the only thing that decides whether the numbers may be quoted.
+    """
     import inspect
 
     from data import fetch
 
     src = inspect.getsource(fetch)
 
-    assert "chunks_requested" in src
+    assert "blocks_requested" in src
+    assert "blocks_retrieved" in src
     assert "missing_ranges" in src
     assert "coverage.json" in src
 
 
-def test_a_403_from_a_public_node_is_retried_rather_than_treated_as_fatal():
-    """403 means two different things. SEC refuses a request whose User-Agent
-    does not name a contact, and retrying never fixes that. A public RPC node
-    means rate limiting, and retrying is the fix. Treating every 403 as fatal
-    abandoned nine chunks in ten on a node that would have answered."""
+def test_a_403_outside_sec_changes_identity_rather_than_backing_off():
+    """403 means opposite things on the two kinds of host here.
+
+    SEC refuses a request whose User-Agent does NOT name a contact; a browser
+    UA makes that worse, so it must fail at once with the fix in the message.
+    Everywhere else a 403 is usually a CDN bot filter rejecting the identifying
+    UA before the request reaches the application -- probing six public
+    Ethereum endpoints returned 403 from all six under the identifying UA and
+    answers from three under a browser UA. Backing off cannot fix an identity
+    check, and the earlier code's exponential sleep both lost the data and told
+    the reader to slow down, which was the wrong instruction.
+    """
     import inspect
 
     from data import datakit
@@ -276,8 +289,74 @@ def test_a_403_from_a_public_node_is_retried_rather_than_treated_as_fatal():
 
     assert "_is_sec" in src
     sec_branch = src.index("_is_sec(host)")
-    retry_branch = src.index("returned 403 on every one of")
-    assert sec_branch < retry_branch, "the SEC case must be distinguished first"
+    # Anchor on the branch BODY, not on the variable's first mention -- the
+    # flag is initialised before the handler and would match too early.
+    ua_branch = src.index("ua, ua_fallback_used = BROWSER_UA, True")
+    assert sec_branch < ua_branch, "the SEC case must be distinguished first"
+    assert "BROWSER_UA" in src
+    # The old advice must not come back: it sent the reader to fix throttling
+    # that was never happening.
+    assert "as rate limiting" not in src
+
+
+def test_the_manifest_records_which_identity_the_host_accepted():
+    """A silent UA swap would change provenance without saying so."""
+    import inspect
+
+    from data import datakit
+
+    src = inspect.getsource(datakit.Fetcher.get)
+    assert '"user_agent": ua' in src
+    assert '"identifying_ua_refused": ua_fallback_used' in src
+
+
+def test_a_refused_range_is_halved_rather_than_abandoned():
+    """Public endpoints cap the span of one eth_getLogs and disagree on both
+    the cap and how they report it -- 403, 400, or a plain message saying
+    "limited to 0 - 50 blocks range". The only portable way to find the cap is
+    to hit it and back off, so a refused range must be split and retried."""
+    from data import fetch
+
+    calls = []
+
+    class FakeFetcher:
+        raw = pathlib.Path(".")
+
+        def get(self, src, refresh=False):
+            lo, hi = (int(x) for x in src.name.split()[-1].split("-"))
+            calls.append((lo, hi))
+            if hi - lo + 1 > 50:
+                raise datakit.FetchError("limited to 0 - 50 blocks range")
+            return pathlib.Path(".")
+
+    got, missing, smallest = fetch.walk_token(
+        FakeFetcher(), "BUIDL", TOKENS["BUIDL"]["address"],
+        1_000, 1_399, chunk=400, refresh=False, verbose=False)
+
+    assert missing == [], "a range refused for its span must not be dropped"
+    assert got == 400, f"every block should arrive in smaller pieces, got {got}"
+    assert smallest <= 50
+    assert any(hi - lo + 1 > 50 for lo, hi in calls), "the wide try should happen first"
+
+
+def test_a_range_refused_even_when_tiny_is_recorded_as_missing():
+    """Halving cannot fix every refusal. What it cannot fetch must show up in
+    missing_ranges, never be silently skipped."""
+    from data import fetch
+
+    class AlwaysRefuses:
+        raw = pathlib.Path(".")
+
+        def get(self, src, refresh=False):
+            raise datakit.FetchError("nope")
+
+    got, missing, _ = fetch.walk_token(
+        AlwaysRefuses(), "BUIDL", TOKENS["BUIDL"]["address"],
+        1_000, 1_199, chunk=200, refresh=False, verbose=False)
+
+    assert got == 0
+    assert sum(b - a + 1 for a, b in missing) == 200, \
+        "every unfetched block must be accounted for"
 
 
 def test_sec_hosts_are_recognised():
@@ -287,3 +366,96 @@ def test_sec_hosts_are_recognised():
     assert _is_sec("www.sec.gov")
     assert not _is_sec("ethereum-rpc.publicnode.com")
     assert not _is_sec("sec.gov.example.com")
+
+
+def _seed_with_coverage(tmp_path, fraction):
+    """A cache plus a coverage record saying the walk was only partly answered."""
+    f = _seed(tmp_path)
+    cov = f.raw / "chain" / "coverage.json"
+    cov.write_text(json.dumps({"by_symbol": {"BUIDL": {
+        "requested_blocks": [1000, 56000],
+        "blocks_requested": 55001,
+        "blocks_retrieved": int(55001 * fraction),
+        "fraction_retrieved": fraction,
+        "missing_ranges": [] if fraction >= 1.0 else [[11000, 56000]],
+    }}}), encoding="utf8")
+    return f
+
+
+def test_a_partial_window_is_flagged_in_the_metadata(tmp_path):
+    """The guard that says "these activity numbers are computed over a window
+    with holes in it" was, for one release, written after the function's return
+    statement -- unreachable. The run looked clean, the JSON carried no
+    qualifier, and a tape missing 9 blocks in 11 was indistinguishable from a
+    quiet market. This test exists so that cannot happen again silently.
+    """
+    _seed_with_coverage(tmp_path, 0.1818)
+    _, meta = load_tokens(root=tmp_path)
+
+    assert meta.get("window_is_incomplete") is True
+    why = meta.get("activity_metrics_qualified_because", "")
+    assert "18.2%" in why, "the qualifier must say how much of the window arrived"
+    assert "quiet market" in why
+
+
+def test_a_complete_window_is_not_flagged(tmp_path):
+    """The flag has to mean something, so it must be absent when the walk
+    actually finished."""
+    _seed_with_coverage(tmp_path, 1.0)
+    _, meta = load_tokens(root=tmp_path)
+
+    assert meta.get("window_is_incomplete") is False
+    assert "activity_metrics_qualified_because" not in meta
+
+
+def test_the_qualifier_reaches_the_result_file_and_the_screen():
+    """A caveat that lives only in a JSON nobody opens is not a caveat."""
+    import inspect
+
+    from src import demo
+
+    src = inspect.getsource(demo)
+    assert '"window_is_incomplete": meta.get("window_is_incomplete"' in src
+    assert "activity_metrics_qualified_because" in src
+    assert "WINDOW IS INCOMPLETE" in src, "it must print, not only serialise"
+
+
+def test_overlapping_cached_chunks_do_not_double_count(tmp_path):
+    """Adaptive chunking leaves a wide file and the narrow ones that replaced
+    it, so the same transfer can sit in two cached files. Counting it twice
+    would inflate every activity figure while looking entirely plausible."""
+    f = _seed(tmp_path)
+    man = f.load_manifest()
+    original = sorted(k for k in man["files"] if "-logs-" in k)[0]
+    payload = (f.raw / original).read_bytes()
+    rows = json.loads(payload)["result"]
+    for i, lg in enumerate(rows):          # a real node returns a log index
+        lg["logIndex"] = hex(i)
+    payload = _rpc(rows)
+    for dest in ("chain/buidl-logs-000001000-000001999.json",
+                 "chain/buidl-logs-000001000-000001499.json"):
+        (f.raw / dest).write_bytes(payload)
+        man["files"][dest] = dict(man["files"][original], source=dest,
+                                  sha256=datakit.sha256_file(f.raw / dest))
+    del man["files"][original]
+    (f.raw / original).unlink()
+    f._write_manifest(man)
+
+    tokens, _ = load_tokens(root=tmp_path)
+    assert len(tokens[0].trades) == len(rows), \
+        "the same log in two cached files must be counted once"
+
+
+def test_a_log_without_an_index_is_never_deduped_away(tmp_path):
+    """One transaction can emit many Transfer events -- a batch settlement does
+    exactly that -- so the hash alone identifies nothing. Deduping on it would
+    delete real transfers while the totals still looked healthy."""
+    f = _seed(tmp_path)
+    man = f.load_manifest()
+    dest = sorted(k for k in man["files"] if "-logs-" in k)[0]
+    n = len(json.loads((f.raw / dest).read_bytes())["result"])
+
+    tokens, _ = load_tokens(root=tmp_path)
+    assert len(tokens[0].trades) == n, (
+        "the fixture gives every log the same transactionHash and no logIndex; "
+        "all of them must survive")

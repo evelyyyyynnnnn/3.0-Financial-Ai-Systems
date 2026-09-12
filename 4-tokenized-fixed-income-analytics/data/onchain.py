@@ -79,10 +79,14 @@ def block_source(block: int, tag: str) -> Source:
 
 
 def logs_source(symbol: str, address: str, from_block: int,
-                to_block: int, chunk: int) -> Source:
+                to_block: int, chunk: int = 0) -> Source:
+    # Named by the block range it covers, not by an ordinal. Chunk sizes are
+    # not fixed any more -- a refused range is halved and retried -- so an
+    # ordinal would label different spans across runs and a resumed walk would
+    # read a stale file as if it answered the current request.
     return Source(
         name=f"{symbol} transfers {from_block}-{to_block}", url=RPC,
-        dest=f"chain/{symbol.lower()}-logs-{chunk:04d}.json",
+        dest=f"chain/{symbol.lower()}-logs-{from_block:09d}-{to_block:09d}.json",
         publisher="public Ethereum RPC", terms=TERMS,
         note=f"Transfer events for {address}",
         body=_rpc("eth_getLogs", [{
@@ -141,6 +145,11 @@ def parse_logs(raw: bytes, decimals: int) -> list:
             "to": _addr(topics[2]),
             "value": value,
             "tx": lg.get("transactionHash"),
+            # (tx, log_index) identifies a log on-chain. Carried so the loader
+            # can drop duplicates: adaptive chunking and cached files from an
+            # earlier run can cover overlapping ranges, and counting a transfer
+            # twice would inflate every activity figure downstream.
+            "log_index": lg.get("logIndex"),
         })
     return out
 
