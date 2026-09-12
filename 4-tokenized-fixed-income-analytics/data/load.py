@@ -45,6 +45,30 @@ def load_tokens(root=ROOT):
             continue
         by_symbol.setdefault(sym, []).extend(rows)
 
+    # Cached chunks can cover overlapping block ranges -- a walk that halved a
+    # refused range leaves both the wide file and the narrow ones, and a
+    # re-run with a different chunk size leaves more. Every log on chain is
+    # uniquely identified by (transaction hash, log index), so dedupe on that
+    # before anything is counted. Without this an overlap would inflate
+    # transfer counts and turnover while looking entirely plausible.
+    for sym, rows in by_symbol.items():
+        seen, unique = set(), []
+        for r in rows:
+            tx, idx = r.get("tx"), r.get("log_index")
+            # Dedupe ONLY on a key that is genuinely unique on chain. One
+            # transaction can emit many Transfer events -- a batch settlement
+            # does exactly that -- so the hash alone identifies nothing, and
+            # deduping on it would delete real transfers while the run still
+            # looked healthy. If either half is missing, keep the row: an
+            # overcount is visible in the totals, a silent undercount is not.
+            if tx is not None and idx is not None:
+                key = (tx, idx)
+                if key in seen:
+                    continue
+                seen.add(key)
+            unique.append(r)
+        by_symbol[sym] = unique
+
     # What the walk asked for, beside what it got. A hole in an activity tape
     # is indistinguishable from an absence of activity unless the gap is
     # recorded, and every concentration figure below is computed over whatever
@@ -107,7 +131,7 @@ def load_tokens(root=ROOT):
     if not histories:
         raise FetchError("no token in the cache had any transfers in the window")
 
-    return histories, {
+    meta = {
         "source": "Ethereum mainnet, read through a public RPC endpoint",
         "n_tokens": len(histories),
         "prices_available": False,
@@ -132,9 +156,12 @@ def load_tokens(root=ROOT):
     if incomplete:
         meta["window_is_incomplete"] = True
         meta["activity_metrics_qualified_because"] = (
-            "the block walk did not retrieve every chunk it asked for "
-            + ", ".join(f"{s} {c.get('chunks_retrieved')}/{c.get('chunks_requested')}"
-                        for s, c in sorted(incomplete.items()))
+            "the block walk did not retrieve every block it asked for ("
+            + ", ".join(
+                f"{s} {(c.get('fraction_retrieved') or 0):.1%} of "
+                f"{c.get('blocks_requested', c.get('chunks_requested'))}"
+                for s, c in sorted(incomplete.items()))
+            + ")"
             + ". Transfer counts, intervals between transfers and turnover are "
               "computed over the transfers that arrived, so a gap in the fetch "
               "is indistinguishable here from a quiet market. Concentration "
@@ -143,3 +170,5 @@ def load_tokens(root=ROOT):
               "the missing ranges are requested.")
     else:
         meta["window_is_incomplete"] = False
+
+    return histories, meta
