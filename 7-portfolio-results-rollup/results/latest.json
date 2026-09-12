@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-11T22:41:46+00:00",
+  "generated_at": "2026-09-12T15:10:27+00:00",
   "is_synthetic": true,
   "data_source": "each project's own results/latest.json",
   "summary": {
@@ -9,7 +9,7 @@
     "n_synthetic_data": 3,
     "n_real_data": 19,
     "n_with_site": 22,
-    "total_tests": 643,
+    "total_tests": 657,
     "repos": [
       "1.0-Secure-Ai-Agent-Infrastructure",
       "2.0-Healthcare-Ai-Systems",
@@ -71,26 +71,26 @@
       "repo": "1.0-Secure-Ai-Agent-Infrastructure",
       "project": "3-llm-audit-agent",
       "has_results": true,
-      "generated_at": "2026-09-01T22:18:55+00:00",
+      "generated_at": "2026-09-09T03:56:16+00:00",
       "is_synthetic": false,
-      "data_source": "SmartBugs curated, via real-corpus.jsonl in chaintrust-bench",
+      "data_source": "real open LLM (qwen2.5-coder:7b) served locally via Ollama, auditing the worked-example contract through the agent's four stages with the hash-chained audit trail",
       "n_tests": 18,
       "has_site": true,
       "headline": [
         {
-          "metric": "Review items cut",
-          "value": 43.81,
-          "note": "percent (105 -> 59), but 6 more findings missed"
+          "metric": "Findings the agent kept after re-checking them",
+          "value": 2,
+          "note": "on openai:qwen2.5-coder:7b, verified against the source"
         },
         {
-          "metric": "False alarms cut",
-          "value": 58.82,
-          "note": "percent (68 -> 28)"
+          "metric": "Findings it dropped because it could not verify them",
+          "value": 2,
+          "note": "self-correction; the whole point of the verify stage"
         },
         {
-          "metric": "Best detector macro-F1",
-          "value": 0.2805,
-          "note": "held by the rule baseline -- the agent does not beat it"
+          "metric": "Seconds for the four-stage audit",
+          "value": 68.3,
+          "note": "one contract, CPU, a real language model rather than the stub"
         }
       ],
       "headline_error": null,
@@ -388,7 +388,7 @@
       "repo": "3.0-Financial-Ai-Systems",
       "project": "7-portfolio-results-rollup",
       "has_results": true,
-      "generated_at": "2026-09-11T22:36:11+00:00",
+      "generated_at": "2026-09-12T15:10:27+00:00",
       "is_synthetic": true,
       "data_source": "each project's own results/latest.json",
       "n_tests": 21,
@@ -546,26 +546,26 @@
       "repo": "5.0-Ai-Engineering-Toolkit",
       "project": "2-llm-eval-calibration-harness",
       "has_results": true,
-      "generated_at": "2026-09-06T23:59:03+00:00",
+      "generated_at": "2026-09-12T14:50:14+00:00",
       "is_synthetic": false,
       "data_source": "SEC EDGAR XBRL company-concept API -- every answer is a filed value; see data/MANIFEST.json for hashes",
-      "n_tests": 35,
+      "n_tests": 49,
       "has_site": true,
       "headline": [
         {
-          "metric": "Questions built from filed values",
-          "value": 24,
-          "note": "every answer checkable against SEC EDGAR"
+          "metric": "Real language model accuracy",
+          "value": 1.0,
+          "note": "llm:gemma4:latest on 22 questions built from filed SEC values"
         },
         {
-          "metric": "Accuracy spread between best and worst answerer",
-          "value": 0.0833,
-          "note": "the harness separates behaviours"
+          "metric": "Fabrication rate, same run",
+          "value": 0.0,
+          "note": "numbers appearing in no source document"
         },
         {
-          "metric": "Fabrication rate, the careful answerer",
-          "value": 0.125,
-          "note": "stubs, not language models -- see no_model_caveat"
+          "metric": "Best non-model baseline",
+          "value": 0.9091,
+          "note": "the careful stand-in, scored by the same grader on the same questions"
         }
       ],
       "headline_error": null,
