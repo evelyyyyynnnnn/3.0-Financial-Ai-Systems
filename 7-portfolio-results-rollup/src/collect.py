@@ -72,6 +72,27 @@ def _count_tests(project: pathlib.Path) -> int:
     return n
 
 
+RESULT_FILES = ("latest-llm.json", "latest-real.json", "latest.json")
+
+
+def _newest_real(results: pathlib.Path) -> pathlib.Path:
+    """The most recent result whose run was on real data, else the demo run."""
+    real = []
+    for name in RESULT_FILES:
+        fp = results / name
+        if not fp.exists():
+            continue
+        try:
+            d = json.loads(fp.read_text(encoding="utf8"))
+        except (ValueError, OSError):
+            continue
+        if d.get("is_synthetic") is False:
+            real.append((d.get("generated_at") or "", fp))
+    if real:
+        return max(real)[1]
+    return results / "latest.json"
+
+
 def discover(root: pathlib.Path | None = None) -> list:
     root = root or PORTFOLIO_ROOT
     out: list = []
@@ -82,10 +103,14 @@ def discover(root: pathlib.Path | None = None) -> list:
                 continue
             if not (project / "src").is_dir():
                 continue
-            # Prefer the real-data run when a project has one; fall back to the
-            # synthetic demo result otherwise.
-            real_rp = project / "results" / "latest-real.json"
-            rp = real_rp if real_rp.exists() else project / "results" / "latest.json"
+            # A project can carry several result files. The roll-up reports the
+            # most recent run that used real data, whatever the file is called
+            # -- latest-llm.json when a real language model was scored,
+            # latest-real.json otherwise -- and falls back to the synthetic
+            # demo result only when no real run exists. Hardcoding
+            # latest-real.json meant a newer real-model run sat unread beside
+            # the superseded run the page kept showing.
+            rp = _newest_real(project / "results")
             pr = ProjectResult(repo=repo.name, project=project.name, path=project,
                                has_results=rp.exists(),
                                n_tests=_count_tests(project),

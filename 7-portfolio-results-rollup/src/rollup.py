@@ -49,17 +49,31 @@ EXTRACTORS = {
          "headroom the benchmark exists to create"),
         ("Corpus size", _get(d, "corpus", "n_cases"), "cases"),
     ],
-    "llm-audit-agent": lambda d: [
-        ("Review items cut",
-         _get(d, "comparison", "workload", "delta", "review_reduction_pct"),
-         "percent (105 -> 59), but 6 more findings missed"),
-        ("False alarms cut",
-         _get(d, "comparison", "workload", "delta", "false_alarm_reduction_pct"),
-         "percent (68 -> 28)"),
-        ("Best detector macro-F1",
-         (d.get("comparison", {}).get("leaderboard") or [{}])[0].get("macro_f1"),
-         "held by the rule baseline -- the agent does not beat it"),
-    ],
+    # Two result shapes here too: the rule-based benchmark over the SmartBugs
+    # corpus, and a run driven by a real open language model. Report whichever
+    # this run produced.
+    "llm-audit-agent": lambda d: (
+        [
+            ("Findings the agent kept after re-checking them",
+             len(_get(d, "worked_example", "findings") or []) or None,
+             f"on {_get(d, 'backend')}, verified against the source"),
+            ("Findings it dropped because it could not verify them",
+             len(_get(d, "worked_example", "dropped") or []) or None,
+             "self-correction; the whole point of the verify stage"),
+            ("Seconds for the four-stage audit",
+             _get(d, "runtime_seconds"),
+             "one contract, CPU, a real language model rather than the stub"),
+        ] if d.get("backend_is_language_model") else [
+            ("Review items cut",
+             _get(d, "comparison", "workload", "delta", "review_reduction_pct"),
+             "percent (105 -> 59), but 6 more findings missed"),
+            ("False alarms cut",
+             _get(d, "comparison", "workload", "delta", "false_alarm_reduction_pct"),
+             "percent (68 -> 28)"),
+            ("Best detector macro-F1",
+             (d.get("comparison", {}).get("leaderboard") or [{}])[0].get("macro_f1"),
+             "held by the rule baseline -- the agent does not beat it"),
+        ]),
     "agent-verification-harness": lambda d: [
         ("Precision", _get(d, "grounding", "precision"), "on flagged claims"),
         ("Recall", _get(d, "grounding", "recall"), "of bad claims caught"),
