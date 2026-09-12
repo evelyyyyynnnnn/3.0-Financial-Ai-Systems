@@ -1,6 +1,7 @@
 """Build TokenHistory objects from the cached transfer tape."""
 from __future__ import annotations
 
+import json
 import pathlib
 
 import numpy as np
@@ -43,6 +44,18 @@ def load_tokens(root=ROOT):
         except ValueError:
             continue
         by_symbol.setdefault(sym, []).extend(rows)
+
+    # What the walk asked for, beside what it got. A hole in an activity tape
+    # is indistinguishable from an absence of activity unless the gap is
+    # recorded, and every concentration figure below is computed over whatever
+    # transfers arrived.
+    coverage = {}
+    cov_path = f.raw / "chain" / "coverage.json"
+    if cov_path.exists():
+        try:
+            coverage = json.loads(cov_path.read_text(encoding="utf8"))
+        except ValueError:
+            coverage = {}
 
     histories, prov = [], []
     for sym, transfers in sorted(by_symbol.items()):
@@ -104,6 +117,7 @@ def load_tokens(root=ROOT):
             "price changes, so neither can be computed from a transfer tape; "
             "and a fund redeeming at net asset value may have no market price "
             "to find at all.",
+        "window_coverage": coverage,
         "holder_register_is_window_limited":
             "balances are the net of transfers observed in the fetched window. "
             "They equal the true register only if the window reaches the "
@@ -111,3 +125,21 @@ def load_tokens(root=ROOT):
             "recently is missing.",
         "tokens": prov,
     }
+
+    by_sym = (coverage.get("by_symbol") or {}) if isinstance(coverage, dict) else {}
+    incomplete = {s: c for s, c in by_sym.items()
+                  if isinstance(c, dict) and (c.get("fraction_retrieved") or 0) < 1.0}
+    if incomplete:
+        meta["window_is_incomplete"] = True
+        meta["activity_metrics_qualified_because"] = (
+            "the block walk did not retrieve every chunk it asked for "
+            + ", ".join(f"{s} {c.get('chunks_retrieved')}/{c.get('chunks_requested')}"
+                        for s, c in sorted(incomplete.items()))
+            + ". Transfer counts, intervals between transfers and turnover are "
+              "computed over the transfers that arrived, so a gap in the fetch "
+              "is indistinguishable here from a quiet market. Concentration "
+              "shares are less affected but still reflect a partial register. "
+              "Re-run `python -m data.fetch` -- cached chunks are kept and only "
+              "the missing ranges are requested.")
+    else:
+        meta["window_is_incomplete"] = False

@@ -163,11 +163,30 @@ class Fetcher:
             except urllib.error.HTTPError as e:
                 last = e
                 if e.code == 403:
-                    raise FetchError(
-                        f"{src.url} returned 403. For SEC hosts this means the "
-                        f"User-Agent was rejected — set DATAKIT_UA to "
-                        f"'Your Name your@email' and retry."
-                    ) from e
+                    # 403 means two different things. SEC refuses a request
+                    # whose User-Agent does not name a contact, and no amount
+                    # of retrying fixes that. A JSON-RPC node returns it when
+                    # rate-limiting, and retrying is exactly the fix -- so
+                    # treating every 403 as fatal made a throttled walk look
+                    # like a misconfigured one, and abandoned nine chunks in
+                    # ten on a node that would have answered a moment later.
+                    if _is_sec(host):
+                        raise FetchError(
+                            f"{src.url} returned 403. SEC requires a "
+                            f"User-Agent naming a real contact — set DATAKIT_UA "
+                            f"to 'Your Name your@email' and retry."
+                        ) from e
+                    if attempt == self.retries - 1:
+                        raise FetchError(
+                            f"{src.url} returned 403 on every one of "
+                            f"{self.retries} attempts. A public node usually "
+                            f"means this as rate limiting; re-running fills the "
+                            f"gaps from cache, or slow the walk with --pace."
+                        ) from e
+                    # Back off harder than the generic retry: a throttled node
+                    # wants seconds, not milliseconds.
+                    time.sleep(min(30.0, 2.0 * (2 ** attempt)))
+                    continue
                 if e.code == 404:
                     raise FetchError(f"{src.url} returned 404 — the URL has moved.") from e
                 if e.code not in RETRYABLE_STATUS:
@@ -254,6 +273,10 @@ def sha256_file(path) -> str:
         for chunk in iter(lambda: f.read(1 << 20), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def _is_sec(host: str) -> bool:
+    return host.endswith("sec.gov")
 
 
 def _looks_blocked(reason: str) -> bool:
