@@ -1,0 +1,36 @@
+name: Giant Portfolio — Quarterly 13F Refresh
+
+on:
+  schedule:
+    - cron: "0 10 17 2  *"
+    - cron: "0 10 18 5  *"
+    - cron: "0 10 18 8  *"
+    - cron: "0 10 17 11 *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests beautifulsoup4 yfinance
+      - name: Run refresh from subfolder
+        run: cd 9-giant-portfolio-tracker && python3 refresh_data.py
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add 9-giant-portfolio-tracker/data.json 9-giant-portfolio-tracker/index.html
+          git diff --quiet --cached || git commit -m "auto: giant-portfolio refresh $(date +'%Y-%m-%d')"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
