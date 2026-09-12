@@ -4,7 +4,7 @@
 > below is read from the file that project's own demo wrote, and this
 > page is rewritten from the same run that writes `latest.json`.
 
-**Run date:** `2026-09-11T22:41:46+00:00`
+**Run date:** `2026-09-12T15:10:27+00:00`
 
 ## Portfolio at a glance
 
@@ -16,7 +16,7 @@
 | Running on **real** data | 19 |
 | Running on synthetic or authored data | 3 |
 | With a published website | 22 |
-| Test functions across the portfolio | 643 |
+| Test functions across the portfolio | 657 |
 
 Repositories walked: `1.0-Secure-Ai-Agent-Infrastructure`, `2.0-Healthcare-Ai-Systems`, `3.0-Financial-Ai-Systems`, `4.0-Decision-Intelligence-Framework`, `5.0-Ai-Engineering-Toolkit`.
 
@@ -26,7 +26,7 @@ Repositories walked: `1.0-Secure-Ai-Agent-Infrastructure`, `2.0-Healthcare-Ai-Sy
 |---|---|---|---|---:|---|
 | `1.0-Secure-Ai-Agent-Infrastructure` | `1-agent-verification-harness` | 2026-09-07 | real | 32 | yes |
 | `1.0-Secure-Ai-Agent-Infrastructure` | `2-chaintrust-bench` | 2026-09-06 | real | 30 | yes |
-| `1.0-Secure-Ai-Agent-Infrastructure` | `3-llm-audit-agent` | 2026-09-01 | real | 18 | yes |
+| `1.0-Secure-Ai-Agent-Infrastructure` | `3-llm-audit-agent` | 2026-09-09 | real | 18 | yes |
 | `2.0-Healthcare-Ai-Systems` | `1-clinical-empathy-analysis` | 2026-09-06 | real | 32 | yes |
 | `2.0-Healthcare-Ai-Systems` | `2-icu-early-warning` | 2026-09-06 | real | 32 | yes |
 | `2.0-Healthcare-Ai-Systems` | `3-physiological-waveform-pipeline` | 2026-09-06 | real | 33 | yes |
@@ -37,13 +37,13 @@ Repositories walked: `1.0-Secure-Ai-Agent-Infrastructure`, `2.0-Healthcare-Ai-Sy
 | `3.0-Financial-Ai-Systems` | `4-tokenized-fixed-income-analytics` | 2026-08-31 | synthetic / authored | 34 | yes |
 | `3.0-Financial-Ai-Systems` | `5-volatility-forecasting` | 2026-09-09 | real | 5 | yes |
 | `3.0-Financial-Ai-Systems` | `6-portfolio-optimization-engine` | 2026-09-11 | real | 9 | yes |
-| `3.0-Financial-Ai-Systems` | `7-portfolio-results-rollup` | 2026-09-11 | synthetic / authored | 21 | yes |
+| `3.0-Financial-Ai-Systems` | `7-portfolio-results-rollup` | 2026-09-12 | synthetic / authored | 21 | yes |
 | `4.0-Decision-Intelligence-Framework` | `1-decision-audit-framework` | 2026-09-06 | real | 33 | yes |
 | `4.0-Decision-Intelligence-Framework` | `2-optimization-under-uncertainty` | 2026-09-07 | real | 33 | yes |
 | `4.0-Decision-Intelligence-Framework` | `3-icu-triage-optimization` | 2026-09-06 | real | 26 | yes |
 | `4.0-Decision-Intelligence-Framework` | `4-decision-benchmark-suite` | 2026-09-09 | synthetic / authored | 24 | yes |
 | `5.0-Ai-Engineering-Toolkit` | `1-data-provenance-library` | 2026-09-06 | real | 33 | yes |
-| `5.0-Ai-Engineering-Toolkit` | `2-llm-eval-calibration-harness` | 2026-09-06 | real | 35 | yes |
+| `5.0-Ai-Engineering-Toolkit` | `2-llm-eval-calibration-harness` | 2026-09-12 | real | 49 | yes |
 | `5.0-Ai-Engineering-Toolkit` | `3-quant-productivity-toolkit` | 2026-09-07 | real | 42 | yes |
 | `5.0-Ai-Engineering-Toolkit` | `4-risk-portfolio-saas` | 2026-09-07 | real | 38 | yes |
 
@@ -51,7 +51,7 @@ Repositories walked: `1.0-Secure-Ai-Agent-Infrastructure`, `2.0-Healthcare-Ai-Sy
 
 - **`1-agent-verification-harness`** — real US government releases (BLS, Federal Reserve); see data/MANIFEST.json for URLs, hashes and retrieval times
 - **`2-chaintrust-bench`** — SmartBugs curated corpus (annotated by its own authors), normalised into data/real-corpus.jsonl
-- **`3-llm-audit-agent`** — SmartBugs curated, via real-corpus.jsonl in chaintrust-bench
+- **`3-llm-audit-agent`** — real open LLM (qwen2.5-coder:7b) served locally via Ollama, auditing the worked-example contract through the agent's four stages with the hash-chained audit trail
 - **`1-clinical-empathy-analysis`** — MTS-Dialog, real doctor-patient consultation transcripts; see data/MANIFEST.json for hashes and retrieval times
 - **`2-icu-early-warning`** — PhysioNet MIMIC-IV clinical database demo (open access); see data/MANIFEST.json for file hashes and retrieval times
 - **`3-physiological-waveform-pipeline`** — PhysioNet BIDMC PPG and Respiration Dataset (open access); see data/MANIFEST.json for file hashes and retrieval times
@@ -89,9 +89,9 @@ not measured, however often it may appear elsewhere.
 | `1-agent-verification-harness` | Recall | 0.6667 | of bad claims caught |
 | `1-agent-verification-harness` | Claims checked | 12 |  |
 | `2-chaintrust-bench` | Corpus size | 121 | cases |
-| `3-llm-audit-agent` | Review items cut | 43.81 | percent (105 -> 59), but 6 more findings missed |
-| `3-llm-audit-agent` | False alarms cut | 58.82 | percent (68 -> 28) |
-| `3-llm-audit-agent` | Best detector macro-F1 | 0.2805 | held by the rule baseline -- the agent does not beat it |
+| `3-llm-audit-agent` | Findings the agent kept after re-checking them | 2 | on openai:qwen2.5-coder:7b, verified against the source |
+| `3-llm-audit-agent` | Findings it dropped because it could not verify them | 2 | self-correction; the whole point of the verify stage |
+| `3-llm-audit-agent` | Seconds for the four-stage audit | 68.3 | one contract, CPU, a real language model rather than the stub |
 | `1-clinical-empathy-analysis` | Real consultations scored | 1,076 | MTS-Dialog doctor-patient transcripts |
 | `1-clinical-empathy-analysis` | Transcripts on which no cue fired | 0.6794 | share -- the lexicon is silent on most real consultations |
 | `1-clinical-empathy-analysis` | Distinct cues that fired at all | 25 | the rest of the lexicon never matched |
@@ -129,9 +129,9 @@ not measured, however often it may appear elsewhere.
 | `1-data-provenance-library` | Filers traced to the character span they were filed in | 2 | SEC EDGAR XBRL, as filed |
 | `1-data-provenance-library` | Fetches that failed and are recorded as failures | 1 | not silently dropped |
 | `1-data-provenance-library` | Package exports | 12 | spanlineage, not published |
-| `2-llm-eval-calibration-harness` | Questions built from filed values | 24 | every answer checkable against SEC EDGAR |
-| `2-llm-eval-calibration-harness` | Accuracy spread between best and worst answerer | 0.0833 | the harness separates behaviours |
-| `2-llm-eval-calibration-harness` | Fabrication rate, the careful answerer | 0.125 | stubs, not language models -- see no_model_caveat |
+| `2-llm-eval-calibration-harness` | Real language model accuracy | 1 | llm:gemma4:latest on 22 questions built from filed SEC values |
+| `2-llm-eval-calibration-harness` | Fabrication rate, same run | 0 | numbers appearing in no source document |
+| `2-llm-eval-calibration-harness` | Best non-model baseline | 0.9091 | the careful stand-in, scored by the same grader on the same questions |
 | `3-quant-productivity-toolkit` | Days of real factor history | 26,296 | 1926-07-01 to 2026-07-31 |
 | `3-quant-productivity-toolkit` | Best Sharpe found by searching a grid | 0.9462 | of 199 strategies tried -- a selection-bias demonstration, not a strategy |
 | `3-quant-productivity-toolkit` | Lookahead detector, forward correlation of the planted leak | 1 | caught: a feature that copies next period's return |
