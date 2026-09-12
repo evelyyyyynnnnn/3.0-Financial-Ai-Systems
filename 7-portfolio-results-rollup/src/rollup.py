@@ -209,16 +209,35 @@ EXTRACTORS = {
         ("Package exports", _get(d, "package", "exports"),
          f"{_get(d, 'package', 'name')}, not published"),
     ],
-    "llm-eval-calibration-harness": lambda d: [
-        ("Questions built from filed values", _get(d, "suite", "n_questions"),
-         "every answer checkable against SEC EDGAR"),
-        ("Accuracy spread between best and worst answerer",
-         _get(d, "separation", "spread"),
-         "the harness separates behaviours"),
-        ("Fabrication rate, the careful answerer",
-         _get(d, "models", "careful", "fabrication_rate"),
-         "stubs, not language models -- see no_model_caveat"),
-    ],
+    # This project has two result shapes: the stub-only run, and a run that
+    # scored a real language model. Prefer the latter when it is present --
+    # "a harness that has never been pointed at a model" was the project's own
+    # stated gap, and the result file says which it is.
+    "llm-eval-calibration-harness": lambda d: (
+        [
+            ("Real language model accuracy",
+             _get(d, "accuracies", _get(d, "model", "name") or "_"),
+             f"{_get(d, 'model', 'name')} on "
+             f"{_get(d, 'suite', 'n_questions')} questions built from filed "
+             "SEC values"),
+            ("Fabrication rate, same run",
+             _get(d, "models", _get(d, "model", "name") or "_",
+                  "fabrication_rate"),
+             "numbers appearing in no source document"),
+            ("Best non-model baseline",
+             _get(d, "model_vs_stubs", "best_stub_accuracy"),
+             f"the {_get(d, 'model_vs_stubs', 'best_stub')} stand-in, scored by "
+             "the same grader on the same questions"),
+        ] if d.get("any_language_model_run") else [
+            ("Questions built from filed values", _get(d, "suite", "n_questions"),
+             "every answer checkable against SEC EDGAR"),
+            ("Accuracy spread between best and worst answerer",
+             _get(d, "separation", "spread"),
+             "the harness separates behaviours"),
+            ("Fabrication rate, the careful answerer",
+             _get(d, "models", "careful", "fabrication_rate"),
+             "stubs, not language models -- see no_model_caveat"),
+        ]),
     "risk-portfolio-saas": lambda d: [
         ("Observations", _get(d, "observations"),
          f"{_get(d, 'window', 'first')} to {_get(d, 'window', 'last')}"),
