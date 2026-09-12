@@ -207,3 +207,83 @@ def test_transfer_times_are_dated_from_block_timestamps(tmp_path):
     assert times.max() <= 1_700_864_000
     assert (np.diff(times) >= 0).all()
     assert meta["tokens"][0]["time_basis"].startswith("interpolated")
+
+
+# --- a gap in the fetch must not read as a quiet market ----------------------
+#
+# The first real walk lost nine chunks in ten to rate limiting and still wrote a
+# manifest. The loader reads whatever log files exist, so a window with holes in
+# it was indistinguishable from a window in which little happened -- and every
+# activity figure is computed over the transfers that arrived.
+
+def _coverage_tree(tmp_path, fraction):
+    """A raw/ tree carrying a coverage record and nothing else."""
+    import json
+
+    cov = tmp_path / "raw" / "chain" / "coverage.json"
+    cov.parent.mkdir(parents=True, exist_ok=True)
+    cov.write_text(json.dumps({
+        "generated_utc": "2026-09-12T00:00:00+00:00",
+        "rpc": "https://example.invalid",
+        "by_symbol": {"BUIDL": {
+            "requested_blocks": [1000, 6000],
+            "chunk_size": 5000,
+            "chunks_requested": 10,
+            "chunks_retrieved": int(10 * fraction),
+            "fraction_retrieved": fraction,
+            "missing_ranges": [] if fraction == 1.0 else [[1000, 2000]],
+        }},
+    }))
+    return cov
+
+
+def test_an_incomplete_walk_is_recorded_as_incomplete(tmp_path):
+    import json
+
+    _coverage_tree(tmp_path, 0.2)
+    cov = json.loads((tmp_path / "raw" / "chain" / "coverage.json").read_text())
+    by = cov["by_symbol"]["BUIDL"]
+
+    assert by["fraction_retrieved"] < 1.0
+    assert by["chunks_retrieved"] < by["chunks_requested"]
+    assert by["missing_ranges"], "the ranges that failed must be named"
+
+
+def test_the_walk_records_what_it_asked_for_not_only_what_it_got():
+    """Without the requested range, nothing downstream can tell a short window
+    from a window with holes."""
+    import inspect
+
+    from data import fetch
+
+    src = inspect.getsource(fetch)
+
+    assert "chunks_requested" in src
+    assert "missing_ranges" in src
+    assert "coverage.json" in src
+
+
+def test_a_403_from_a_public_node_is_retried_rather_than_treated_as_fatal():
+    """403 means two different things. SEC refuses a request whose User-Agent
+    does not name a contact, and retrying never fixes that. A public RPC node
+    means rate limiting, and retrying is the fix. Treating every 403 as fatal
+    abandoned nine chunks in ten on a node that would have answered."""
+    import inspect
+
+    from data import datakit
+
+    src = inspect.getsource(datakit)
+
+    assert "_is_sec" in src
+    sec_branch = src.index("_is_sec(host)")
+    retry_branch = src.index("returned 403 on every one of")
+    assert sec_branch < retry_branch, "the SEC case must be distinguished first"
+
+
+def test_sec_hosts_are_recognised():
+    from data.datakit import _is_sec
+
+    assert _is_sec("data.sec.gov")
+    assert _is_sec("www.sec.gov")
+    assert not _is_sec("ethereum-rpc.publicnode.com")
+    assert not _is_sec("sec.gov.example.com")

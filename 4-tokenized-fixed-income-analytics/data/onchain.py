@@ -21,6 +21,8 @@ transfer and reporting a spread of zero.
 """
 from __future__ import annotations
 
+import os
+
 import json
 
 from .datakit import Source
@@ -29,7 +31,10 @@ from .datakit import Source
 TRANSFER_TOPIC = ("0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df"
                   "523b3ef")
 
-RPC = "https://ethereum-rpc.publicnode.com"
+# A public node, which is free and therefore rate-limited. Point ETH_RPC_URL at
+# your own endpoint to walk a longer window without being throttled; the data is
+# identical, and the manifest records whichever endpoint answered.
+RPC = os.environ.get("ETH_RPC_URL") or "https://ethereum-rpc.publicnode.com"
 
 # Tokenised fixed income on Ethereum mainnet. Each is a fund whose units are
 # ERC-20 tokens; the contract address is the fund.
