@@ -36,6 +36,27 @@ DEFAULT_UA = os.environ.get(
     "niw-portfolio-research/0.1 (contact: set DATAKIT_UA env var)",
 )
 
+# The identifying User-Agent above is what SEC's fair-access policy asks for,
+# and it is the right thing to send to a document archive run by a publisher
+# who wants to know who is reading. It is also, on a host sitting behind a
+# consumer CDN, the signature of a bot -- and the CDN answers 403 before the
+# request ever reaches the application.
+#
+# That is not a hypothesis. Probing six public Ethereum endpoints with the
+# identifying UA returned 403 from all six; the same eth_blockNumber call with
+# a browser UA was answered by three of them. The failure had nothing to do
+# with rate limiting or with the block range, which is what the earlier error
+# text guessed at, and guessing wrong in an error message costs more than
+# saying nothing -- it sends the reader to fix something that is not broken.
+#
+# So: send the identifying UA first, because being identifiable is the polite
+# default and most hosts accept it. If a host refuses it outright, retry once
+# with a browser UA and RECORD that in the manifest, so the provenance says
+# which identity the bytes were obtained under rather than quietly changing it.
+BROWSER_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+              "AppleWebKit/537.36 (KHTML, like Gecko) "
+              "Chrome/126.0.0.0 Safari/537.36")
+
 RETRYABLE_STATUS = {408, 425, 429, 500, 502, 503, 504}
 
 
@@ -121,13 +142,13 @@ class Fetcher:
             time.sleep(self.min_interval - gap)
         self._last_request = time.monotonic()
 
-    def _open(self, url: str, headers: dict, body=None) -> bytes:
+    def _open(self, url: str, headers: dict, body=None, ua: str = "") -> bytes:
         data = None
         if body is not None:
             data = json.dumps(body).encode()
             headers = {"Content-Type": "application/json", **headers}
         req = urllib.request.Request(url, data=data, headers={
-            "User-Agent": self.user_agent,
+            "User-Agent": ua or self.user_agent,
             "Accept-Encoding": "gzip, deflate",
             **headers,
         })
@@ -156,37 +177,43 @@ class Fetcher:
 
         host = src.url.split("/")[2] if "://" in src.url else src.url
         last: Exception | None = None
+        ua = self.user_agent
+        ua_fallback_used = False
         for attempt in range(self.retries):
             try:
-                data = self._open(src.url, src.headers, src.body)
+                data = self._open(src.url, src.headers, src.body, ua=ua)
                 break
             except urllib.error.HTTPError as e:
                 last = e
                 if e.code == 403:
-                    # 403 means two different things. SEC refuses a request
-                    # whose User-Agent does not name a contact, and no amount
-                    # of retrying fixes that. A JSON-RPC node returns it when
-                    # rate-limiting, and retrying is exactly the fix -- so
-                    # treating every 403 as fatal made a throttled walk look
-                    # like a misconfigured one, and abandoned nine chunks in
-                    # ten on a node that would have answered a moment later.
+                    # 403 from these hosts means one of two things, and they
+                    # want opposite responses.
+                    #
+                    # SEC refuses a request whose User-Agent does NOT name a
+                    # contact. Retrying cannot fix that and a browser UA makes
+                    # it worse, so fail immediately and say what to set.
                     if _is_sec(host):
                         raise FetchError(
                             f"{src.url} returned 403. SEC requires a "
                             f"User-Agent naming a real contact — set DATAKIT_UA "
                             f"to 'Your Name your@email' and retry."
                         ) from e
-                    if attempt == self.retries - 1:
-                        raise FetchError(
-                            f"{src.url} returned 403 on every one of "
-                            f"{self.retries} attempts. A public node usually "
-                            f"means this as rate limiting; re-running fills the "
-                            f"gaps from cache, or slow the walk with --pace."
-                        ) from e
-                    # Back off harder than the generic retry: a throttled node
-                    # wants seconds, not milliseconds.
-                    time.sleep(min(30.0, 2.0 * (2 ** attempt)))
-                    continue
+                    # Everywhere else a 403 is usually the opposite problem:
+                    # a CDN bot filter rejecting the identifying UA before the
+                    # request reaches the node. Retrying the SAME request more
+                    # slowly cannot fix an identity check, which is why the
+                    # previous backoff lost nine chunks in ten and blamed rate
+                    # limiting. Change the identity once, then give up.
+                    if not ua_fallback_used:
+                        ua, ua_fallback_used = BROWSER_UA, True
+                        continue
+                    raise FetchError(
+                        f"{src.url} returned 403 under both the identifying "
+                        f"User-Agent and a browser one. This is a refusal, not "
+                        f"throttling: slowing down will not help. Point "
+                        f"ETH_RPC_URL (or the source's own endpoint setting) at "
+                        f"an endpoint you have a key for."
+                    ) from e
                 if e.code == 404:
                     raise FetchError(f"{src.url} returned 404 — the URL has moved.") from e
                 if e.code not in RETRYABLE_STATUS:
@@ -216,6 +243,11 @@ class Fetcher:
             "sha256": hashlib.sha256(data).hexdigest(),
             "bytes": len(data),
             "retrieved_utc": utc_now(),
+            # Which identity the host actually accepted. Recorded because a
+            # reader checking provenance should not have to guess whether the
+            # polite UA was honoured or silently swapped for a browser one.
+            "user_agent": ua,
+            "identifying_ua_refused": ua_fallback_used,
             "request_fingerprint": _fingerprint(src),
         }
         self._write_manifest(man)
