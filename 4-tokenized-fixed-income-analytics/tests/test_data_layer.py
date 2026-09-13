@@ -459,3 +459,28 @@ def test_a_log_without_an_index_is_never_deduped_away(tmp_path):
     assert len(tokens[0].trades) == n, (
         "the fixture gives every log the same transactionHash and no logIndex; "
         "all of them must survive")
+
+
+def test_addresses_go_out_lower_cased():
+    """A mixed-case address carries an EIP-55 checksum. An endpoint that
+    validates it answers a wrong one with a bare HTTP 400, which the walk
+    cannot tell apart from "range too wide" -- so it halves itself to the floor
+    and reports the wrong cause. Sending lower case removes the ambiguity."""
+    s = logs_source("BUIDL", TOKENS["BUIDL"]["address"], 100, 200)
+    sent = s.body["params"][0]["address"]
+    assert sent == sent.lower(), f"address sent with mixed case: {sent}"
+    assert sent == TOKENS["BUIDL"]["address"].lower()
+
+
+def test_an_http_error_reports_what_the_server_said():
+    """"returned HTTP 400" names the status and hides the cause. The body is
+    where a JSON-RPC endpoint explains itself; discarding it left guessing as
+    the only way forward."""
+    import inspect
+
+    src = inspect.getsource(datakit)
+    assert "_body_of" in src
+    assert "The server said:" in src
+    body_src = inspect.getsource(datakit._body_of)
+    assert "error" in body_src and "message" in body_src, \
+        "a JSON-RPC error's message must be unwrapped, not dumped raw"
