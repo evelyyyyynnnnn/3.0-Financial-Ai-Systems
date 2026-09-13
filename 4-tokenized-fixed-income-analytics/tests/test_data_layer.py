@@ -484,3 +484,53 @@ def test_an_http_error_reports_what_the_server_said():
     body_src = inspect.getsource(datakit._body_of)
     assert "error" in body_src and "message" in body_src, \
         "a JSON-RPC error's message must be unwrapped, not dumped raw"
+
+
+def test_a_stated_cap_is_read_from_the_rejection():
+    """Providers name their eth_getLogs cap in the rejection, each in its own
+    prose. Reading it beats halving toward it: a free tier that caps at 10
+    blocks costs eight failed requests to discover by bisection, and a floor
+    set above the cap never discovers it at all."""
+    from data.fetch import cap_from
+
+    assert cap_from("Under the Free tier plan, you can make eth_getLogs "
+                    "requests with up to a 10 block range.") == 10
+    assert cap_from("eth_getLogs is limited to 0 - 50 blocks range") == 50
+    assert cap_from("up to a 2K block range") == 2000
+    assert cap_from("maximum of 10,000 blocks") == 10000
+    # A cap on the RESULT COUNT is a different limit and must not be read as a
+    # block range -- adopting 10,000 blocks here would fail every request.
+    assert cap_from("query returned more than 10000 results") is None
+    assert cap_from("something unrelated") is None
+    assert cap_from("") is None
+
+
+def test_the_walk_adopts_the_stated_cap_instead_of_bisecting():
+    from data import fetch
+
+    calls = []
+
+    class CapAt10:
+        raw = pathlib.Path(".")
+
+        def get(self, src, refresh=False):
+            lo, hi = (int(x) for x in src.name.split()[-1].split("-"))
+            calls.append(hi - lo + 1)
+            if hi - lo + 1 > 10:
+                raise datakit.FetchError(
+                    "returned HTTP 400. The server said: Under the Free tier "
+                    "plan, you can make eth_getLogs requests with up to a 10 "
+                    "block range. (code -32600)")
+            return pathlib.Path(".")
+
+    got, missing, smallest = fetch.walk_token(
+        CapAt10(), "BUIDL", TOKENS["BUIDL"]["address"],
+        1_000, 1_099, chunk=5000, refresh=False, verbose=False)
+
+    assert missing == [], "a stated cap is not a reason to drop blocks"
+    assert got == 100
+    assert smallest <= 10
+    # Bisecting 5000 down to 10 takes nine rejections; reading the number takes
+    # one. Anything above three means the cap is being discovered, not read.
+    rejected = [w for w in calls if w > 10]
+    assert len(rejected) <= 3, f"bisected instead of reading the cap: {calls}"
