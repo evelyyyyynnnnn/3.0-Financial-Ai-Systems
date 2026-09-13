@@ -90,7 +90,15 @@ def logs_source(symbol: str, address: str, from_block: int,
         publisher="public Ethereum RPC", terms=TERMS,
         note=f"Transfer events for {address}",
         body=_rpc("eth_getLogs", [{
-            "address": address,
+            # Lower-cased deliberately. A mixed-case address carries an EIP-55
+            # checksum, and an endpoint that validates it rejects a wrong one
+            # with a bare HTTP 400 -- indistinguishable, from the outside, from
+            # a range that is too wide, which is what the walk would otherwise
+            # conclude and then halve itself uselessly down to the floor.
+            # EIP-55 treats an all-lower-case address as unchecksummed, so this
+            # removes the failure mode rather than relying on the constant above
+            # being typed correctly.
+            "address": address.lower(),
             "fromBlock": hex(from_block), "toBlock": hex(to_block),
             "topics": [TRANSFER_TOPIC],
         }]),

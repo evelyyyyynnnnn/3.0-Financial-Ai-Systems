@@ -217,7 +217,14 @@ class Fetcher:
                 if e.code == 404:
                     raise FetchError(f"{src.url} returned 404 — the URL has moved.") from e
                 if e.code not in RETRYABLE_STATUS:
-                    raise FetchError(f"{src.url} returned HTTP {e.code}.") from e
+                    # The server explains itself in the response body, and the
+                    # earlier version threw that away -- leaving "returned HTTP
+                    # 400" as the only clue and a guess as the only next step.
+                    # A JSON-RPC endpoint in particular puts the real cause here
+                    # (a malformed address, a range cap, an unsupported filter).
+                    raise FetchError(
+                        f"{src.url} returned HTTP {e.code}. "
+                        f"The server said: {_body_of(e)}") from e
             except urllib.error.URLError as e:
                 last = e
                 reason = str(getattr(e, "reason", e))
@@ -305,6 +312,27 @@ def sha256_file(path) -> str:
         for chunk in iter(lambda: f.read(1 << 20), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def _body_of(e) -> str:
+    """The server's own explanation, trimmed, or a note that it sent none."""
+    try:
+        raw = e.read()
+    except Exception:
+        return "(the response body could not be read)"
+    if not raw:
+        return "(the response had an empty body)"
+    text = raw.decode("utf8", "replace").strip()
+    try:                       # a JSON-RPC error carries the useful part inside
+        d = json.loads(text)
+        err = d.get("error") if isinstance(d, dict) else None
+        if isinstance(err, dict):
+            msg = err.get("message") or ""
+            code = err.get("code")
+            return f"{msg} (code {code})" if code is not None else msg
+    except Exception:
+        pass
+    return text[:400] + ("…" if len(text) > 400 else "")
 
 
 def _is_sec(host: str) -> bool:
