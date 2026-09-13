@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+import re
 import sys
 
 from .datakit import Fetcher, FetchError, NetworkBlocked, utc_now
@@ -35,8 +36,40 @@ BLOCKS_PER_DAY = 7200          # 12-second slots
 # which is why a walk could lose nine ranges in ten. The walk now discovers the
 # real cap by halving a refused range instead of assuming one.
 CHUNK_BLOCKS = 5_000
-MIN_CHUNK_BLOCKS = 25         # below this, the endpoint is refusing for some
-                              # other reason and halving again just wastes time
+MIN_CHUNK_BLOCKS = 1          # an endpoint is allowed to cap at anything; the
+                              # free tier of one major provider caps at 10, and
+                              # a floor above the cap made every request fail
+                              # while the walk blamed the range for being wide
+
+
+# Providers state their cap in the rejection, in prose, and each says it
+# differently. Reading it beats halving blind: the walk adopts the number the
+# server gave instead of spending eight failed requests discovering it.
+_CAP_PATTERNS = (
+    re.compile(r"up to (?:a )?([\d,]+\s*[KkMm]?)\s*block range", re.I),
+    re.compile(r"limited to \d+\s*-\s*([\d,]+\s*[KkMm]?)\s*blocks?", re.I),
+    re.compile(r"(?:max(?:imum)?|exceeds?)\D{0,20}?([\d,]+\s*[KkMm]?)\s*blocks?", re.I),
+)
+
+_MULT = {"k": 1_000, "m": 1_000_000}
+
+
+def cap_from(message: str):
+    """The block-range cap the server named, or None if it named none."""
+    for pat in _CAP_PATTERNS:
+        m = pat.search(message or "")
+        if m:
+            raw = m.group(1).strip().replace(",", "").replace(" ", "")
+            mult = _MULT.get(raw[-1:].lower(), 1)
+            if mult > 1:
+                raw = raw[:-1]
+            try:
+                n = int(raw) * mult
+            except ValueError:
+                continue
+            if 0 < n <= 1_000_000:
+                return n
+    return None
 
 
 def walk_token(f, sym, address, start, head, chunk, refresh, verbose=True):
@@ -64,6 +97,16 @@ def walk_token(f, sym, address, start, head, chunk, refresh, verbose=True):
             got_blocks += width
             smallest = min(smallest, width)
         except FetchError as exc:
+            stated = cap_from(str(exc))
+            if stated and stated < width:
+                # The server named its cap. Take it rather than halving toward
+                # it -- and re-plan the whole remaining range at that size.
+                chunk = max(1, stated)
+                pending.insert(0, (lo, hi))
+                if verbose:
+                    print(f"  endpoint caps eth_getLogs at {chunk} blocks; "
+                          f"re-planning at that size", file=sys.stderr)
+                continue
             if width > MIN_CHUNK_BLOCKS:
                 mid = lo + width // 2
                 pending.insert(0, (mid, hi))
@@ -141,6 +184,18 @@ def main(argv=None) -> int:
         f.get(block_source(head, "hi"), refresh=args.refresh)
 
         want_blocks = head - start + 1
+
+        def report_cost(cap, note=""):
+            per = -(-want_blocks // cap)
+            total = per * len(want)
+            secs = total * args.pace
+            unit = (f"{secs/3600:.1f} h" if secs >= 3600 else
+                    f"{secs/60:.0f} min" if secs >= 60 else f"{secs:.0f} s")
+            print(f"  at {cap:,} blocks per call this window needs "
+                  f"{per:,} calls per token ({total:,} total, about {unit})"
+                  + (f" — {note}" if note else ""))
+            return secs
+
         for sym in want:
             meta = TOKENS[sym]
             print(f"\n{sym} ({meta['address']})")
@@ -165,6 +220,14 @@ def main(argv=None) -> int:
             }
             if skipped:
                 total_missing.append((sym, missing_blocks, want_blocks))
+            if smallest < 100 and want_blocks // max(smallest, 1) > 5_000:
+                secs = report_cost(smallest, "too many for one sitting")
+                if secs > 3600:
+                    print(f"  this endpoint's cap makes --days {args.days} "
+                          f"impractical. Either shrink the window "
+                          f"(--days {max(1, args.days // 30)}) or use an "
+                          f"endpoint with a wider eth_getLogs range.",
+                          file=sys.stderr)
     except NetworkBlocked as e:
         print(f"\nBLOCKED: {e}", file=sys.stderr)
         return 2
