@@ -166,6 +166,24 @@ class Fetcher:
             data = zlib.decompress(data, -zlib.MAX_WBITS)
         return data
 
+    def prune(self) -> list:
+        """Drop manifest entries whose file is no longer on disk.
+
+        Deleting a cache directory leaves the manifest describing files that
+        are gone. Everything downstream reads the manifest, so those entries
+        become instructions to open files that do not exist -- and they
+        accumulate across runs, so a manifest can end up naming caches from
+        three different failed attempts at once. Returns what it removed, so
+        the caller can say so rather than quietly rewriting history.
+        """
+        man = self.load_manifest()
+        gone = [d for d in man["files"] if not (self.raw / d).exists()]
+        for d in gone:
+            del man["files"][d]
+        if gone:
+            self._write_manifest(man)
+        return sorted(gone)
+
     def get(self, src: Source, refresh: bool = False) -> pathlib.Path:
         """Download one Source into the cache and record it in the manifest."""
         dest = self.raw / src.dest

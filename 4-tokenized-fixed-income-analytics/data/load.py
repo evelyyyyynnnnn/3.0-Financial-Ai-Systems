@@ -33,16 +33,47 @@ def load_tokens(root=ROOT):
     if (f.raw / "chain/block-hi.json").exists():
         hi_ts = parse_block_timestamp((f.raw / "chain/block-hi.json").read_bytes())
 
+    # The window the fetch actually asked for. Anything outside it is not part
+    # of this measurement -- and a cache directory can hold files from an
+    # earlier run against a DIFFERENT CHAIN, whose block numbers are simply
+    # wrong here. One such attempt in this project's own history left logs at
+    # block 38,000,000 beside a mainnet window ending near 26,000,000; nothing
+    # in the dedupe would have caught them, because they are genuinely
+    # distinct logs.
+    window = None
+    cov_path = f.raw / "chain" / "coverage.json"
+    if cov_path.exists():
+        try:
+            c = json.loads(cov_path.read_text(encoding="utf8"))
+            spans = [v.get("requested_blocks") for v in
+                     (c.get("by_symbol") or {}).values()
+                     if isinstance(v, dict) and v.get("requested_blocks")]
+            if spans:
+                window = (min(s[0] for s in spans), max(s[1] for s in spans))
+        except (ValueError, KeyError, TypeError, IndexError):
+            window = None
+
     by_symbol: dict = {}
+    missing_files, out_of_window = [], 0
     for dest in log_files:
         sym = pathlib.Path(dest).name.split("-logs-")[0].upper()
         meta = TOKENS.get(sym)
         if meta is None:
             continue
+        path = f.raw / dest
+        if not path.exists():
+            # A manifest entry with no file is a stale record, not a silent
+            # loss of data. Skip it, count it, and report it below.
+            missing_files.append(dest)
+            continue
         try:
-            rows = parse_logs((f.raw / dest).read_bytes(), meta["decimals"])
+            rows = parse_logs(path.read_bytes(), meta["decimals"])
         except ValueError:
             continue
+        if window:
+            kept = [r for r in rows if window[0] <= r["block"] <= window[1]]
+            out_of_window += len(rows) - len(kept)
+            rows = kept
         by_symbol.setdefault(sym, []).extend(rows)
 
     # Cached chunks can cover overlapping block ranges -- a walk that halved a
@@ -149,6 +180,22 @@ def load_tokens(root=ROOT):
             "recently is missing.",
         "tokens": prov,
     }
+
+    if missing_files:
+        meta["manifest_entries_without_a_file"] = len(missing_files)
+        meta["stale_manifest_note"] = (
+            f"{len(missing_files)} manifest entr"
+            f"{'y' if len(missing_files) == 1 else 'ies'} named a cached file "
+            f"that is no longer on disk and was skipped. Run "
+            f"`python -m data.fetch` to reconcile the manifest.")
+    if out_of_window:
+        meta["logs_outside_the_requested_window"] = out_of_window
+        meta["out_of_window_note"] = (
+            f"{out_of_window} cached log(s) fell outside the block window this "
+            f"run asked for and were discarded. Cached files from an earlier "
+            f"run against a different chain or a different window look like "
+            f"ordinary data otherwise, and would be counted as transfers of "
+            f"these tokens.")
 
     by_sym = (coverage.get("by_symbol") or {}) if isinstance(coverage, dict) else {}
     incomplete = {s: c for s, c in by_sym.items()
