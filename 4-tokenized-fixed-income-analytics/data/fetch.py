@@ -21,6 +21,7 @@ import re
 import sys
 
 from .datakit import Fetcher, FetchError, NetworkBlocked, utc_now
+from . import etherscan
 from .onchain import (RPC, TOKENS, block_number_source, block_source,
                       logs_source, parse_block_number)
 
@@ -123,6 +124,43 @@ def walk_token(f, sym, address, start, head, chunk, refresh, verbose=True):
     return got_blocks, missing, smallest
 
 
+def walk_token_etherscan(f, sym, address, start, head, refresh, verbose=True):
+    """Page through Etherscan's log index for one token.
+
+    Returns (blocks_retrieved, missing_ranges, pages). There is no block-range
+    cap to discover here, so the whole window is one query paged until it runs
+    out -- the cost tracks the number of transfers, not the width of the
+    window. A refusal mid-way leaves the window incomplete and is reported as
+    such rather than being taken for the end of the data.
+    """
+    page, rows_seen = 1, 0
+    while True:
+        src = etherscan.logs_source(sym, address, start, head, page)
+        try:
+            path = f.get(src, refresh=refresh)
+        except FetchError as exc:
+            if verbose:
+                print(f"  page {page} failed: {exc}", file=sys.stderr)
+            return 0, [(start, head)], page - 1
+        try:
+            rows, last = etherscan.parse_page(path.read_bytes(), 18)
+        except etherscan.RateLimited as exc:
+            # A refusal is NOT an empty page. Stopping here without saying so
+            # would report a truncated tape as a complete one.
+            if verbose:
+                print(f"  page {page}: {exc}", file=sys.stderr)
+            path.unlink(missing_ok=True)
+            return 0, [(start, head)], page - 1
+        rows_seen += len(rows)
+        if verbose and (last or page % 5 == 0):
+            print(f"  page {page}: {rows_seen:,} transfers so far")
+        if last:
+            return head - start + 1, [], page
+        page += 1
+        if page > 200:                     # 200k transfers; far beyond these funds
+            return 0, [(start, head)], page - 1
+
+
 def main(argv=None) -> int:
     import argparse
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -133,6 +171,9 @@ def main(argv=None) -> int:
                     help="how far back to walk the chain (default 90)")
     ap.add_argument("--tokens", default=",".join(TOKENS),
                     help="comma-separated symbols to fetch")
+    ap.add_argument("--rpc-only", action="store_true",
+                    help="walk blocks over JSON-RPC even when ETHERSCAN_API_KEY "
+                         "is set, to compare the two backends")
     ap.add_argument("--chunk", type=int, default=CHUNK_BLOCKS,
                     help=f"blocks per eth_getLogs call (default {CHUNK_BLOCKS}). "
                          f"A refused range is halved automatically, so this is "
@@ -184,6 +225,12 @@ def main(argv=None) -> int:
         f.get(block_source(head, "hi"), refresh=args.refresh)
 
         want_blocks = head - start + 1
+        backend = "etherscan" if (etherscan.available() and not args.rpc_only) else "rpc"
+        print(f"  backend: {backend}"
+              + ("  (ETHERSCAN_API_KEY is set; no block-range cap to work around)"
+                 if backend == "etherscan"
+                 else "  (set ETHERSCAN_API_KEY to page an index instead of "
+                      "walking blocks)"))
 
         def report_cost(cap, note=""):
             per = -(-want_blocks // cap)
@@ -199,8 +246,12 @@ def main(argv=None) -> int:
         for sym in want:
             meta = TOKENS[sym]
             print(f"\n{sym} ({meta['address']})")
-            got_blocks, skipped, smallest = walk_token(
-                f, sym, meta["address"], start, head, args.chunk, args.refresh)
+            if backend == "etherscan":
+                got_blocks, skipped, smallest = walk_token_etherscan(
+                    f, sym, meta["address"], start, head, args.refresh)
+            else:
+                got_blocks, skipped, smallest = walk_token(
+                    f, sym, meta["address"], start, head, args.chunk, args.refresh)
             missing_blocks = sum(b - a + 1 for a, b in skipped)
             frac = (got_blocks / want_blocks) if want_blocks else 0.0
             print(f"  {got_blocks:,} of {want_blocks:,} blocks retrieved "
@@ -242,7 +293,8 @@ def main(argv=None) -> int:
     cov_path = f.raw / "chain" / "coverage.json"
     cov_path.parent.mkdir(parents=True, exist_ok=True)
     cov_path.write_text(json.dumps(
-        {"generated_utc": utc_now(), "rpc": RPC, "pace_seconds": args.pace,
+        {"generated_utc": utc_now(), "rpc": RPC, "backend": backend,
+         "pace_seconds": args.pace,
          "days_requested": args.days, "by_symbol": coverage},
         indent=2, sort_keys=True) + "\n", encoding="utf8")
     print(f"wrote {cov_path}")
