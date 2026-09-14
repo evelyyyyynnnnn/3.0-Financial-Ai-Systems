@@ -211,6 +211,16 @@ def main(argv=None) -> int:
         print(f"unknown token(s): {unknown}; known: {list(TOKENS)}", file=sys.stderr)
         return 1
 
+    # A deleted cache leaves the manifest describing files that are gone, and
+    # the entries pile up across attempts. Reconcile before walking, and say
+    # what was dropped -- a silent rewrite of the provenance record is exactly
+    # what this project exists not to do.
+    stale = f.prune()
+    if stale:
+        print(f"dropped {len(stale)} manifest entr"
+              f"{'y' if len(stale) == 1 else 'ies'} whose file is gone "
+              f"(cache was deleted since the last run)")
+
     try:
         head = parse_block_number(
             f.get(block_number_source(), refresh=args.refresh).read_bytes())

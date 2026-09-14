@@ -712,3 +712,70 @@ def test_a_complete_index_run_prints_no_cost_warning(capsys, tmp_path, monkeypat
     assert entry["pages_fetched"] == 1
     assert entry["smallest_accepted_chunk"] is None, \
         "a page count is not a chunk size and must not be stored as one"
+
+
+def test_a_manifest_entry_without_a_file_is_skipped_and_reported(tmp_path):
+    """Deleting the cache leaves the manifest naming files that are gone. The
+    loader read them straight into read_bytes() and died with FileNotFoundError
+    partway through; a stale record is not a loss of data, and it is not a
+    reason to lose the rest of the run either."""
+    f = _seed(tmp_path)
+    man = f.load_manifest()
+    real = sorted(k for k in man["files"] if "-logs-" in k)[0]
+    man["files"]["chain/buidl-logs-0009.json"] = dict(man["files"][real])
+    f._write_manifest(man)
+
+    tokens, meta = load_tokens(root=tmp_path)          # must not raise
+    assert tokens, "one bad entry must not empty the run"
+    assert meta["manifest_entries_without_a_file"] == 1
+    assert "reconcile" in meta["stale_manifest_note"]
+
+
+def test_prune_drops_only_the_entries_whose_file_is_gone(tmp_path):
+    f = _seed(tmp_path)
+    man = f.load_manifest()
+    before = set(man["files"])
+    man["files"]["chain/ghost-logs-0001.json"] = {"source": "ghost", "url": "x",
+                                                  "publisher": "p", "terms": "t",
+                                                  "sha256": "0", "bytes": 0,
+                                                  "retrieved_utc": "now"}
+    f._write_manifest(man)
+
+    gone = f.prune()
+    assert gone == ["chain/ghost-logs-0001.json"]
+    assert set(f.load_manifest()["files"]) == before, "a real entry was dropped"
+    assert f.prune() == [], "pruning twice must be a no-op"
+
+
+def test_logs_from_another_chain_are_not_counted_as_transfers(tmp_path):
+    """A cache can hold files from an earlier run against a DIFFERENT CHAIN.
+    This project's own history has one: an endpoint chosen by mistake answered
+    at block 38,000,000 while Ethereum mainnet was near 26,000,000. Those logs
+    are genuinely distinct, so deduping by (tx, logIndex) does not touch them,
+    and every one would have been counted as a transfer of these tokens."""
+    f = _seed(tmp_path)
+    man = f.load_manifest()
+    real = sorted(k for k in man["files"] if "-logs-" in k)[0]
+    baseline = len(json.loads((f.raw / real).read_bytes())["result"])
+
+    # the window this run asked for
+    (f.raw / "chain" / "coverage.json").write_text(json.dumps({"by_symbol": {
+        "BUIDL": {"requested_blocks": [900, 3000], "blocks_requested": 2101,
+                  "blocks_retrieved": 2101, "fraction_retrieved": 1.0,
+                  "missing_ranges": []}}}), encoding="utf8")
+
+    wrong = [{"blockNumber": hex(38_468_987 + i),
+              "topics": [TRANSFER_TOPIC, _topic(A1), _topic(A2)],
+              "data": hex(10 ** 18), "transactionHash": f"0xdead{i:059x}",
+              "logIndex": hex(i)} for i in range(7)]
+    dest = "chain/buidl-logs-038468987-038468993.json"
+    (f.raw / dest).write_bytes(_rpc(wrong))
+    man["files"][dest] = dict(man["files"][real],
+                              sha256=datakit.sha256_file(f.raw / dest))
+    f._write_manifest(man)
+
+    tokens, meta = load_tokens(root=tmp_path)
+    assert meta["logs_outside_the_requested_window"] == 7
+    assert "different chain" in meta["out_of_window_note"]
+    assert len(tokens[0].trades) == baseline, \
+        "logs from another chain were counted as transfers of this token"
