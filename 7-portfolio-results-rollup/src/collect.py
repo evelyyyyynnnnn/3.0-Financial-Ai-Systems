@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 # The five repositories, relative to this project.
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 PORTFOLIO_ROOT = REPO_ROOT.parent
+EXPECTED_REPOS = 5
 
 
 @dataclass
@@ -93,11 +94,43 @@ def _newest_real(results: pathlib.Path) -> pathlib.Path:
     return results / "latest.json"
 
 
+def repo_dirs(root: pathlib.Path) -> list:
+    """The portfolio repositories visible from root.
+
+    The roll-up spans five repositories checked out side by side. A CI runner
+    checks out ONE, so from inside it the siblings do not exist and the walk
+    finds nothing at all -- which is how this returned zero projects on every
+    push while passing on a laptop. Falling back to the repository this file
+    lives in lets the roll-up do its job on whatever it can actually see; what
+    it could not see is recorded rather than assumed away, because a summary
+    over six projects labelled as the portfolio is the same silent failure this
+    project exists to prevent.
+    """
+    sibling = sorted(p for p in root.iterdir()
+                     if p.is_dir() and p.name[0].isdigit()
+                     and any(c.is_dir() and (c / "src").is_dir()
+                             for c in p.iterdir()))
+    return sibling or [REPO_ROOT]
+
+
+def visibility(root: pathlib.Path | None = None) -> dict:
+    """Which repositories this walk could see, and which it expected."""
+    root = root or PORTFOLIO_ROOT
+    seen = [r.name for r in repo_dirs(root)]
+    return {"repos_visible": len(seen), "repos_expected": EXPECTED_REPOS,
+            "repos": seen,
+            "is_partial_view": len(seen) < EXPECTED_REPOS,
+            "partial_view_because":
+                (f"only {len(seen)} of the {EXPECTED_REPOS} portfolio "
+                 f"repositories are checked out here ({', '.join(seen)}), so "
+                 f"these totals describe that subset and not the portfolio.")
+                if len(seen) < EXPECTED_REPOS else ""}
+
+
 def discover(root: pathlib.Path | None = None) -> list:
     root = root or PORTFOLIO_ROOT
     out: list = []
-    for repo in sorted(p for p in root.iterdir()
-                       if p.is_dir() and p.name[0].isdigit()):
+    for repo in repo_dirs(root):
         for project in sorted(p for p in repo.iterdir() if p.is_dir()):
             if project.name in ("previous", ".git", ".github", "scripts"):
                 continue

@@ -103,10 +103,39 @@ def test_every_extractor_is_callable_on_an_empty_payload():
 
 
 def test_live_portfolio_is_readable():
-    """The roll-up must work against the real tree, not only fixtures."""
+    """The roll-up must work against the real tree, not only fixtures.
+
+    It used to assert five repositories checked out side by side. A CI runner
+    checks out ONE, so from inside it the siblings do not exist, discover()
+    returned zero, and this failed on every push while passing on a laptop --
+    a test that encoded the author's directory layout as a property of the
+    code. What must hold in either layout is that the walk finds the projects
+    it can actually see.
+    """
     found = discover()
-    assert len(found) >= 4
+    assert found, "the walk found no projects in the tree it is running in"
     assert any(p.has_results for p in found)
+    assert len({p.repo for p in found}) >= 1
+
+
+def test_a_one_repo_view_is_never_reported_as_the_portfolio(tmp_path):
+    """Falling back to the containing repository keeps the roll-up working on
+    a single checkout. It must not let that narrower view be read as the whole
+    portfolio: totals over six projects labelled as twenty-two would be the
+    same silent failure this project exists to prevent."""
+    from src.collect import EXPECTED_REPOS, visibility
+
+    solo = tmp_path / "3.0-only"
+    (solo / "1-thing" / "src").mkdir(parents=True)
+    v = visibility(root=solo)
+
+    assert v["repos_visible"] < EXPECTED_REPOS
+    assert v["is_partial_view"] is True
+    assert "not the portfolio" in v["partial_view_because"]
+
+    summary = portfolio_summary(discover())
+    for key in ("repos_visible", "repos_expected", "is_partial_view"):
+        assert key in summary, f"{key} must travel with the totals"
 
 
 # --- provenance must survive whatever the project chose to call the field ---
