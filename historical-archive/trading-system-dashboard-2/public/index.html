@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Simulation Platform - Professional Quantitative Trading</title>
+    <meta name="description" content="Advanced trading strategy platform with comprehensive backtesting engine for quantitative trading professionals">
+    <meta name="keywords" content="trading, quantitative, backtesting, strategy, portfolio, simulation">
+    
+    <!-- Chart.js for financial charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    
+    <!-- Socket.IO for real-time updates -->
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-chart-line"></i>
+                <span>TradingSim Pro</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#dashboard" class="nav-link active">Dashboard</a>
+                <a href="#backtesting" class="nav-link">Backtesting</a>
+                <a href="#portfolio" class="nav-link">Portfolio</a>
+                <a href="#strategies" class="nav-link">Strategies</a>
+                <a href="#market-data" class="nav-link">Market Data</a>
+                <a href="#analytics" class="nav-link">Analytics</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-primary" onclick="showLoginModal()">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="container">
+                <div class="section-header">
+                    <h1>Quantitative Trading Dashboard</h1>
+                    <p>Professional-grade trading strategy platform with advanced backtesting capabilities</p>
+                </div>
+                
+                <!-- Key Metrics Cards -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3>Total Return</h3>
+                            <p class="metric-value positive">+15.8%</p>
+                            <p class="metric-change">+2.3% today</p>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3>Sharpe Ratio</h3>
+                            <p class="metric-value">1.42</p>
+                            <p class="metric-change">Risk-adjusted performance</p>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3>Max Drawdown</h3>
+                            <p class="metric-value negative">-8.7%</p>
+                            <p class="metric-change">Peak to trough</p>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3>Win Rate</h3>
+                            <p class="metric-value">62.4%</p>
+                            <p class="metric-change">Profitable trades</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Performance Chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h2>Portfolio Performance</h2>
+                        <div class="chart-controls">
+                            <button class="btn btn-outline active" data-period="1Y">1Y</button>
+                            <button class="btn btn-outline" data-period="3Y">3Y</button>
+                            <button class="btn btn-outline" data-period="5Y">5Y</button>
+                            <button class="btn btn-outline" data-period="ALL">ALL</button>
+                        </div>
+                    </div>
+                    <canvas id="performanceChart"></canvas>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="activity-section">
+                    <h2>Recent Trading Activity</h2>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-icon buy">
+                                <i class="fas fa-arrow-up"></i>
+                            </div>
+                            <div class="activity-details">
+                                <h4>BUY AAPL</h4>
+                                <p>100 shares @ $155.75</p>
+                                <span class="activity-time">2 hours ago</span>
+                            </div>
+                            <div class="activity-status">
+                                <span class="status-badge filled">Filled</span>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon sell">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <div class="activity-details">
+                                <h4>SELL GOOGL</h4>
+                                <p>25 shares @ $2,800.00</p>
+                                <span class="activity-time">1 day ago</span>
+                            </div>
+                            <div class="activity-status">
+                                <span class="status-badge filled">Filled</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Backtesting Section -->
+        <section id="backtesting" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h1>Strategy Backtesting Engine</h1>
+                    <p>Test your trading strategies with historical data and comprehensive performance analysis</p>
+                </div>
+                
+                <!-- Strategy Selection -->
+                <div class="strategy-selector">
+                    <div class="form-group">
+                        <label for="strategy">Trading Strategy</label>
+                        <select id="strategy" class="form-control">
+                            <option value="">Select a strategy...</option>
+                            <option value="moving-average-crossover">Moving Average Crossover</option>
+                            <option value="mean-reversion">Mean Reversion</option>
+                            <option value="momentum">Momentum</option>
+                            <option value="bollinger-bands">Bollinger Bands</option>
+                            <option value="rsi-divergence">RSI Divergence</option>
+                            <option value="macd-crossover">MACD Crossover</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="symbol">Symbol</label>
+                        <input type="text" id="symbol" class="form-control" placeholder="e.g., AAPL" value="AAPL">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="capital">Initial Capital</label>
+                        <input type="number" id="capital" class="form-control" value="100000" min="1000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="period">Time Period</label>
+                        <select id="period" class="form-control">
+                            <option value="1y">1 Year</option>
+                            <option value="2y">2 Years</option>
+                            <option value="5y">5 Years</option>
+                            <option value="10y">10 Years</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Strategy Parameters -->
+                <div id="strategy-params" class="strategy-params" style="display: none;">
+                    <h3>Strategy Parameters</h3>
+                    <div class="params-grid">
+                        <!-- Parameters will be dynamically loaded -->
+                    </div>
+                </div>
+                
+                <!-- Run Backtest Button -->
+                <div class="backtest-actions">
+                    <button class="btn btn-primary btn-large" onclick="runBacktest()">
+                        <i class="fas fa-play"></i> Run Backtest
+                    </button>
+                    <button class="btn btn-outline" onclick="compareStrategies()">
+                        <i class="fas fa-balance-scale"></i> Compare Strategies
+                    </button>
+                </div>
+                
+                <!-- Backtest Results -->
+                <div id="backtest-results" class="backtest-results" style="display: none;">
+                    <div class="results-header">
+                        <h2>Backtest Results</h2>
+                        <div class="results-summary">
+                            <div class="summary-item">
+                                <span class="label">Total Return:</span>
+                                <span class="value positive" id="total-return">--</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Sharpe Ratio:</span>
+                                <span class="value" id="sharpe-ratio">--</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Max Drawdown:</span>
+                                <span class="value negative" id="max-drawdown">--</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Win Rate:</span>
+                                <span class="value" id="win-rate">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Equity Curve Chart -->
+                    <div class="chart-container">
+                        <h3>Equity Curve</h3>
+                        <canvas id="equityChart"></canvas>
+                    </div>
+                    
+                    <!-- Trade Analysis -->
+                    <div class="trade-analysis">
+                        <h3>Trade Analysis</h3>
+                        <div class="trades-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Signal</th>
+                                        <th>Price</th>
+                                        <th>Shares</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="trades-body">
+                                    <!-- Trades will be dynamically loaded -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portfolio Section -->
+        <section id="portfolio" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h1>Portfolio Management</h1>
+                    <p>Advanced portfolio optimization using Modern Portfolio Theory and risk management</p>
+                </div>
+                
+                <!-- Portfolio Overview -->
+                <div class="portfolio-overview">
+                    <div class="portfolio-summary">
+                        <div class="summary-card">
+                            <h3>Total Value</h3>
+                            <p class="value">$125,750</p>
+                            <p class="change positive">+$5,750 (+4.8%)</p>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <h3>Cash</h3>
+                            <p class="value">$15,250</p>
+                            <p class="change">Available for trading</p>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <h3>Invested</h3>
+                            <p class="value">$110,500</p>
+                            <p class="change">In securities</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Portfolio Optimization -->
+                <div class="optimization-section">
+                    <h2>Portfolio Optimization</h2>
+                    <div class="optimization-controls">
+                        <div class="form-group">
+                            <label for="optimization-method">Optimization Method</label>
+                            <select id="optimization-method" class="form-control">
+                                <option value="max-sharpe">Maximum Sharpe Ratio</option>
+                                <option value="min-variance">Minimum Variance</option>
+                                <option value="risk-parity">Risk Parity</option>
+                                <option value="equal">Equal Weight</option>
+                            </select>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="optimizePortfolio()">
+                            <i class="fas fa-magic"></i> Optimize Portfolio
+                        </button>
+                    </div>
+                    
+                    <!-- Optimization Results -->
+                    <div id="optimization-results" class="optimization-results" style="display: none;">
+                        <div class="results-grid">
+                            <div class="chart-container">
+                                <h3>Optimal Weights</h3>
+                                <canvas id="weightsChart"></canvas>
+                            </div>
+                            
+                            <div class="metrics-panel">
+                                <h3>Portfolio Metrics</h3>
+                                <div class="metric-item">
+                                    <span class="label">Expected Return:</span>
+                                    <span class="value" id="expected-return">--</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="label">Portfolio Risk:</span>
+                                    <span class="value" id="portfolio-risk">--</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="label">Sharpe Ratio:</span>
+                                    <span class="value" id="portfolio-sharpe">--</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="label">Diversification Ratio:</span>
+                                    <span class="value" id="diversification-ratio">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Strategies Section -->
+        <section id="strategies" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h1>Trading Strategies Library</h1>
+                    <p>Comprehensive collection of proven trading strategies with detailed analysis</p>
+                </div>
+                
+                <!-- Strategy Categories -->
+                <div class="strategy-categories">
+                    <button class="category-btn active" data-category="all">All Strategies</button>
+                    <button class="category-btn" data-category="trend-following">Trend Following</button>
+                    <button class="category-btn" data-category="mean-reversion">Mean Reversion</button>
+                    <button class="category-btn" data-category="momentum">Momentum</button>
+                    <button class="category-btn" data-category="oscillator">Oscillator</button>
+                </div>
+                
+                <!-- Strategies Grid -->
+                <div class="strategies-grid" id="strategies-grid">
+                    <!-- Strategies will be dynamically loaded -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Market Data Section -->
+        <section id="market-data" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h1>Real-Time Market Data</h1>
+                    <p>Live market data with technical indicators and analysis tools</p>
+                </div>
+                
+                <!-- Market Overview -->
+                <div class="market-overview">
+                    <div class="market-widgets">
+                        <div class="market-widget">
+                            <div class="widget-header">
+                                <h3>AAPL</h3>
+                                <span class="change positive">+$5.50 (+3.7%)</span>
+                            </div>
+                            <div class="widget-price">$155.75</div>
+                            <div class="widget-volume">Volume: 45.2M</div>
+                        </div>
+                        
+                        <div class="market-widget">
+                            <div class="widget-header">
+                                <h3>GOOGL</h3>
+                                <span class="change positive">+$50.00 (+1.8%)</span>
+                            </div>
+                            <div class="widget-price">$2,800.00</div>
+                            <div class="widget-volume">Volume: 12.8M</div>
+                        </div>
+                        
+                        <div class="market-widget">
+                            <div class="widget-header">
+                                <h3>MSFT</h3>
+                                <span class="change negative">-$2.25 (-0.7%)</span>
+                            </div>
+                            <div class="widget-price">$320.50</div>
+                            <div class="widget-volume">Volume: 28.9M</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chart with Indicators -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Price Chart with Indicators</h3>
+                        <div class="indicator-controls">
+                            <label><input type="checkbox" checked> SMA</label>
+                            <label><input type="checkbox" checked> RSI</label>
+                            <label><input type="checkbox" checked> MACD</label>
+                            <label><input type="checkbox" checked> Bollinger Bands</label>
+                        </div>
+                    </div>
+                    <canvas id="marketChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section id="analytics" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h1>Advanced Analytics</h1>
+                    <p>Comprehensive performance analysis and risk management tools</p>
+                </div>
+                
+                <!-- Risk Metrics -->
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3>Risk Metrics</h3>
+                        <div class="metrics-list">
+                            <div class="metric-row">
+                                <span class="label">Value at Risk (95%):</span>
+                                <span class="value">-2.1%</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="label">Value at Risk (99%):</span>
+                                <span class="value">-3.8%</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="label">Expected Shortfall:</span>
+                                <span class="value">-4.2%</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="label">Beta:</span>
+                                <span class="value">0.85</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3>Performance Attribution</h3>
+                        <div class="attribution-chart">
+                            <canvas id="attributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Monte Carlo Simulation -->
+                <div class="simulation-section">
+                    <h2>Monte Carlo Simulation</h2>
+                    <div class="simulation-controls">
+                        <div class="form-group">
+                            <label for="simulation-count">Number of Simulations</label>
+                            <input type="number" id="simulation-count" class="form-control" value="10000" min="1000" max="100000">
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="runSimulation()">
+                            <i class="fas fa-dice"></i> Run Simulation
+                        </button>
+                    </div>
+                    
+                    <div id="simulation-results" class="simulation-results" style="display: none;">
+                        <div class="chart-container">
+                            <h3>Simulation Results</h3>
+                            <canvas id="simulationChart"></canvas>
+                        </div>
+                        
+                        <div class="percentiles-grid">
+                            <div class="percentile-item">
+                                <span class="label">1st Percentile:</span>
+                                <span class="value" id="p1">--</span>
+                            </div>
+                            <div class="percentile-item">
+                                <span class="label">5th Percentile:</span>
+                                <span class="value" id="p5">--</span>
+                            </div>
+                            <div class="percentile-item">
+                                <span class="label">25th Percentile:</span>
+                                <span class="value" id="p25">--</span>
+                            </div>
+                            <div class="percentile-item">
+                                <span class="label">Median:</span>
+                                <span class="value" id="p50">--</span>
+                            </div>
+                            <div class="percentile-item">
+                                <span class="label">75th Percentile:</span>
+                                <span class="value" id="p75">--</span>
+                            </div>
+                            <div class="percentile-item">
+                                <span class="label">95th Percentile:</span>
+                                <span class="value" id="p95">--</span>
+                            </div>
+                            <div class="percentile-item">
+                                <span class="label">99th Percentile:</span>
+                                <span class="value" id="p99">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Login to TradingSim Pro</h2>
+                <span class="close" onclick="closeLoginModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Login</button>
+                </form>
+                <p class="text-center">
+                    <a href="#" onclick="showSignupModal()">Don't have an account? Sign up</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Account</h2>
+                <span class="close" onclick="closeSignupModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+                </form>
+                <p class="text-center">
+                    <a href="#" onclick="showLoginModal()">Already have an account? Login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+        </div>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>

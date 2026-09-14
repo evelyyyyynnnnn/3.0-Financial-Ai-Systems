@@ -1,0 +1,7 @@
+version: "3.8"
+services:
+  mw:
+    build: .
+    image: mw
+    stdin_open: true
+    tty: true

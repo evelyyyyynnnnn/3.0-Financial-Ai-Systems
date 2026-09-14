@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketWatcher - Options Volatility Trading Monitor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin: 20px auto;
+            padding: 30px;
+        }
+        .status-card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .status-card:hover {
+            transform: translateY(-5px);
+        }
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .status-running {
+            background-color: #28a745;
+            animation: pulse 2s infinite;
+        }
+        .status-stopped {
+            background-color: #dc3545;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .opportunity-card {
+            border-left: 5px solid;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .opportunity-card:hover {
+            transform: translateX(5px);
+        }
+        .long-straddle {
+            border-left-color: #ff6b6b;
+            background: linear-gradient(90deg, rgba(255,107,107,0.1) 0%, rgba(255,255,255,0.9) 100%);
+        }
+        .short-straddle {
+            border-left-color: #4ecdc4;
+            background: linear-gradient(90deg, rgba(78,205,196,0.1) 0%, rgba(255,255,255,0.9) 100%);
+        }
+        .market-data-table {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .refresh-btn {
+            border-radius: 25px;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+        }
+        .refresh-btn:hover {
+            transform: scale(1.05);
+        }
+        .control-btn {
+            border-radius: 25px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="main-container">
+            <!-- Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="display-4 mb-0">
+                                <i class="fas fa-chart-line text-primary"></i>
+                                MarketWatcher
+                            </h1>
+                            <p class="lead text-muted">Options Volatility Trading Monitor System</p>
+                        </div>
+                        <div class="text-end">
+                            <div id="connection-status" class="badge bg-success fs-6">
+                                <i class="fas fa-wifi"></i> Connected
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">Last Update: <span id="last-update">--</span></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card status-card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">
+                                <span id="system-status-indicator" class="status-indicator status-running"></span>
+                                System Status
+                            </h5>
+                            <p class="card-text" id="system-status">Running</p>
+                            <div class="mt-3">
+                                <button id="control-btn" class="btn btn-danger control-btn" onclick="toggleSystem()">
+                                    <i class="fas fa-stop"></i> Stop System
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card status-card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">
+                                <i class="fas fa-chart-bar text-info"></i>
+                                Monitored Stocks
+                            </h5>
+                            <h3 class="text-info" id="total-stocks">0</h3>
+                            <p class="card-text">stocks</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card status-card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">
+                                <i class="fas fa-arrow-up text-danger"></i>
+                                Long Straddle
+                            </h5>
+                            <h3 class="text-danger" id="long-opportunities">0</h3>
+                            <p class="card-text">个机会</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card status-card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">
+                                <i class="fas fa-arrow-down text-success"></i>
+                                Short Straddle
+                            </h5>
+                            <h3 class="text-success" id="short-opportunities">0</h3>
+                            <p class="card-text">个机会</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Investment Opportunities -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card status-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-bullseye text-warning"></i>
+                                投资机会
+                            </h5>
+                            <button class="btn btn-outline-primary refresh-btn" onclick="refreshData()">
+                                <i class="fas fa-sync-alt"></i> 刷新
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="opportunities-container">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                    <p class="mt-2">正在加载投资机会...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trading Signals -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card status-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-signal text-success"></i>
+                                交易信号
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="signals-container">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                    <p class="mt-2">正在加载交易信号...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Data -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card status-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-line text-primary"></i>
+                                市场数据 (前20只股票)
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0 market-data-table">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>股票代码</th>
+                                            <th>涨跌幅</th>
+                                            <th>方向</th>
+                                            <th>策略</th>
+                                            <th>时间</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="market-data-table">
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">
+                                                <i class="fas fa-spinner fa-spin"></i> 正在加载数据...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trading Logic Explanation Section -->
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-brain"></i>
+                            Quantitative Trading System Logic
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="text-primary">🎯 System Overview</h5>
+                                <ul class="list-unstyled">
+                                    <li><strong>• Strategy Type:</strong> Volatility-based Options Trading</li>
+                                    <li><strong>• Data Source:</strong> Yahoo Finance API (Real-time)</li>
+                                    <li><strong>• Update Frequency:</strong> Every 5 minutes</li>
+                                    <li><strong>• Monitoring Scope:</strong> 100 pre-selected stocks</li>
+                                    <li><strong>• Trading Instruments:</strong> Long Straddle & Short Straddle Options</li>
+                                </ul>
+                                
+                                <h5 class="text-primary mt-4">📊 Stock Classification Process</h5>
+                                <ul class="list-unstyled">
+                                    <li><strong>• Historical Analysis:</strong> Russell 3000 Index screening</li>
+                                    <li><strong>• Volatility Calculation:</strong> Weighted historical volatility</li>
+                                    <li><strong>• Formula:</strong> 0.5 × 1-week + 0.3 × 2-week + 0.2 × 1-month</li>
+                                    <li><strong>• High Volatility:</strong> Top 50 stocks → Long Straddle candidates</li>
+                                    <li><strong>• Low Volatility:</strong> Bottom 50 stocks → Short Straddle candidates</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h5 class="text-success">📈 Long Straddle Strategy</h5>
+                                <ul class="list-unstyled">
+                                    <li><strong>• Target Stocks:</strong> High volatility stocks</li>
+                                    <li><strong>• Trigger Condition:</strong> Daily P&L > 5% (absolute value)</li>
+                                    <li><strong>• Action:</strong> Buy both Call and Put options</li>
+                                    <li><strong>• Profit Logic:</strong> Profit from large price movements in either direction</li>
+                                    <li><strong>• Risk:</strong> Limited to premium paid</li>
+                                    <li><strong>• Example:</strong> Stock moves ±10% → Both options gain value</li>
+                                </ul>
+                                
+                                <h5 class="text-warning">📉 Short Straddle Strategy</h5>
+                                <ul class="list-unstyled">
+                                    <li><strong>• Target Stocks:</strong> Low volatility stocks</li>
+                                    <li><strong>• Trigger Condition:</strong> Daily P&L < 0.5% (absolute value)</li>
+                                    <li><strong>• Action:</strong> Sell both Call and Put options</li>
+                                    <li><strong>• Profit Logic:</strong> Collect premium when stock remains stable</li>
+                                    <li><strong>• Risk:</strong> Unlimited if stock moves significantly</li>
+                                    <li><strong>• Example:</strong> Stock stays flat → Options expire worthless, keep premium</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="text-info">⚙️ System Workflow</h5>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <div class="bg-light p-3 rounded">
+                                                <i class="fas fa-download fa-2x text-primary mb-2"></i>
+                                                <h6>Data Collection</h6>
+                                                <small>Fetch real-time stock prices, volumes, and historical data from Yahoo Finance</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <div class="bg-light p-3 rounded">
+                                                <i class="fas fa-calculator fa-2x text-success mb-2"></i>
+                                                <h6>Analysis</h6>
+                                                <small>Calculate daily P&L percentages and compare against trading thresholds</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <div class="bg-light p-3 rounded">
+                                                <i class="fas fa-bullseye fa-2x text-warning mb-2"></i>
+                                                <h6>Signal Generation</h6>
+                                                <small>Generate buy/sell signals based on volatility thresholds and stock classification</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <div class="bg-light p-3 rounded">
+                                                <i class="fas fa-chart-line fa-2x text-danger mb-2"></i>
+                                                <h6>Execution</h6>
+                                                <small>Display opportunities and signals on dashboard for manual or automated trading</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Important Notes</h6>
+                            <ul class="mb-0">
+                                <li><strong>Risk Management:</strong> This system is for educational and research purposes. Always consider risk management in actual trading.</li>
+                                <li><strong>Market Conditions:</strong> Volatility thresholds may need adjustment based on market conditions.</li>
+                                <li><strong>Data Quality:</strong> System depends on Yahoo Finance data availability and accuracy.</li>
+                                <li><strong>Backtesting:</strong> Historical performance does not guarantee future results.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        // Initialize Socket.IO connection
+        const socket = io();
+        
+        // Connection status
+        socket.on('connect', function() {
+            document.getElementById('connection-status').innerHTML = '<i class="fas fa-wifi"></i> 已连接';
+            document.getElementById('connection-status').className = 'badge bg-success fs-6';
+        });
+        
+        socket.on('disconnect', function() {
+            document.getElementById('connection-status').innerHTML = '<i class="fas fa-wifi"></i> 连接断开';
+            document.getElementById('connection-status').className = 'badge bg-danger fs-6';
+        });
+        
+        // Real-time market updates
+        socket.on('market_update', function(data) {
+            updateDashboard(data);
+        });
+        
+        // Initial data load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSystemStatus();
+            loadOpportunities();
+            loadTradingSignals();
+            loadMarketData();
+            
+            // Refresh data every 30 seconds
+            setInterval(() => {
+                loadSystemStatus();
+                loadOpportunities();
+                loadMarketData();
+            }, 30000);
+        });
+        
+        function loadSystemStatus() {
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    updateSystemStatus(data);
+                })
+                .catch(error => console.error('Error loading system status:', error));
+        }
+        
+        function loadOpportunities() {
+            fetch('/api/opportunities')
+                .then(response => response.json())
+                .then(data => {
+                    updateOpportunities(data.opportunities);
+                })
+                .catch(error => console.error('Error loading opportunities:', error));
+        }
+        
+        function loadTradingSignals() {
+            fetch('/api/trading-signals')
+                .then(response => response.json())
+                .then(data => {
+                    updateTradingSignals(data.signals);
+                })
+                .catch(error => console.error('Error loading trading signals:', error));
+        }
+        
+        function loadMarketData() {
+            fetch('/api/market-data')
+                .then(response => response.json())
+                .then(data => {
+                    updateMarketData(data.data);
+                })
+                .catch(error => console.error('Error loading market data:', error));
+        }
+        
+        function updateSystemStatus(data) {
+            const indicator = document.getElementById('system-status-indicator');
+            const status = document.getElementById('system-status');
+            const controlBtn = document.getElementById('control-btn');
+            
+            if (data.system_running) {
+                indicator.className = 'status-indicator status-running';
+                status.textContent = '运行中';
+                controlBtn.innerHTML = '<i class="fas fa-stop"></i> 停止系统';
+                controlBtn.className = 'btn btn-danger control-btn';
+            } else {
+                indicator.className = 'status-indicator status-stopped';
+                status.textContent = '已停止';
+                controlBtn.innerHTML = '<i class="fas fa-play"></i> 启动系统';
+                controlBtn.className = 'btn btn-success control-btn';
+            }
+            
+            document.getElementById('total-stocks').textContent = data.stats.total_stocks || 0;
+            document.getElementById('long-opportunities').textContent = data.stats.long_opportunities || 0;
+            document.getElementById('short-opportunities').textContent = data.stats.short_opportunities || 0;
+            document.getElementById('total-signals').textContent = data.stats.total_signals || 0;
+            
+            if (data.last_update) {
+                const date = new Date(data.last_update);
+                document.getElementById('last-update').textContent = date.toLocaleTimeString();
+            }
+        }
+        
+        function updateOpportunities(opportunities) {
+            const container = document.getElementById('opportunities-container');
+            
+            if (opportunities.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted">
+                        <i class="fas fa-check-circle fa-3x mb-3"></i>
+                        <h5>暂无投资机会</h5>
+                        <p>当前市场中没有符合策略条件的股票</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            opportunities.forEach(opp => {
+                const cardClass = opp.strategy === 'long straddle' ? 'long-straddle' : 'short-straddle';
+                const icon = opp.direction === 'UP' ? 'fas fa-arrow-up text-success' : 'fas fa-arrow-down text-danger';
+                
+                html += `
+                    <div class="card opportunity-card ${cardClass}">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    <h5 class="mb-0">${opp.ticker}</h5>
+                                    <small class="text-muted">${opp.strategy}</small>
+                                </div>
+                                <div class="col-md-2">
+                                    <h4 class="mb-0 ${opp.pnl > 0 ? 'text-success' : 'text-danger'}">
+                                        ${opp.pnl_percent}%
+                                    </h4>
+                                </div>
+                                <div class="col-md-2">
+                                    <i class="${icon} fa-2x"></i>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">
+                                        检测时间: ${new Date(opp.timestamp).toLocaleString()}
+                                    </small>
+                                </div>
+                                <div class="col-md-3 text-end">
+                                    <span class="badge ${opp.strategy === 'long straddle' ? 'bg-danger' : 'bg-success'} fs-6">
+                                        ${opp.strategy.toUpperCase()}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function updateMarketData(data) {
+            const tbody = document.getElementById('market-data-table');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">暂无市场数据</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            data.forEach(stock => {
+                const directionIcon = stock.direction === 'UP' ? 'fas fa-arrow-up text-success' : 'fas fa-arrow-down text-danger';
+                const strategy = Math.abs(stock.change_percent) > 5 ? 'Long Straddle' : 
+                               Math.abs(stock.change_percent) < 0.5 ? 'Short Straddle' : '--';
+                const strategyBadge = strategy === 'Long Straddle' ? 'bg-danger' : 
+                                    strategy === 'Short Straddle' ? 'bg-success' : 'bg-secondary';
+                
+                html += `
+                    <tr>
+                        <td><strong>${stock.ticker}</strong></td>
+                        <td>
+                            <span class="${stock.change_percent > 0 ? 'text-success' : 'text-danger'}">
+                                ${stock.change_percent.toFixed(2)}%
+                            </span>
+                        </td>
+                        <td><i class="${directionIcon}"></i></td>
+                        <td><span class="badge ${strategyBadge}">${strategy}</span></td>
+                        <td><small class="text-muted">${new Date().toLocaleTimeString()}</small></td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        function updateDashboard(data) {
+            updateOpportunities(data.opportunities);
+            
+            if (data.signals) {
+                updateTradingSignals(data.signals);
+            }
+            
+            document.getElementById('total-stocks').textContent = data.stats.total_stocks || 0;
+            document.getElementById('long-opportunities').textContent = data.stats.long_opportunities || 0;
+            document.getElementById('short-opportunities').textContent = data.stats.short_opportunities || 0;
+            document.getElementById('total-signals').textContent = data.stats.total_signals || 0;
+            
+            if (data.timestamp) {
+                const date = new Date(data.timestamp);
+                document.getElementById('last-update').textContent = date.toLocaleTimeString();
+            }
+        }
+        
+        function toggleSystem() {
+            const isRunning = document.getElementById('system-status').textContent === '运行中';
+            const action = isRunning ? 'stop' : 'start';
+            
+            fetch('/api/control', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: action })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    setTimeout(() => {
+                        loadSystemStatus();
+                    }, 1000);
+                } else {
+                    alert('操作失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('操作失败，请重试');
+            });
+        }
+        
+        function refreshData() {
+            loadSystemStatus();
+            loadOpportunities();
+            loadTradingSignals();
+            loadMarketData();
+        }
+        
+        function updateTradingSignals(signals) {
+            const container = document.getElementById('signals-container');
+            
+            if (signals.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted"><i class="fas fa-info-circle"></i><p class="mt-2">暂无交易信号</p></div>';
+                return;
+            }
+            
+            let html = '';
+            signals.forEach(signal => {
+                const actionClass = signal.action === 'BUY_CALL_PUT' ? 'success' : 'warning';
+                const actionText = signal.action === 'BUY_CALL_PUT' ? '买入' : '卖出';
+                const actionIcon = signal.action === 'BUY_CALL_PUT' ? 'fa-arrow-up' : 'fa-arrow-down';
+                const direction = signal.direction === 'UP' ? 'success' : 'danger';
+                
+                html += `
+                    <div class="card signal-card border-${actionClass} mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    <h5 class="mb-0">${signal.ticker}</h5>
+                                    <small class="text-muted">${signal.type}</small>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="badge bg-${actionClass} fs-6">${actionText}</span>
+                                </div>
+                                <div class="col-md-2">
+                                    <h4 class="mb-0 text-${direction}">
+                                        ${Math.abs(signal.change_percent).toFixed(2)}%
+                                    </h4>
+                                </div>
+                                <div class="col-md-2">
+                                    <i class="fas ${actionIcon} fa-2x text-${actionClass}"></i>
+                                </div>
+                                <div class="col-md-4">
+                                    <small class="text-muted">价格: $${signal.current_price?.toFixed(2) || 'N/A'}</small><br>
+                                    <small class="text-muted">${signal.reason}</small><br>
+                                    <small class="text-muted">${new Date(signal.timestamp).toLocaleTimeString()}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
