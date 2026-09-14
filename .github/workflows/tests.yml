@@ -23,7 +23,25 @@ jobs:
             # The RL engine needs TensorFlow/gymnasium; excluded from the light test badge.
             case "$d" in 6-portfolio-optimization-engine/) echo "skip heavy $d"; continue;; esac
             echo "::group::${d}"
-            ( cd "$d" && { [ -f requirements.txt ] && pip install -q -r requirements.txt || true; } && python -m pytest tests/ -q -p no:cacheprovider ) || rc=1
+            # A project with tests must say what they need, even if the answer is
+            # nothing: an undeclared dependency used to reach the runner as a
+            # ModuleNotFoundError inside a test, which names the symptom and hides
+            # the cause. A comment-only requirements.txt is a valid answer.
+            if [ ! -f "${d}requirements.txt" ]; then
+              echo "::error::${d} has tests/ but no requirements.txt. Declare what the"
+              echo "::error::suite needs beyond the base stack, or commit an empty file to say 'nothing'."
+              rc=1
+              echo "::endgroup::"
+              continue
+            fi
+            # No `|| true` here. A failed install is reported as a failed install.
+            if ! ( cd "$d" && pip install -q -r requirements.txt ); then
+              echo "::error::${d} requirements.txt failed to install; its tests were not run."
+              rc=1
+              echo "::endgroup::"
+              continue
+            fi
+            ( cd "$d" && python -m pytest tests/ -q -p no:cacheprovider ) || rc=1
             echo "::endgroup::"
           done
           exit $rc

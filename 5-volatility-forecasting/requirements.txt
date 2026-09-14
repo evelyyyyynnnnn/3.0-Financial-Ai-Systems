@@ -1,0 +1,16 @@
+# What this project's test suite needs, on top of the base scientific stack
+# (numpy, pandas, scipy, scikit-learn) that CI installs for every project.
+#
+# The tests are offline and framework-free by design -- see tests/conftest.py --
+# but they import the pipeline, and the pipeline imports these two at module
+# level: config/config.py calls load_dotenv(), data/data_loader.py holds the
+# yfinance download path. Neither is exercised by a test; both must be
+# importable for one to run.
+#
+# The full training stack -- torch, optuna, wandb, matplotlib, seaborn, tqdm --
+# lives in LSTM-Volatility-Prediction/requirements.txt and is deliberately not
+# repeated here. CI reads only this file, and installing a deep-learning
+# framework to check a no-lookahead property would be a lie about what the
+# property costs to verify.
+python-dotenv>=0.19.0
+yfinance>=0.1.63
