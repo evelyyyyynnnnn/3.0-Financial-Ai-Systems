@@ -246,16 +246,26 @@ def main(argv=None) -> int:
         for sym in want:
             meta = TOKENS[sym]
             print(f"\n{sym} ({meta['address']})")
+            # The two backends measure their effort in different units -- the
+            # RPC walk in blocks per call, the index in pages -- so the third
+            # value is kept named and is never fed to the other's arithmetic.
+            # Treating a page count as a chunk size once produced "at 3 blocks
+            # per call this needs 108 hours" printed under a run that had just
+            # retrieved 100% of the window.
             if backend == "etherscan":
-                got_blocks, skipped, smallest = walk_token_etherscan(
+                got_blocks, skipped, pages = walk_token_etherscan(
                     f, sym, meta["address"], start, head, args.refresh)
+                effort = f"{pages} page{'s' if pages != 1 else ''}"
+                smallest = None
             else:
                 got_blocks, skipped, smallest = walk_token(
                     f, sym, meta["address"], start, head, args.chunk, args.refresh)
+                pages = None
+                effort = f"smallest accepted range {smallest:,} blocks"
             missing_blocks = sum(b - a + 1 for a, b in skipped)
             frac = (got_blocks / want_blocks) if want_blocks else 0.0
             print(f"  {got_blocks:,} of {want_blocks:,} blocks retrieved "
-                  f"({frac:.1%}); smallest accepted range {smallest:,} blocks"
+                  f"({frac:.1%}); {effort}"
                   + (f"; {missing_blocks:,} blocks still missing" if skipped else ""))
             # Coverage is counted in BLOCKS, not chunks. Chunk sizes vary now,
             # so "9 of 11 chunks" no longer describes how much of the window
@@ -266,12 +276,15 @@ def main(argv=None) -> int:
                 "blocks_requested": want_blocks,
                 "blocks_retrieved": got_blocks,
                 "fraction_retrieved": round(frac, 4),
-                "smallest_accepted_chunk": smallest,
+                "backend": backend,
+                "smallest_accepted_chunk": smallest,   # RPC walk only
+                "pages_fetched": pages,                # index backend only
                 "missing_ranges": [[a, b] for a, b in skipped],
             }
             if skipped:
                 total_missing.append((sym, missing_blocks, want_blocks))
-            if smallest < 100 and want_blocks // max(smallest, 1) > 5_000:
+            if (backend == "rpc" and smallest is not None and smallest < 100
+                    and want_blocks // max(smallest, 1) > 5_000):
                 secs = report_cost(smallest, "too many for one sitting")
                 if secs > 3600:
                     print(f"  this endpoint's cap makes --days {args.days} "

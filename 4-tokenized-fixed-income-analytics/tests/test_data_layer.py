@@ -663,3 +663,52 @@ def test_rotating_a_key_does_not_invalidate_the_cache(tmp_path):
     f.get(datakit.Source(name="l", url=base + "NEWKEY", dest="chain/p.json",
                          publisher="Etherscan", terms="public"))
     assert len(calls) == 1, "a rotated key should not force a refetch"
+
+
+def test_a_complete_index_run_prints_no_cost_warning(capsys, tmp_path, monkeypatch):
+    """A run that retrieved 100% of the window must not also announce that the
+    window is impractical. The two backends measure effort in different units --
+    blocks per call for the RPC walk, pages for the index -- and feeding a page
+    count into the block-cap arithmetic produced "at 3 blocks per call this
+    window needs 216,001 calls ... about 108.0 h" underneath three tokens that
+    had each just come back at 100.0%."""
+    from data import etherscan, fetch
+
+    monkeypatch.setenv("ETHERSCAN_API_KEY", "TESTKEY")
+    monkeypatch.setattr(fetch, "ROOT", tmp_path)
+
+    head = 25_972_229
+    calls = {"n": 0}
+
+    def fake_get(self, src, refresh=False):
+        calls["n"] += 1
+        dest = self.raw / src.dest
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        if "blocknumber" in src.dest:
+            dest.write_bytes(json.dumps({"result": hex(head)}).encode())
+        elif "block-" in src.dest:
+            dest.write_bytes(json.dumps(
+                {"result": {"timestamp": hex(1_700_000_000)}}).encode())
+        else:                       # one short page, so the walk ends at once
+            dest.write_bytes(_es_page(3))
+        return dest
+
+    monkeypatch.setattr(datakit.Fetcher, "get", fake_get)
+    rc = fetch.main(["--days", "90", "--tokens", "BUIDL", "--pace", "0"])
+    out = capsys.readouterr().out + capsys.readouterr().err
+
+    assert rc == 0
+    assert "100.0%" in out
+    assert "1 page" in out, "effort should be reported in pages for this backend"
+    assert "blocks per call" not in out, \
+        "the RPC cost estimate must not run against an index backend"
+    assert "impractical" not in out
+    assert "h) —" not in out
+
+    cov = json.loads((tmp_path / "raw" / "chain" / "coverage.json").read_text())
+    entry = cov["by_symbol"]["BUIDL"]
+    assert entry["fraction_retrieved"] == 1.0
+    assert entry["backend"] == "etherscan"
+    assert entry["pages_fetched"] == 1
+    assert entry["smallest_accepted_chunk"] is None, \
+        "a page count is not a chunk size and must not be stored as one"
