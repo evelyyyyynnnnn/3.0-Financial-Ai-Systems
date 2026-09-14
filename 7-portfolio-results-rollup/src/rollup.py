@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from . import collect
 
 
 def _get(d: dict, *path, default=None):
@@ -292,6 +293,9 @@ def portfolio_summary(projects: list) -> dict:
     synthetic = [p for p in run if p.is_synthetic]
     real = [p for p in run if p.is_synthetic is False]
     return {
+        # A summary computed over one checked-out repository is not a summary
+        # of the portfolio, and must not be readable as one.
+        **collect.visibility(),
         "n_projects": len(projects),
         "n_with_results": len(run),
         "n_never_run": len(projects) - len(run),
