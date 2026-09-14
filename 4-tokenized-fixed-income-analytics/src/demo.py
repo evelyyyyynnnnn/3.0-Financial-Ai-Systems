@@ -110,8 +110,11 @@ def run_real() -> dict:
     results = {
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "is_synthetic": False,
-        "data_source": "Ethereum mainnet transfer logs, read through a public "
-                       "RPC endpoint; see data/MANIFEST.json for retrieval times",
+        "data_source": f"Ethereum mainnet transfer logs, {meta['source'].split(', ', 1)[1]}"
+                       f"; see data/MANIFEST.json for retrieval times",
+        "backend": meta.get("backend"),
+        "time_basis": (meta["tokens"][0] or {}).get("time_basis")
+                      if meta.get("tokens") else None,
         "price_metrics_reported": False,
         "price_metrics_withheld_because": meta["price_metrics_withheld_because"],
         "holder_register_caveat": meta["holder_register_is_window_limited"],
@@ -153,8 +156,12 @@ def main_real() -> int:
     for x in r["tokens"]:
         g = x["gaps"]
         if g:
-            print(f"  {x['symbol']:<8} median {g.get('median_gap_s', 0)/3600:>8.2f} h, "
-                  f"longest {g.get('max_gap_s', 0)/86400:>6.2f} d")
+            # trade_gap_stats returns hours, under *_gap_h. Asking for
+            # *_gap_s and defaulting to 0 printed 0.00 for every token on
+            # every run -- a typo that .get() turned into a plausible number.
+            med, mx = g["median_gap_h"], g["max_gap_h"]
+            print(f"  {x['symbol']:<8} median {med:>8.2f} h, "
+                  f"longest {mx/24:>6.2f} d")
     print("\nAMIHUD ILLIQUIDITY AND ROLL SPREAD ARE NOT REPORTED: " +
           r["price_metrics_withheld_because"])
     print("\nholder register: " + r["holder_register_caveat"])

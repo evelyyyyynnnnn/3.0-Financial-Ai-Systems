@@ -7,7 +7,7 @@ import pathlib
 import numpy as np
 
 from .datakit import Fetcher, FetchError
-from .onchain import (TOKENS, block_to_time, parse_block_timestamp, parse_logs,
+from .onchain import (TOKENS, block_to_time, parse_block_anchor, parse_logs,
                       reconstruct_balances)
 
 ROOT = pathlib.Path(__file__).resolve().parent
@@ -28,10 +28,13 @@ def load_tokens(root=ROOT):
             "simulated tape as an on-chain record.")
 
     lo_ts = hi_ts = lo_block = hi_block = None
+    anchor_lo = anchor_hi = None
     if (f.raw / "chain/block-lo.json").exists():
-        lo_ts = parse_block_timestamp((f.raw / "chain/block-lo.json").read_bytes())
+        anchor_lo, lo_ts = parse_block_anchor(
+            (f.raw / "chain/block-lo.json").read_bytes())
     if (f.raw / "chain/block-hi.json").exists():
-        hi_ts = parse_block_timestamp((f.raw / "chain/block-hi.json").read_bytes())
+        anchor_hi, hi_ts = parse_block_anchor(
+            (f.raw / "chain/block-hi.json").read_bytes())
 
     # The window the fetch actually asked for. Anything outside it is not part
     # of this measurement -- and a cache directory can hold files from an
@@ -112,6 +115,11 @@ def load_tokens(root=ROOT):
         except ValueError:
             coverage = {}
 
+    # Prefer the block numbers that came back with the timestamps; fall back
+    # to the window the fetch recorded.
+    win_lo = anchor_lo if anchor_lo is not None else (window[0] if window else None)
+    win_hi = anchor_hi if anchor_hi is not None else (window[1] if window else None)
+
     histories, prov = [], []
     for sym, transfers in sorted(by_symbol.items()):
         if not transfers:
@@ -121,14 +129,26 @@ def load_tokens(root=ROOT):
         blocks = [t["block"] for t in transfers]
         lo_block, hi_block = min(blocks), max(blocks)
 
-        if lo_ts is None or hi_ts is None:
-            # Without endpoint timestamps, block height is the only clock.
+        # Three clocks, in order of preference. The index backend returns each
+        # log's own block timestamp, so interpolation is not needed at all --
+        # and interpolating anyway was wrong here, because it anchored the
+        # TRANSFERS' block extremes to the WINDOW endpoints' timestamps, two
+        # different pairs of numbers.
+        stamped = [t.get("ts") for t in transfers]
+        if all(x is not None for x in stamped):
+            times = [int(x) for x in stamped]
+            time_basis = "each log's own block timestamp, as returned with it"
+        elif (lo_ts is not None and hi_ts is not None
+              and win_lo is not None and win_hi is not None and win_lo != win_hi):
+            times = [block_to_time(b, win_lo, lo_ts, win_hi, hi_ts)
+                     for b in blocks]
+            time_basis = ("interpolated between the window endpoints' "
+                          "timestamps")
+        else:
+            # Without timestamps, block height is the only clock. It is not
+            # seconds, so gap statistics computed on it are not hours.
             times = [t["block"] for t in transfers]
             time_basis = "block height (no block timestamps cached)"
-        else:
-            times = [block_to_time(b, lo_block, lo_ts, hi_block, hi_ts)
-                     for b in blocks]
-            time_basis = "interpolated between the window's endpoint timestamps"
 
         rec = reconstruct_balances(transfers)
         held = np.array(sorted((v for v in rec["balances"].values() if v > DUST),
@@ -162,8 +182,14 @@ def load_tokens(root=ROOT):
     if not histories:
         raise FetchError("no token in the cache had any transfers in the window")
 
+    backend = ((coverage.get("backend") if isinstance(coverage, dict) else None)
+               or "rpc")
+    reader = {"etherscan": "read through Etherscan's log index",
+              "rpc": "read through a public RPC endpoint"}.get(
+                  backend, f"read through {backend}")
     meta = {
-        "source": "Ethereum mainnet, read through a public RPC endpoint",
+        "source": f"Ethereum mainnet, {reader}",
+        "backend": backend,
         "n_tokens": len(histories),
         "prices_available": False,
         "price_metrics_withheld_because":
