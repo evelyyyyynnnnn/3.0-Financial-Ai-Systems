@@ -534,3 +534,132 @@ def test_the_walk_adopts_the_stated_cap_instead_of_bisecting():
     # one. Anything above three means the cap is being discovered, not read.
     rejected = [w for w in calls if w > 10]
     assert len(rejected) <= 3, f"bisected instead of reading the cap: {calls}"
+
+
+# --- Etherscan backend -----------------------------------------------------
+
+def _es_page(n, last=False, status="1", message="OK", result=None):
+    """An Etherscan envelope holding n synthetic Transfer logs."""
+    from data.etherscan import PAGE_SIZE
+    logs = [{
+        "address": TOKENS["BUIDL"]["address"].lower(),
+        "topics": [TRANSFER_TOPIC, _topic(A1), _topic(A2)],
+        "data": hex(int(1.5 * 10 ** 18)),
+        "blockNumber": hex(1000 + i),
+        "timeStamp": hex(1_700_000_000 + i * 12),
+        "logIndex": hex(i),
+        "transactionHash": f"0x{i:064x}",
+    } for i in range(n)]
+    body = {"status": status, "message": message,
+            "result": logs if result is None else result}
+    return json.dumps(body).encode()
+
+
+def test_etherscan_page_parses_and_reports_whether_it_is_the_last():
+    from data.etherscan import PAGE_SIZE, parse_page
+
+    rows, last = parse_page(_es_page(3), 18)
+    assert len(rows) == 3 and last is True
+    assert rows[0]["value"] == 1.5
+    assert rows[0]["from"] == A1.lower() and rows[0]["to"] == A2.lower()
+    assert rows[0]["log_index"] is not None, "needed for dedupe"
+    assert rows[0]["ts"] == 1_700_000_000
+
+    rows, last = parse_page(_es_page(PAGE_SIZE), 18)
+    assert len(rows) == PAGE_SIZE and last is False, "a full page is never the last"
+
+
+def test_no_records_found_ends_the_walk_but_a_refusal_does_not():
+    """Etherscan answers HTTP 200 for everything and puts the outcome in the
+    envelope. An empty result and a rate-limit refusal therefore look identical
+    to anything checking only the status code -- and treating the refusal as
+    the end of the data would silently truncate the tape."""
+    from data.etherscan import RateLimited, parse_page
+
+    rows, last = parse_page(
+        _es_page(0, status="0", message="No records found", result=[]), 18)
+    assert rows == [] and last is True
+
+    with pytest.raises(RateLimited):
+        parse_page(_es_page(0, status="0", message="NOTOK",
+                            result="Max rate limit reached"), 18)
+
+    with pytest.raises(RateLimited):
+        parse_page(_es_page(0, status="0", message="NOTOK",
+                            result="Invalid API Key"), 18)
+
+
+def test_the_api_key_never_reaches_the_manifest():
+    """MANIFEST.json is committed. A repository that publishes its own API key
+    is a worse outcome than a fetch that did not run."""
+    import os
+
+    from data.datakit import public_url
+
+    os.environ["ETHERSCAN_API_KEY"] = "SECRET_KEY_VALUE_123"
+    try:
+        from data import etherscan
+        src = etherscan.logs_source("BUIDL", TOKENS["BUIDL"]["address"],
+                                    100, 200, page=1)
+        assert "SECRET_KEY_VALUE_123" in src.url, "the real request needs the key"
+        assert "SECRET_KEY_VALUE_123" not in public_url(src.url)
+        assert "apikey=REDACTED" in public_url(src.url)
+    finally:
+        os.environ.pop("ETHERSCAN_API_KEY", None)
+
+
+def test_path_embedded_keys_are_redacted_too():
+    """Several RPC providers put the key in the path rather than the query."""
+    from data.datakit import public_url
+
+    for url, leaked in [
+        ("https://eth-mainnet.g.alchemy.com/v2/alch_abcdefghijklmnop123",
+         "alch_abcdefghijklmnop123"),
+        ("https://mainnet.infura.io/v3/0123456789abcdef0123456789abcdef",
+         "0123456789abcdef0123456789abcdef"),
+        ("https://lb.drpc.org/ogrpc?network=ethereum&dkey=SECRETVALUE",
+         "SECRETVALUE"),
+    ]:
+        assert leaked not in public_url(url), url
+    # A public path that merely looks like a key must survive intact.
+    keep = "https://data.sec.gov/api/xbrl/companyconcept/CIK0000320193.json"
+    assert public_url(keep) == keep
+
+
+def test_the_manifest_on_disk_contains_no_key(tmp_path):
+    """The previous test proves public_url() redacts. It does NOT prove the
+    manifest writer calls it -- reverting that one line left the earlier test
+    green while the key went back into the committed file. This one reads the
+    manifest off disk and looks."""
+    f = datakit.Fetcher(tmp_path)
+    src = datakit.Source(
+        name="logs", url="https://api.etherscan.io/v2/api?module=logs&apikey=TOPSECRET42",
+        dest="chain/probe.json", publisher="Etherscan", terms="public")
+
+    f._open = lambda url, headers, body=None, ua="": b'{"status":"1","result":[]}'
+    f.get(src)
+
+    raw = f.manifest_path.read_text()
+    assert "TOPSECRET42" not in raw, "the API key was written to MANIFEST.json"
+    assert "apikey=REDACTED" in raw
+    rec = json.loads(raw)["files"]["chain/probe.json"]
+    assert "TOPSECRET42" not in json.dumps(rec)
+
+
+def test_rotating_a_key_does_not_invalidate_the_cache(tmp_path):
+    """The request fingerprint is built from the redacted URL, so replacing a
+    key leaves identical cached bytes usable instead of forcing a full refetch."""
+    f = datakit.Fetcher(tmp_path)
+    calls = []
+
+    def fake(url, headers, body=None, ua=""):
+        calls.append(url)
+        return b'{"status":"1","result":[]}'
+
+    f._open = fake
+    base = "https://api.etherscan.io/v2/api?module=logs&apikey="
+    f.get(datakit.Source(name="l", url=base + "OLDKEY", dest="chain/p.json",
+                         publisher="Etherscan", terms="public"))
+    f.get(datakit.Source(name="l", url=base + "NEWKEY", dest="chain/p.json",
+                         publisher="Etherscan", terms="public"))
+    assert len(calls) == 1, "a rotated key should not force a refetch"

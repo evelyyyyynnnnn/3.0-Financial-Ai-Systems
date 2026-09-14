@@ -23,11 +23,13 @@ import ssl
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
-__all__ = ["Fetcher", "Source", "NetworkBlocked", "FetchError", "utc_now"]
+__all__ = ["Fetcher", "Source", "NetworkBlocked", "FetchError", "utc_now",
+           "public_url"]
 
 # SEC's fair-access policy requires a User-Agent naming a real contact. Other
 # sources do not require it but none object to it. Override with DATAKIT_UA.
@@ -243,7 +245,7 @@ class Fetcher:
         dest.write_bytes(data)
         man["files"][src.dest] = {
             "source": src.name,
-            "url": src.url,
+            "url": public_url(src.url),
             "publisher": src.publisher,
             "terms": src.terms,
             "note": src.note,
@@ -302,7 +304,8 @@ def _fingerprint(src) -> str:
     Two JSON-RPC calls to the same node differ only in their POST body, so a
     URL-keyed cache would serve the first answer for every later question.
     """
-    payload = json.dumps({"url": src.url, "body": src.body}, sort_keys=True)
+    payload = json.dumps({"url": public_url(src.url), "body": src.body},
+                         sort_keys=True)
     return hashlib.sha256(payload.encode()).hexdigest()[:16]
 
 
@@ -333,6 +336,37 @@ def _body_of(e) -> str:
     except Exception:
         pass
     return text[:400] + ("…" if len(text) > 400 else "")
+
+
+# Query parameters that carry a credential. A provenance record has to name
+# the endpoint that answered, and must not carry the key that opened it --
+# MANIFEST.json is committed, and a repository that publishes its own API key
+# is a worse failure than a missing fetch.
+_SECRET_PARAMS = ("apikey", "api_key", "key", "dkey", "token", "access_token",
+                  "auth", "secret", "password", "pk")
+
+
+def public_url(url: str) -> str:
+    """The URL with any credential replaced by a placeholder.
+
+    Redacts both query parameters (?apikey=...) and the path-embedded form
+    several RPC providers use (/v2/<key>, /v3/<key>), because a key is a key
+    wherever the provider chose to put it.
+    """
+    try:
+        sp = urllib.parse.urlsplit(url)
+    except Exception:
+        return url
+    if sp.query:
+        pairs = urllib.parse.parse_qsl(sp.query, keep_blank_values=True)
+        pairs = [(k, "REDACTED" if k.lower() in _SECRET_PARAMS else v)
+                 for k, v in pairs]
+        sp = sp._replace(query=urllib.parse.urlencode(pairs))
+    parts = [seg for seg in sp.path.split("/") if seg]
+    if len(parts) >= 2 and parts[-2].lower() in ("v2", "v3") and len(parts[-1]) >= 16:
+        parts[-1] = "REDACTED"
+        sp = sp._replace(path="/" + "/".join(parts))
+    return urllib.parse.urlunsplit(sp)
 
 
 def _is_sec(host: str) -> bool:
