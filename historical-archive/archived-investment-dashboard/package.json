@@ -1,0 +1,47 @@
+{
+  "name": "investment-dashboard-expert",
+  "version": "1.0.0",
+  "description": "智能投资分析专家仪表板 - 基于实时数据和AI分析的投资决策支持系统",
+  "main": "server/app.js",
+  "scripts": {
+    "start": "node server/app.js",
+    "dev": "nodemon server/app.js",
+    "test": "node test.js",
+    "build": "echo \"Building project...\"",
+    "install-deps": "npm install"
+  },
+  "keywords": [
+    "investment",
+    "dashboard",
+    "ai",
+    "financial-analysis",
+    "portfolio-management",
+    "real-time-data",
+    "google-ai",
+    "stock-market",
+    "cryptocurrency",
+    "economic-indicators"
+  ],
+  "author": "Investment Dashboard Expert Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/investment-dashboard-expert.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/investment-dashboard-expert/issues"
+  },
+  "homepage": "https://github.com/your-username/investment-dashboard-expert#readme"
+}

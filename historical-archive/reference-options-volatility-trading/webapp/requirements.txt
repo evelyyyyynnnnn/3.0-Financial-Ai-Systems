@@ -1,0 +1,10 @@
+Flask==2.3.3
+Flask-SocketIO==5.3.6
+python-socketio==5.9.0
+eventlet==0.33.3
+PyYAML==6.0.2
+python-dotenv==1.0.0
+yahoofinancials==1.20
+requests==2.32.3
+
+
