@@ -1,0 +1,165 @@
+{
+  "generated_at": "2026-09-14T01:04:05+00:00",
+  "is_synthetic": false,
+  "data_source": "Ethereum mainnet transfer logs, read through Etherscan's log index; see data/MANIFEST.json for retrieval times",
+  "backend": "etherscan",
+  "time_basis": "each log's own block timestamp, as returned with it",
+  "price_metrics_reported": false,
+  "price_metrics_withheld_because": "an ERC-20 Transfer event carries a value and two addresses and no price. Amihud illiquidity and the Roll spread are both built on price changes, so neither can be computed from a transfer tape; and a fund redeeming at net asset value may have no market price to find at all.",
+  "holder_register_caveat": "balances are the net of transfers observed in the fetched window. They equal the true register only if the window reaches the token's first block; otherwise an address that has not transacted recently is missing.",
+  "window_is_incomplete": false,
+  "window_coverage": {
+    "backend": "etherscan",
+    "by_symbol": {
+      "BUIDL": {
+        "backend": "etherscan",
+        "blocks_requested": 648001,
+        "blocks_retrieved": 648001,
+        "fraction_retrieved": 1.0,
+        "missing_ranges": [],
+        "pages_fetched": 3,
+        "requested_blocks": [
+          25324229,
+          25972229
+        ],
+        "smallest_accepted_chunk": null
+      },
+      "OUSG": {
+        "backend": "etherscan",
+        "blocks_requested": 648001,
+        "blocks_retrieved": 648001,
+        "fraction_retrieved": 1.0,
+        "missing_ranges": [],
+        "pages_fetched": 1,
+        "requested_blocks": [
+          25324229,
+          25972229
+        ],
+        "smallest_accepted_chunk": null
+      },
+      "USDY": {
+        "backend": "etherscan",
+        "blocks_requested": 648001,
+        "blocks_retrieved": 648001,
+        "fraction_retrieved": 1.0,
+        "missing_ranges": [],
+        "pages_fetched": 7,
+        "requested_blocks": [
+          25324229,
+          25972229
+        ],
+        "smallest_accepted_chunk": null
+      }
+    },
+    "days_requested": 90,
+    "generated_utc": "2026-09-14T01:00:14+00:00",
+    "pace_seconds": 0.6,
+    "rpc": "https://ethereum-rpc.publicnode.com"
+  },
+  "provenance": [
+    {
+      "symbol": "BUIDL",
+      "status": "ok",
+      "address": "0x7712c34205737192402172409a8F7ccef8aA2AEc",
+      "fund": "BlackRock USD Institutional Digital Liquidity Fund",
+      "n_transfers": 2119,
+      "first_block": 25330721,
+      "last_block": 25954825,
+      "n_addresses_with_balance": 25,
+      "observed_supply_change": 3.1e-05,
+      "time_basis": "each log's own block timestamp, as returned with it"
+    },
+    {
+      "symbol": "OUSG",
+      "status": "ok",
+      "address": "0x1B19C19393e2d034D8Ff31ff34c81252FcBbee92",
+      "fund": "Ondo Short-Term US Government Treasuries",
+      "n_transfers": 146,
+      "first_block": 25328727,
+      "last_block": 25955337,
+      "n_addresses_with_balance": 11,
+      "observed_supply_change": -628176.315259,
+      "time_basis": "each log's own block timestamp, as returned with it"
+    },
+    {
+      "symbol": "USDY",
+      "status": "ok",
+      "address": "0x96F6eF951840721AdBF46Ac996b59E0235CB985C",
+      "fund": "Ondo US Dollar Yield",
+      "n_transfers": 6189,
+      "first_block": 25324408,
+      "last_block": 25968685,
+      "n_addresses_with_balance": 413,
+      "observed_supply_change": 65594924.090237,
+      "time_basis": "each log's own block timestamp, as returned with it"
+    }
+  ],
+  "tokens": [
+    {
+      "symbol": "USDY",
+      "fund": "Ondo US Dollar Yield",
+      "address": "0x96F6eF951840721AdBF46Ac996b59E0235CB985C",
+      "n_transfers": 6189,
+      "n_holders": 413,
+      "observed_supply": 83773469.4767,
+      "hhi": 0.200599,
+      "effective_holders": 4.985,
+      "top5_share": 0.82077,
+      "gini": 0.979002,
+      "turnover": 21.966998,
+      "gaps": {
+        "median_gap_h": 0.017,
+        "p95_gap_h": 1.969,
+        "max_gap_h": 14.49,
+        "n_trades": 6189
+      },
+      "median_transfer": 1200.0,
+      "amihud_illiquidity": null,
+      "roll_spread": null
+    },
+    {
+      "symbol": "BUIDL",
+      "fund": "BlackRock USD Institutional Digital Liquidity Fund",
+      "address": "0x7712c34205737192402172409a8F7ccef8aA2AEc",
+      "n_transfers": 2119,
+      "n_holders": 25,
+      "observed_supply": 0.0,
+      "hhi": 0.37205,
+      "effective_holders": 2.688,
+      "top5_share": 0.938834,
+      "gini": 0.86454,
+      "turnover": 10.881582,
+      "gaps": {
+        "median_gap_h": 0.0,
+        "p95_gap_h": 0.272,
+        "max_gap_h": 97.07,
+        "n_trades": 2119
+      },
+      "median_transfer": 0.0,
+      "amihud_illiquidity": null,
+      "roll_spread": null
+    },
+    {
+      "symbol": "OUSG",
+      "fund": "Ondo Short-Term US Government Treasuries",
+      "address": "0x1B19C19393e2d034D8Ff31ff34c81252FcBbee92",
+      "n_transfers": 146,
+      "n_holders": 11,
+      "observed_supply": 124521.621,
+      "hhi": 0.346738,
+      "effective_holders": 2.884,
+      "top5_share": 0.985177,
+      "gini": 0.753097,
+      "turnover": 102.017409,
+      "gaps": {
+        "median_gap_h": 3.19,
+        "p95_gap_h": 67.407,
+        "max_gap_h": 150.313,
+        "n_trades": 146
+      },
+      "median_transfer": 4271.9658,
+      "amihud_illiquidity": null,
+      "roll_spread": null
+    }
+  ]
+}
