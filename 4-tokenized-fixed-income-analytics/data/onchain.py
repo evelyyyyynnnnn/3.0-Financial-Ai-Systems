@@ -120,6 +120,24 @@ def parse_block_number(raw: bytes) -> int:
     return int(rpc_result(raw, "eth_blockNumber"), 16)
 
 
+def parse_block_anchor(raw: bytes) -> tuple:
+    """Return (block_number, timestamp) from one eth_getBlockByNumber reply.
+
+    Both halves of an interpolation anchor come from the same response, so the
+    block number and the timestamp cannot drift apart. Reading the timestamp
+    here and the block number from somewhere else is how an interpolation ends
+    up mapping the transfers' own block extremes onto the window endpoints'
+    clock -- two different pairs of numbers, and a time axis that is wrong
+    everywhere except at its ends.
+    """
+    res = rpc_result(raw, "eth_getBlockByNumber")
+    if not res:
+        raise ValueError("eth_getBlockByNumber returned null; the block may be "
+                         "beyond this node's retained history")
+    num = res.get("number")
+    return (int(num, 16) if num else None), int(res["timestamp"], 16)
+
+
 def parse_block_timestamp(raw: bytes) -> int:
     res = rpc_result(raw, "eth_getBlockByNumber")
     if not res:
@@ -158,6 +176,10 @@ def parse_logs(raw: bytes, decimals: int) -> list:
             # earlier run can cover overlapping ranges, and counting a transfer
             # twice would inflate every activity figure downstream.
             "log_index": lg.get("logIndex"),
+            # Standard eth_getLogs carries no timestamp, but several providers
+            # include one. Read it when it is there: a real timestamp beats
+            # interpolating one, and the loader prefers it automatically.
+            "ts": (int(lg["timeStamp"], 16) if lg.get("timeStamp") else None),
         })
     return out
 
