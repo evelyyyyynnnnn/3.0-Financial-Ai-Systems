@@ -133,8 +133,12 @@ def _seed(tmp_path, symbol="BUIDL", n_holders=8):
             "sha256": datakit.sha256_file(f.raw / dest), "bytes": len(payload),
             "retrieved_utc": datakit.utc_now(), "request_fingerprint": dest}
 
-    put("chain/block-lo.json", _rpc({"timestamp": hex(1_700_000_000)}))
-    put("chain/block-hi.json", _rpc({"timestamp": hex(1_700_864_000)}))
+    # A real eth_getBlockByNumber reply carries the block number beside the
+    # timestamp; the loader needs both halves of the anchor from one response.
+    put("chain/block-lo.json", _rpc({"number": hex(1000),
+                                     "timestamp": hex(1_700_000_000)}))
+    put("chain/block-hi.json", _rpc({"number": hex(1000 + 50 * 40),
+                                     "timestamp": hex(1_700_864_000)}))
 
     holders = ["0x" + f"{i:02x}" * 20 for i in range(1, n_holders + 1)]
     logs = []
@@ -779,3 +783,78 @@ def test_logs_from_another_chain_are_not_counted_as_transfers(tmp_path):
     assert "different chain" in meta["out_of_window_note"]
     assert len(tokens[0].trades) == baseline, \
         "logs from another chain were counted as transfers of this token"
+
+
+def test_gap_statistics_are_printed_in_the_units_they_are_computed_in():
+    """trade_gap_stats returns hours under *_gap_h. The printer asked for
+    *_gap_s and defaulted to 0, so every token on every run showed
+    "median 0.00 h, longest 0.00 d" — a typo that .get() turned into a
+    plausible-looking number instead of a KeyError. 6,189 transfers across 90
+    days cannot have a zero median gap; nothing said so."""
+    import inspect
+
+    from src import demo
+
+    src = inspect.getsource(demo.main_real)
+    assert "median_gap_s" not in src and "max_gap_s" not in src, \
+        "the printer is reading keys trade_gap_stats does not return"
+    assert 'g["median_gap_h"]' in src, "read the key directly, not through .get"
+    assert "/3600" not in src, "the value is already in hours"
+
+
+def test_a_logs_own_timestamp_is_preferred_over_interpolation(tmp_path):
+    """The index backend returns each log's block timestamp. Using it removes
+    the interpolation entirely, along with the chance of anchoring it wrong."""
+    f = _seed(tmp_path)
+    man = f.load_manifest()
+    dest = sorted(k for k in man["files"] if "-logs-" in k)[0]
+    payload = json.loads((f.raw / dest).read_bytes())
+    for i, lg in enumerate(payload["result"]):
+        lg["timeStamp"] = hex(1_700_000_000 + i * 600)
+        lg["logIndex"] = hex(i)
+    raw = json.dumps(payload).encode()
+    (f.raw / dest).write_bytes(raw)
+    man["files"][dest] = dict(man["files"][dest],
+                              sha256=datakit.sha256_file(f.raw / dest))
+    f._write_manifest(man)
+
+    tokens, meta = load_tokens(root=tmp_path)
+    basis = meta["tokens"][0]["time_basis"]
+    assert "own block timestamp" in basis, basis
+    times = tokens[0].times()
+    assert times.min() == 1_700_000_000
+
+
+def test_the_interpolation_anchors_come_from_one_response_each(tmp_path):
+    """Both halves of an anchor must come from the same reply. Pairing the
+    TRANSFERS' block extremes with the WINDOW endpoints' timestamps produces a
+    time axis that is correct only at its two ends."""
+    import inspect
+
+    from data import load, onchain
+
+    num, ts = onchain.parse_block_anchor(
+        _rpc({"number": hex(1234), "timestamp": hex(1_700_000_000)}))
+    assert (num, ts) == (1234, 1_700_000_000)
+
+    src = inspect.getsource(load.load_tokens)
+    assert "parse_block_anchor" in src
+    assert "block_to_time(b, win_lo, lo_ts, win_hi, hi_ts)" in src, \
+        "interpolate between the window endpoints, not the transfer extremes"
+
+
+def test_the_result_names_the_backend_that_answered(tmp_path):
+    """A run read through an index is not a run read through an RPC endpoint,
+    and the provenance line is what a reader checks."""
+    f = _seed(tmp_path)
+    (f.raw / "chain" / "coverage.json").write_text(json.dumps({
+        "backend": "etherscan",
+        "by_symbol": {"BUIDL": {"requested_blocks": [900, 3000],
+                                "blocks_requested": 2101, "blocks_retrieved": 2101,
+                                "fraction_retrieved": 1.0, "missing_ranges": []}}
+    }), encoding="utf8")
+
+    _, meta = load_tokens(root=tmp_path)
+    assert meta["backend"] == "etherscan"
+    assert "Etherscan" in meta["source"]
+    assert "RPC endpoint" not in meta["source"]
