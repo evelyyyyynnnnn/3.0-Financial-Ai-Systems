@@ -4,7 +4,7 @@
 > below is read from the file that project's own demo wrote, and this
 > page is rewritten from the same run that writes `latest.json`.
 
-**Run date:** `2026-09-12T15:10:27+00:00`
+**Run date:** `2026-09-19T01:13:36+00:00`
 
 ## Portfolio at a glance
 
@@ -13,12 +13,12 @@
 | Projects walked | 22 |
 | With a recorded run | 22 |
 | Never run | 0 |
-| Running on **real** data | 19 |
-| Running on synthetic or authored data | 3 |
+| Running on **real** data | 20 |
+| Running on synthetic or authored data | 2 |
 | With a published website | 22 |
-| Test functions across the portfolio | 657 |
+| Test functions across the portfolio | 688 |
 
-Repositories walked: `1.0-Secure-Ai-Agent-Infrastructure`, `2.0-Healthcare-Ai-Systems`, `3.0-Financial-Ai-Systems`, `4.0-Decision-Intelligence-Framework`, `5.0-Ai-Engineering-Toolkit`.
+Repositories walked: `1.0-Secure-Ai-Agent-Infrastructure`, `2.0-Healthcare-Ai-Systems`, `3.0-financial-ai-systems`, `4.0-Decision-Intelligence-Framework`, `5.0-Ai-Engineering-Toolkit`.
 
 ## Every project, and what it ran on
 
@@ -31,13 +31,13 @@ Repositories walked: `1.0-Secure-Ai-Agent-Infrastructure`, `2.0-Healthcare-Ai-Sy
 | `2.0-Healthcare-Ai-Systems` | `2-icu-early-warning` | 2026-09-06 | real | 32 | yes |
 | `2.0-Healthcare-Ai-Systems` | `3-physiological-waveform-pipeline` | 2026-09-06 | real | 33 | yes |
 | `2.0-Healthcare-Ai-Systems` | `4-pyhealth-rhealth-extension` | 2026-09-06 | real | 29 | yes |
-| `3.0-Financial-Ai-Systems` | `1-contagion-observatory` | 2026-09-07 | real | 41 | yes |
-| `3.0-Financial-Ai-Systems` | `2-filing-intelligence` | 2026-09-07 | real | 33 | yes |
-| `3.0-Financial-Ai-Systems` | `3-private-credit-data-provenance` | 2026-09-07 | real | 30 | yes |
-| `3.0-Financial-Ai-Systems` | `4-tokenized-fixed-income-analytics` | 2026-08-31 | synthetic / authored | 34 | yes |
-| `3.0-Financial-Ai-Systems` | `5-volatility-forecasting` | 2026-09-09 | real | 5 | yes |
-| `3.0-Financial-Ai-Systems` | `6-portfolio-optimization-engine` | 2026-09-11 | real | 9 | yes |
-| `3.0-Financial-Ai-Systems` | `7-portfolio-results-rollup` | 2026-09-12 | synthetic / authored | 21 | yes |
+| `3.0-financial-ai-systems` | `1-contagion-observatory` | 2026-09-07 | real | 41 | yes |
+| `3.0-financial-ai-systems` | `2-filing-intelligence` | 2026-09-07 | real | 33 | yes |
+| `3.0-financial-ai-systems` | `3-private-credit-data-provenance` | 2026-09-07 | real | 30 | yes |
+| `3.0-financial-ai-systems` | `4-tokenized-fixed-income-analytics` | 2026-09-14 | real | 64 | yes |
+| `3.0-financial-ai-systems` | `5-volatility-forecasting` | 2026-09-09 | real | 5 | yes |
+| `3.0-financial-ai-systems` | `6-portfolio-optimization-engine` | 2026-09-11 | real | 9 | yes |
+| `3.0-financial-ai-systems` | `7-portfolio-results-rollup` | 2026-09-19 | synthetic / authored | 22 | yes |
 | `4.0-Decision-Intelligence-Framework` | `1-decision-audit-framework` | 2026-09-06 | real | 33 | yes |
 | `4.0-Decision-Intelligence-Framework` | `2-optimization-under-uncertainty` | 2026-09-07 | real | 33 | yes |
 | `4.0-Decision-Intelligence-Framework` | `3-icu-triage-optimization` | 2026-09-06 | real | 26 | yes |
@@ -59,6 +59,7 @@ Repositories walked: `1.0-Secure-Ai-Agent-Infrastructure`, `2.0-Healthcare-Ai-Sy
 - **`1-contagion-observatory`** — real daily value-weighted returns of the Fama-French 10 industry portfolios (Kenneth R. French Data Library; see data/MANIFEST.json for the URL, sha256 and retrieval time)
 - **`2-filing-intelligence`** — real 10-K filings retrieved from SEC EDGAR (see data/MANIFEST.json for URLs, hashes and retrieval times)
 - **`3-private-credit-data-provenance`** — real BDC 10-K filings from SEC EDGAR; see data/MANIFEST.json for URLs, hashes and retrieval times
+- **`4-tokenized-fixed-income-analytics`** — Ethereum mainnet transfer logs, read through Etherscan's log index; see data/MANIFEST.json for retrieval times
 - **`5-volatility-forecasting`** — real daily prices for ^GSPC via Yahoo Finance (yfinance), 2010-01-01 to 2023-12-31; target is realised volatility (close_to_close)
 - **`6-portfolio-optimization-engine`** — real daily OHLCV for GLD, IWM, QQQ, SPY, TLT via Yahoo Finance (yfinance), 2010-01-04 to 2023-12-29 (3522 trading days); cached in data/market_data.pkl
 - **`1-decision-audit-framework`** — Statlog German Credit Data (UCI); see data/MANIFEST.json for the URL, hash and retrieval time
@@ -71,7 +72,6 @@ Repositories walked: `1.0-Secure-Ai-Agent-Infrastructure`, `2.0-Healthcare-Ai-Sy
 
 ### The runs that are *not* on real data
 
-- **`4-tokenized-fixed-income-analytics`** — synthetic on-chain trade and redemption history (src/chain.py)
 - **`7-portfolio-results-rollup`** — each project's own results/latest.json
 - **`4-decision-benchmark-suite`** — closed-form benchmark tasks with exact oracles (src/tasks.py)
 
@@ -110,8 +110,6 @@ not measured, however often it may appear elsewhere.
 | `3-private-credit-data-provenance` | Cited spans that contain their value | 0.9444 | share -- checkable without an answer key, unlike accuracy |
 | `3-private-credit-data-provenance` | Values extracted | 18 |  |
 | `3-private-credit-data-provenance` | Fields abstained on | 12 | declined rather than guessed |
-| `4-tokenized-fixed-income-analytics` | Stress latency ratio | 5.152 | redemption queue lengthening |
-| `4-tokenized-fixed-income-analytics` | Tokens analysed | 6 | synthetic |
 | `6-portfolio-optimization-engine` | DQN Sharpe | -0.3525 | IN-SAMPLE -- the declared train/test split was read by no code |
 | `6-portfolio-optimization-engine` | SAC Sharpe | -0.4715 | in-sample; both agents lose money on their own training data |
 | `6-portfolio-optimization-engine` | Buy-and-hold SPY Sharpe, same period | 0.6725 | total return 4.455186632973433 -- the baseline the agents were said to underperform, now computed |
@@ -163,6 +161,9 @@ real filing pairs carry no human-annotated list of material changes, so there is
 
 **`3-private-credit-data-provenance` — accuracy**  
 nobody has annotated a real BDC schedule of investments with the values an extractor should return, so precision and recall have no denominator
+
+**`4-tokenized-fixed-income-analytics` — price metrics**  
+an ERC-20 Transfer event carries a value and two addresses and no price. Amihud illiquidity and the Roll spread are both built on price changes, so neither can be computed from a transfer tape; and a fund redeeming at net asset value may have no market price to find at all.
 
 **`5-volatility-forecasting` — metrics**  
 this run predates the lookahead fix in LSTM-Volatility-Prediction/data/data_loader.py. The feature scaler was fitted with fit_transform over the whole 2010-2023 series, so the test period's minimum and maximum were inside every training feature; shifting only the last 10% of the series moved the training tensor by 0.99 on a [0, 1] scale. An R2 measured that way is not evidence about held-out performance. The model has to be retrained on the fixed pipeline before any figure here is quoted; the superseded numbers are kept below as a record of what was run, not as a result.

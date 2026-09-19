@@ -1,22 +1,26 @@
 {
-  "generated_at": "2026-09-12T15:10:27+00:00",
+  "generated_at": "2026-09-19T01:13:36+00:00",
   "is_synthetic": true,
   "data_source": "each project's own results/latest.json",
   "summary": {
-    "n_projects": 22,
-    "n_with_results": 22,
-    "n_never_run": 0,
-    "n_synthetic_data": 3,
-    "n_real_data": 19,
-    "n_with_site": 22,
-    "total_tests": 657,
+    "repos_visible": 5,
+    "repos_expected": 5,
     "repos": [
       "1.0-Secure-Ai-Agent-Infrastructure",
       "2.0-Healthcare-Ai-Systems",
-      "3.0-Financial-Ai-Systems",
+      "3.0-financial-ai-systems",
       "4.0-Decision-Intelligence-Framework",
       "5.0-Ai-Engineering-Toolkit"
-    ]
+    ],
+    "is_partial_view": false,
+    "partial_view_because": "",
+    "n_projects": 22,
+    "n_with_results": 22,
+    "n_never_run": 0,
+    "n_synthetic_data": 2,
+    "n_real_data": 20,
+    "n_with_site": 22,
+    "total_tests": 688
   },
   "projects": [
     {
@@ -222,7 +226,7 @@
       "withheld": []
     },
     {
-      "repo": "3.0-Financial-Ai-Systems",
+      "repo": "3.0-financial-ai-systems",
       "project": "1-contagion-observatory",
       "has_results": true,
       "generated_at": "2026-09-07T00:11:33+00:00",
@@ -256,7 +260,7 @@
       ]
     },
     {
-      "repo": "3.0-Financial-Ai-Systems",
+      "repo": "3.0-financial-ai-systems",
       "project": "2-filing-intelligence",
       "has_results": true,
       "generated_at": "2026-09-07T00:04:56+00:00",
@@ -280,7 +284,7 @@
       ]
     },
     {
-      "repo": "3.0-Financial-Ai-Systems",
+      "repo": "3.0-financial-ai-systems",
       "project": "3-private-credit-data-provenance",
       "has_results": true,
       "generated_at": "2026-09-07T00:06:16+00:00",
@@ -314,31 +318,25 @@
       ]
     },
     {
-      "repo": "3.0-Financial-Ai-Systems",
+      "repo": "3.0-financial-ai-systems",
       "project": "4-tokenized-fixed-income-analytics",
       "has_results": true,
-      "generated_at": "2026-08-31T21:50:25+00:00",
-      "is_synthetic": true,
-      "data_source": "synthetic on-chain trade and redemption history (src/chain.py)",
-      "n_tests": 34,
+      "generated_at": "2026-09-14T01:04:05+00:00",
+      "is_synthetic": false,
+      "data_source": "Ethereum mainnet transfer logs, read through Etherscan's log index; see data/MANIFEST.json for retrieval times",
+      "n_tests": 64,
       "has_site": true,
-      "headline": [
-        {
-          "metric": "Stress latency ratio",
-          "value": 5.152,
-          "note": "redemption queue lengthening"
-        },
-        {
-          "metric": "Tokens analysed",
-          "value": 6,
-          "note": "synthetic"
-        }
-      ],
+      "headline": [],
       "headline_error": null,
-      "withheld": []
+      "withheld": [
+        {
+          "topic": "price metrics",
+          "because": "an ERC-20 Transfer event carries a value and two addresses and no price. Amihud illiquidity and the Roll spread are both built on price changes, so neither can be computed from a transfer tape; and a fund redeeming at net asset value may have no market price to find at all."
+        }
+      ]
     },
     {
-      "repo": "3.0-Financial-Ai-Systems",
+      "repo": "3.0-financial-ai-systems",
       "project": "5-volatility-forecasting",
       "has_results": true,
       "generated_at": "2026-09-09T19:30:14+00:00",
@@ -356,7 +354,7 @@
       ]
     },
     {
-      "repo": "3.0-Financial-Ai-Systems",
+      "repo": "3.0-financial-ai-systems",
       "project": "6-portfolio-optimization-engine",
       "has_results": true,
       "generated_at": "2026-09-11T22:41:21+00:00",
@@ -385,13 +383,13 @@
       "withheld": []
     },
     {
-      "repo": "3.0-Financial-Ai-Systems",
+      "repo": "3.0-financial-ai-systems",
       "project": "7-portfolio-results-rollup",
       "has_results": true,
-      "generated_at": "2026-09-12T15:10:27+00:00",
+      "generated_at": "2026-09-19T01:13:08+00:00",
       "is_synthetic": true,
       "data_source": "each project's own results/latest.json",
-      "n_tests": 21,
+      "n_tests": 22,
       "has_site": true,
       "headline": [],
       "headline_error": null,
