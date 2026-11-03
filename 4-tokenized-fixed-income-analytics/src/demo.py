@@ -169,6 +169,12 @@ def main_real() -> int:
         print("\nWINDOW IS INCOMPLETE -- DO NOT CITE THESE ACTIVITY FIGURES: "
               + r["activity_metrics_qualified_because"])
     print("wrote results/latest-real.json")
+    try:
+        from .site import build_site
+        build_site(r)
+        print("website/ rebuilt from this run")
+    except Exception as exc:                      # noqa: BLE001
+        print(f"(site not rebuilt: {exc})", file=sys.stderr)
     return 0
 
 

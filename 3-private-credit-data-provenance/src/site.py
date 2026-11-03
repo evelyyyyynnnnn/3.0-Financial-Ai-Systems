@@ -24,6 +24,11 @@ META = {
 
 
 def build_site(results: dict) -> pathlib.Path:
+    # The real run and the authored run have different shapes; dispatch on the
+    # flag the results file carries rather than on which keys happen to exist.
+    if not results.get("is_synthetic", True):
+        return build_site_real(results)
+
     c, v = results["corpus"], results["values"]
     so, se, t = results["spans_overlap"], results["spans_exact"], results["tamper"]
 
@@ -192,3 +197,130 @@ python -m src.demo</pre>
 </section>
 """
     return sk.build(ROOT, META, body, results)
+
+
+# --------------------------------------------------------------------------
+# Real-data page: extraction from real BDC filings, where span support is
+# checkable without an answer key and accuracy is not.
+# --------------------------------------------------------------------------
+
+REAL_META = dict(META)
+REAL_META.update({
+    "tags": [("real BDC 10-Ks", "real"), ("span-level provenance", ""),
+             ("abstains rather than guesses", ""), ("no answer key", "")],
+    "banner": "Run on real business-development-company 10-K filings retrieved from SEC "
+              "EDGAR, with URLs, hashes and retrieval times recorded in "
+              "data/MANIFEST.json. Every extracted value carries the exact character "
+              "span it came from, so a wrong number can be located rather than merely "
+              "suspected.",
+    "datanote": "Built from results/latest-real.json. Nobody has annotated a real BDC "
+                "schedule of investments with the values an extractor ought to return, "
+                "so precision and recall have no denominator; span support does, and is "
+                "reported instead.",
+})
+
+
+def build_site_real(results: dict) -> pathlib.Path:
+    pc = results["provenance_check"]
+    docs = results.get("documents", [])
+    per = results.get("per_document", [])
+
+    metrics = sk.metric_grid([
+        ("Span support rate", f"{pc['span_support_rate'] * 100:.1f}%",
+         "cited spans that contain their value"),
+        ("Values extracted", pc["extracted_values"], "across all filings"),
+        ("Fields abstained on", pc["abstentions"], "declined rather than guessed"),
+        ("Spans that failed", pc["spans_not_supporting_their_value"],
+         "cited a span without the value"),
+    ])
+
+    support_chart = sk.bar_chart(
+        [("spans supporting their value", pc["spans_supporting_their_value"]),
+         ("fields abstained on", pc["abstentions"]),
+         ("spans not supporting", pc["spans_not_supporting_their_value"])],
+        fmt="{:.0f}")
+
+    check_tbl = sk.table(
+        ["", "Count"],
+        [["Values extracted", pc["extracted_values"]],
+         ["Spans that do contain the value cited",
+          pc["spans_supporting_their_value"]],
+         ["Spans that do not", pc["spans_not_supporting_their_value"]],
+         ["Fields the extractor abstained on", pc["abstentions"]]],
+        numeric_cols=(1,))
+
+    doc_tbl = sk.table(
+        ["Filing", "Schedule located", "Document characters", "SHA-256 (first 16)"],
+        [[d["doc_id"], "yes" if d.get("schedule_located") else "no",
+          f"{d.get('document_chars', 0):,}", d.get("sha256", "")] for d in docs],
+        numeric_cols=(2,))
+
+    per_tbl = sk.table(
+        ["Filing", "Values extracted", "Fields abstained on"],
+        [[p["doc_id"], p["n_extracted"], p["n_abstained"]] for p in per],
+        numeric_cols=(1, 2))
+    per_chart = sk.bar_chart(
+        [(p["doc_id"], p["n_extracted"]) for p in per], fmt="{:.0f}")
+
+    body = f"""
+<section>
+  <h2>This run</h2>
+  <div class="stack-lg">
+    {metrics}
+    <p class="mono" style="color:var(--muted);font-size:12.5px">
+      generated {sk.esc(results['generated_at'])} &middot;
+      {len(docs)} filings &middot; {len(results.get('fields', []))} target fields
+    </p>
+  </div>
+</section>
+
+<section>
+  <h2>The check that works without an answer key</h2>
+  <div class="stack-lg">
+    {support_chart}
+    {check_tbl}
+    <p>{sk.esc(pc.get('what_this_measures', ''))}</p>
+  </div>
+</section>
+
+<section>
+  <h2>Per filing</h2>
+  <div class="stack-lg">
+    {per_chart}
+    {per_tbl}
+    <p>Abstention is the designed behaviour, not a weakness being hidden. Counting the
+    refusals is what makes the span-support rate meaningful: a extractor that guessed
+    every field would have more values and a worse story.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Source filings</h2>
+  <div class="stack-lg">
+    {doc_tbl}
+  </div>
+</section>
+
+<section>
+  <h2>What this run does not compute</h2>
+  <div class="stack-lg">
+    <div class="note">
+      <h3>Accuracy has no denominator here</h3>
+      <p>{sk.esc(results.get('accuracy_withheld_because', ''))}</p>
+      <p>Span support says each cited span <em>contains</em> the value attributed to it.
+      It says nothing about whether that value is the right one for the field, and the
+      distinction is recorded in the result file rather than left to the reader.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Reproduce</h2>
+  <div class="stack">
+    <pre>python -m src.demo --real
+# -&gt; results/latest-real.json
+pytest -q</pre>
+  </div>
+</section>
+"""
+    return sk.build(ROOT, REAL_META, body, results)
