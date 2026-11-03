@@ -1,6 +1,6 @@
 # Private Credit Data Provenance — website
 
-Static site for `3-private-credit-data-provenance`. No build step: Vercel serves this folder as-is.
+Static site for `private-credit-data-provenance`. No build step: Vercel serves this folder as-is.
 
 ## Deploy on its own
 

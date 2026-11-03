@@ -134,6 +134,12 @@ def main_real() -> int:
             print(f"    [{ex['kind']}] {ex['headline'][:110]}")
     print("\naccuracy is NOT reported: " + r["accuracy_withheld_because"])
     print("wrote results/latest-real.json")
+    try:
+        from .site import build_site
+        build_site(r)
+        print("website/ rebuilt from this run")
+    except Exception as exc:                      # noqa: BLE001
+        print(f"(site not rebuilt: {exc})", file=sys.stderr)
     return 0
 
 

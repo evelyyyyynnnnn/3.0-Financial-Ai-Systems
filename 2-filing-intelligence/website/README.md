@@ -1,6 +1,6 @@
 # Filing Intelligence — website
 
-Static site for `2-filing-intelligence`. No build step: Vercel serves this folder as-is.
+Static site for `filing-intelligence`. No build step: Vercel serves this folder as-is.
 
 ## Deploy on its own
 
