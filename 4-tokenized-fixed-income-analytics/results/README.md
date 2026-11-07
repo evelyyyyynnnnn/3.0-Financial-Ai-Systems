@@ -1,7 +1,7 @@
 # Results — Tokenized Fixed-Income Analytics
 
-Nothing measured yet. This file is the only source for numbers cited in the
-[redacted]; if a figure is not here with a run date, it does not get cited.
+Nothing measured yet. This file is the only source for the numbers quoted
+elsewhere in this repository; if a figure is not here with a run date, it is not cited.
 
 ## Measured results
 

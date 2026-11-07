@@ -1,7 +1,7 @@
 """Walk the portfolio and read each project's results/latest.json.
 
 This exists because of a specific failure mode. Numbers get quoted in a CV, a
-[redacted] or a README, and over time nobody can say which run produced them or
+README or a slide, and over time nobody can say which run produced them or
 whether that run still exists. Every figure here is read from the file the
 project's own demo wrote, so a number without a run behind it simply cannot
 appear -- and a project that has never been run shows up as such rather than

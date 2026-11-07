@@ -22,6 +22,11 @@ META = {
 
 
 def build_site(results: dict) -> pathlib.Path:
+    # The real run and the authored run have different shapes; dispatch on the
+    # flag the results file carries rather than on which keys happen to exist.
+    if not results.get("is_synthetic", True):
+        return build_site_real(results)
+
     s, c, t, tc = (results["scoring"], results["corpus"], results["timing"],
                    results["toc_check"])
 
@@ -182,3 +187,121 @@ python -m src.demo</pre>
 </section>
 """
     return sk.build(ROOT, META, body, results)
+
+
+# --------------------------------------------------------------------------
+# Real-data page: risk-disclosure diffs on filings pulled live from EDGAR.
+# --------------------------------------------------------------------------
+
+REAL_META = dict(META)
+REAL_META.update({
+    "tags": [("real SEC EDGAR", "real"), ("live 10-K pairs", ""),
+             ("risk-by-risk diff", ""), ("no answer key", "")],
+    "banner": "Run on real 10-K filings retrieved from SEC EDGAR, with URLs, hashes and "
+              "retrieval times recorded in data/MANIFEST.json. Each report matches the "
+              "prior year's risk items against the current year's and classifies every "
+              "change.",
+    "datanote": "Built from results/latest-real.json. Real filing pairs carry no "
+                "human-annotated list of material changes, so precision and recall have "
+                "no denominator and the run reports what it found rather than how often "
+                "it was right.",
+})
+
+
+def build_site_real(results: dict) -> pathlib.Path:
+    reports = results.get("reports", [])
+    timing = results.get("timing", {})
+    tot = sum(r["counts"]["total"] for r in reports)
+    mat = sum(r["counts"]["material"] for r in reports)
+    biggest = max(reports, key=lambda r: r["counts"]["total"]) if reports else None
+
+    metrics = sk.metric_grid([
+        ("Filing pairs", len(reports), "pulled live from EDGAR"),
+        ("Changes classified", f"{tot:,}", "added, removed, reworded, unchanged"),
+        ("Material changes", f"{mat:,}", "across all pairs"),
+        ("Throughput", f"{timing.get('chars_per_second', 0) / 1e6:.1f} M",
+         "characters per second"),
+    ])
+
+    rep_tbl = sk.table(
+        ["Company", "Period", "Risks prior → current", "Added", "Removed",
+         "Reworded", "Unchanged", "Material"],
+        [[r["company"], f"{r['prior_period']} → {r['current_period']}",
+          f"{r['n_risks_prior']} → {r['n_risks_current']}",
+          r["counts"]["added"], r["counts"]["removed"], r["counts"]["reworded"],
+          r["counts"]["unchanged"], r["counts"]["material"]] for r in reports],
+        numeric_cols=(3, 4, 5, 6, 7))
+
+    total_chart = sk.bar_chart(
+        [(r["company"], r["counts"]["total"]) for r in reports], fmt="{:.0f}")
+
+    kind_chart = ""
+    kind_tbl = ""
+    if biggest:
+        c = biggest["counts"]
+        kind_chart = sk.bar_chart(
+            [("reworded", c["reworded"]), ("unchanged", c["unchanged"]),
+             ("removed", c["removed"]), ("added", c["added"])], fmt="{:.0f}")
+        kind_tbl = sk.table(
+            ["Classification", "Items", "Share of the pair"],
+            [[k, c[k], f"{c[k] / c['total'] * 100:.1f}%"]
+             for k in ("reworded", "unchanged", "removed", "added")],
+            numeric_cols=(1, 2))
+
+    body = f"""
+<section>
+  <h2>This run</h2>
+  <div class="stack-lg">
+    {metrics}
+    <p class="mono" style="color:var(--muted);font-size:12.5px">
+      generated {sk.esc(results['generated_at'])} &middot;
+      EDGAR used in this run: {str(results.get('edgar_used_in_this_run', False)).lower()}
+      &middot; {timing.get('chars_processed', 0):,} characters compared
+    </p>
+  </div>
+</section>
+
+<section>
+  <h2>Every filing pair, as the run reported it</h2>
+  <div class="stack-lg">
+    {total_chart}
+    {rep_tbl}
+  </div>
+</section>
+
+<section>
+  <h2>{"Inside the " + biggest["company"] + " pair" if biggest else "Change breakdown"}</h2>
+  <div class="stack-lg">
+    {kind_chart}
+    {kind_tbl}
+    <p>{"This pair moves from " + str(biggest["n_risks_prior"]) + " risk items to "
+        + str(biggest["n_risks_current"]) + ", so a reader comparing headline counts "
+          "would see a handful disappear. The diff shows "
+        + str(biggest["counts"]["material"]) + " material movements underneath."
+        if biggest else ""}</p>
+  </div>
+</section>
+
+<section>
+  <h2>What this run does not compute</h2>
+  <div class="stack-lg">
+    <div class="note">
+      <h3>There is no labelled change list to score against</h3>
+      <p>{sk.esc(results.get('accuracy_withheld_because', ''))}</p>
+      <p>The throughput figure is a machine measurement with
+      <code>human_baseline_measured: {str(timing.get('human_baseline_measured', False)).lower()}</code>
+      beside it. No human comparison was run, so no time saving is quoted from it.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Reproduce</h2>
+  <div class="stack">
+    <pre>python -m src.demo --real   # pulls live from SEC EDGAR
+# -&gt; results/latest-real.json
+pytest -q</pre>
+  </div>
+</section>
+"""
+    return sk.build(ROOT, REAL_META, body, results)

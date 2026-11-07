@@ -1,6 +1,6 @@
 # Contagion Observatory — website
 
-Static site for `1-contagion-observatory`. No build step: Vercel serves this folder as-is.
+Static site for `contagion-observatory`. No build step: Vercel serves this folder as-is.
 
 ## Deploy on its own
 

@@ -22,6 +22,11 @@ META = {
 
 
 def build_site(results: dict) -> pathlib.Path:
+    # The real run and the authored run have different shapes; dispatch on the
+    # flag the results file carries rather than on which keys happen to exist.
+    if not results.get("is_synthetic", True):
+        return build_site_real(results)
+
     toks = results["tokens"]
     rc = results["recovery"]
     st = results["stress"]
@@ -179,3 +184,136 @@ python -m src.demo</pre>
 </section>
 """
     return sk.build(ROOT, META, body, results)
+
+
+# --------------------------------------------------------------------------
+# Real-data page: holder concentration read off Ethereum mainnet.
+# --------------------------------------------------------------------------
+
+REAL_META = dict(META)
+REAL_META.update({
+    "tags": [("real Ethereum mainnet", "real"), ("Etherscan log index", ""),
+             ("3 live tokenised funds", ""), ("no price in a transfer", "")],
+    "banner": "Run on Ethereum mainnet ERC-20 transfer logs read through Etherscan's "
+              "log index, each log timestamped by its own block, with the window's "
+              "block coverage recorded in data/MANIFEST.json.",
+    "datanote": "Built from results/latest-real.json. Balances are the net of transfers "
+                "observed in the fetched window, so they equal the true register only "
+                "if the window reaches the token's first block.",
+})
+
+
+def build_site_real(results: dict) -> pathlib.Path:
+    toks = results.get("tokens", [])
+    cov = results.get("window_coverage", {})
+    by = cov.get("by_symbol", {})
+    frac = min((v.get("fraction_retrieved", 0) for v in by.values()), default=0)
+
+    metrics = sk.metric_grid([
+        ("Tokenised funds", len(toks), "live on Ethereum mainnet"),
+        ("Transfers read", f"{sum(t['n_transfers'] for t in toks):,}",
+         f"over {cov.get('days_requested', 0)} days"),
+        ("Block coverage", f"{frac * 100:.0f}%", "no missing ranges"),
+        ("Fewest effective holders",
+         f"{min((t['effective_holders'] for t in toks), default=0):.2f}",
+         "concentration, not headcount"),
+    ])
+
+    tok_tbl = sk.table(
+        ["Token", "Fund", "Transfers", "Holders", "Effective holders",
+         "HHI", "Top-5 share", "Gini", "Turnover"],
+        [[t["symbol"], t["fund"], f"{t['n_transfers']:,}", f"{t['n_holders']:,}",
+          f"{t['effective_holders']:.2f}", f"{t['hhi']:.4f}",
+          f"{t['top5_share'] * 100:.1f}%", f"{t['gini']:.3f}", f"{t['turnover']:.2f}"]
+         for t in toks],
+        numeric_cols=(2, 3, 4, 5, 6, 7, 8))
+
+    top5_chart = sk.bar_chart(
+        [(t["symbol"], t["top5_share"]) for t in toks], fmt="{:.3f}")
+    eff_chart = sk.bar_chart(
+        [(f"{t['symbol']} ({t['n_holders']} addresses)", t["effective_holders"])
+         for t in toks], fmt="{:.2f}")
+
+    gap_tbl = sk.table(
+        ["Token", "Median gap", "95th percentile", "Longest gap", "Median transfer"],
+        [[t["symbol"], f"{t['gaps']['median_gap_h']:.3f} h",
+          f"{t['gaps']['p95_gap_h']:.3f} h", f"{t['gaps']['max_gap_h']:.2f} h",
+          f"{t['median_transfer']:,.0f}"] for t in toks],
+        numeric_cols=(1, 2, 3, 4))
+
+    cov_tbl = sk.table(
+        ["Token", "Blocks requested", "Blocks retrieved", "Fraction", "Pages fetched"],
+        [[s, f"{v.get('blocks_requested', 0):,}", f"{v.get('blocks_retrieved', 0):,}",
+          f"{v.get('fraction_retrieved', 0):.3f}", v.get("pages_fetched", 0)]
+         for s, v in by.items()],
+        numeric_cols=(1, 2, 3, 4))
+
+    body = f"""
+<section>
+  <h2>This run</h2>
+  <div class="stack-lg">
+    {metrics}
+    <p class="mono" style="color:var(--muted);font-size:12.5px">
+      generated {sk.esc(results['generated_at'])} &middot;
+      backend {sk.esc(results.get('backend', ''))} &middot;
+      {sk.esc(results.get('time_basis', ''))}
+    </p>
+  </div>
+</section>
+
+<section>
+  <h2>Concentration in live tokenised funds</h2>
+  <div class="stack-lg">
+    {eff_chart}
+    {tok_tbl}
+    <p>The effective-holder count is the number that does the work. A fund can carry
+    hundreds of addresses on its register and still be, in concentration terms, a handful
+    of accounts. That gap between headcount and effective count is what this measurement
+    exists to make visible.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Share held by the top five addresses</h2>
+  <div class="stack-lg">
+    {top5_chart}
+  </div>
+</section>
+
+<section>
+  <h2>Transfer timing</h2>
+  <div class="stack-lg">
+    {gap_tbl}
+  </div>
+</section>
+
+<section>
+  <h2>Window coverage</h2>
+  <div class="stack-lg">
+    {cov_tbl}
+    <p>Coverage is recorded per token so a partial fetch cannot be mistaken for a quiet
+    market. {sk.esc(results.get('holder_register_caveat', ''))}</p>
+  </div>
+</section>
+
+<section>
+  <h2>What a transfer tape cannot tell you</h2>
+  <div class="stack-lg">
+    <div class="note">
+      <h3>Price-based liquidity measures are not computed</h3>
+      <p>{sk.esc(results.get('price_metrics_withheld_because', ''))}</p>
+      <p>The fields are present and null rather than filled with a proxy.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Reproduce</h2>
+  <div class="stack">
+    <pre>python -m src.demo --real   # Etherscan log index
+# -&gt; results/latest-real.json
+pytest -q</pre>
+  </div>
+</section>
+"""
+    return sk.build(ROOT, REAL_META, body, results)

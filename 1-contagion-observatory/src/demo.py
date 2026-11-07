@@ -181,6 +181,12 @@ def main_real() -> int:
         print(f"  {name:>9}: total absolute impact {tot:.4f}")
     print("\nrecovery precision is NOT reported: " + r["recovery_withheld_because"])
     print("wrote results/latest-real.json")
+    try:
+        from .site import build_site
+        build_site(r)
+        print("website/ rebuilt from this run")
+    except Exception as exc:                      # noqa: BLE001
+        print(f"(site not rebuilt: {exc})", file=sys.stderr)
     return 0
 
 

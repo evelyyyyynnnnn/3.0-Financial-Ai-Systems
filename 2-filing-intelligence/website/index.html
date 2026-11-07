@@ -116,127 +116,61 @@ svg.chart{display:block;width:100%;height:auto}
   <div class="eyebrow">3.0-Financial-Ai-Systems &middot; Financial Stability</div>
   <h1>Filing Intelligence</h1>
   <p class="lede">What CHANGED in a company&#x27;s SEC risk disclosures since its prior filing — matched risk by risk, so reordering is not reported as change.</p>
-  <div class="tags"><span class="tag ">Item 1A extraction</span><span class="tag ">risk-level matching</span><span class="tag demo">authored pairs</span><span class="tag warn">EDGAR not pulled</span></div>
+  <div class="tags"><span class="tag real">real SEC EDGAR</span><span class="tag ">live 10-K pairs</span><span class="tag ">risk-by-risk diff</span><span class="tag ">no answer key</span></div>
 </header>
 <div class="banner">
   <span class="bi">Data</span>
-  <p>This run used three authored filing pairs with labelled changes, NOT filings from EDGAR. The EDGAR client in src/edgar.py is real and unexercised — running it against the live universe is the step that would turn this into evidence, and it has not been run. No scale claim and no time-saving percentage appears anywhere on this page.</p>
+  <p>Run on real 10-K filings retrieved from SEC EDGAR, with URLs, hashes and retrieval times recorded in data/MANIFEST.json. Each report matches the prior year&#x27;s risk items against the current year&#x27;s and classifies every change.</p>
 </div>
-
-<section>
-  <h2>Why this is not a text diff</h2>
-  <div class="stack">
-    <p>The report a reader wants is: which risks are new, which are gone, and which are
-    still there but now say something different. A positional diff cannot produce that,
-    because risks get reordered between filings and the diff then reports the entire
-    section as changed.</p>
-    <p>So risks are matched across the two documents first, by token overlap, and only
-    then classified. Matching is greedy rather than optimal — with a few dozen risks the
-    difference is negligible, and greedy keeps every pairing explainable as "the best
-    remaining match", which a reader can check.</p>
-  </div>
-</section>
 
 <section>
   <h2>This run</h2>
   <div class="stack-lg">
-    <div class="metrics"><div class="metric"><span class="mk">Material changes found</span><span class="mv">6/6</span><span class="mn">100% of labelled changes</span></div><div class="metric"><span class="mk">False alarms</span><span class="mv">0</span><span class="mn">on the identical-filings pair</span></div><div class="metric"><span class="mk">Throughput</span><span class="mv">6,464,545</span><span class="mn">characters per second</span></div><div class="metric"><span class="mk">Filings from EDGAR</span><span class="mv">0</span><span class="mn">the client is unexercised</span></div></div>
+    <div class="metrics"><div class="metric"><span class="mk">Filing pairs</span><span class="mv">5</span><span class="mn">pulled live from EDGAR</span></div><div class="metric"><span class="mk">Changes classified</span><span class="mv">500</span><span class="mn">added, removed, reworded, unchanged</span></div><div class="metric"><span class="mk">Material changes</span><span class="mv">380</span><span class="mn">across all pairs</span></div><div class="metric"><span class="mk">Throughput</span><span class="mv">12.2 M</span><span class="mn">characters per second</span></div></div>
     <p class="mono" style="color:var(--muted);font-size:12.5px">
-      generated 2026-08-31T21:50:23+00:00 &middot; 3 authored filing pairs with labelled changes (src/corpus.py)
+      generated 2026-09-07T00:04:56+00:00 &middot;
+      EDGAR used in this run: true
+      &middot; 3,781 characters compared
     </p>
-    <div class="tw"><table><thead><tr><th>Company</th><th>Periods</th><th>Added</th><th>Removed</th><th>Reworded</th><th>Unchanged</th><th>Tests</th></tr></thead><tbody><tr><td>Meridian Components</td><td>FY2023 → FY2024</td><td class="n">1</td><td class="n">1</td><td class="n">1</td><td class="n">1</td><td>One added, one removed, one materially reworded with a changed concentration figure, one untouched.</td></tr><tr><td>Harborline Bancorp</td><td>FY2023 → FY2024</td><td class="n">1</td><td class="n">0</td><td class="n">2</td><td class="n">1</td><td>Two rewordings, one addition, nothing removed. The interest-rate risk is byte-identical and must not be reported as changed.</td></tr><tr><td>Steadfast Services</td><td>FY2023 → FY2024</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">2</td><td>Identical filings. A change detector that reports anything here is producing noise, which is the failure mode that makes these tools ignored in practice.</td></tr></tbody></table></div>
   </div>
 </section>
 
 <section>
-  <h2>Every material change it reported</h2>
+  <h2>Every filing pair, as the run reported it</h2>
   <div class="stack-lg">
-    <div class="tw"><table><thead><tr><th>Company</th><th>Kind</th><th>Similarity</th><th>Figures changed</th><th>Summary</th></tr></thead><tbody><tr><td>Meridian Components</td><td>reworded</td><td class="n">0.68</td><td>2024, 42</td><td>REWORDED: We depend on a limited number of suppliers for critical components. A single supplier…</td></tr><tr><td>Meridian Components</td><td>added</td><td class="n">0.05</td><td>—</td><td>NEW: We are subject to evolving data protection and artificial intelligence regulation in the ju</td></tr><tr><td>Meridian Components</td><td>removed</td><td class="n">0.00</td><td>—</td><td>REMOVED: We face intense competition in all of our markets. Some of our competitors have…</td></tr><tr><td>Harborline Bancorp</td><td>reworded</td><td class="n">0.48</td><td>18, 24</td><td>REWORDED: We are exposed to credit risk in our commercial real estate portfolio, which represent</td></tr><tr><td>Harborline Bancorp</td><td>reworded</td><td class="n">0.67</td><td>—</td><td>REWORDED: Our business depends on the continued availability of deposits. A significant withdraw</td></tr><tr><td>Harborline Bancorp</td><td>added</td><td class="n">0.00</td><td>—</td><td>NEW: We rely on third-party cloud infrastructure for core banking functions. A prolonged outage </td></tr></tbody></table></div>
+    <figure><svg class="chart" viewBox="0 0 680 184" role="img" aria-label="Bar chart of results"><text x="180" y="26.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">AAPL</text><rect x="190" y="9" width="17.7" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="216.7" y="26.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">8</text><text x="180" y="61.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">BA</text><rect x="190" y="44" width="278.4" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="477.4" y="61.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">126</text><text x="180" y="96.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">KO</text><rect x="190" y="79" width="422.0" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="621.0" y="96.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">191</text><text x="180" y="131.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">MSFT</text><rect x="190" y="114" width="234.2" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="433.2" y="131.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">106</text><text x="180" y="166.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">PFE</text><rect x="190" y="149" width="152.5" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="351.5" y="166.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">69</text></svg></figure>
+    <div class="tw"><table><thead><tr><th>Company</th><th>Period</th><th>Risks prior → current</th><th>Added</th><th>Removed</th><th>Reworded</th><th>Unchanged</th><th>Material</th></tr></thead><tbody><tr><td>AAPL</td><td>FY2023 → FY2024</td><td>6 → 7</td><td class="n">2</td><td class="n">1</td><td class="n">4</td><td class="n">1</td><td class="n">7</td></tr><tr><td>BA</td><td>FY2024 → FY2025</td><td>111 → 107</td><td class="n">15</td><td class="n">19</td><td class="n">50</td><td class="n">42</td><td class="n">84</td></tr><tr><td>KO</td><td>FY2024 → FY2025</td><td>172 → 164</td><td class="n">19</td><td class="n">27</td><td class="n">102</td><td class="n">43</td><td class="n">148</td></tr><tr><td>MSFT</td><td>FY2024 → FY2025</td><td>83 → 100</td><td class="n">23</td><td class="n">6</td><td class="n">50</td><td class="n">27</td><td class="n">79</td></tr><tr><td>PFE</td><td>FY2024 → FY2025</td><td>51 → 55</td><td class="n">18</td><td class="n">14</td><td class="n">30</td><td class="n">7</td><td class="n">62</td></tr></tbody></table></div>
+  </div>
+</section>
+
+<section>
+  <h2>Inside the KO pair</h2>
+  <div class="stack-lg">
+    <figure><svg class="chart" viewBox="0 0 680 149" role="img" aria-label="Bar chart of results"><text x="180" y="26.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">reworded</text><rect x="190" y="9" width="422.0" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="621.0" y="26.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">102</text><text x="180" y="61.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">unchanged</text><rect x="190" y="44" width="177.9" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="376.9" y="61.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">43</text><text x="180" y="96.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">removed</text><rect x="190" y="79" width="111.7" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="310.7" y="96.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">27</text><text x="180" y="131.68" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".72">added</text><rect x="190" y="114" width="78.6" height="26" rx="3" fill="var(--accent)" opacity=".85"/><text x="277.6" y="131.68" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor" opacity=".62">19</text></svg></figure>
+    <div class="tw"><table><thead><tr><th>Classification</th><th>Items</th><th>Share of the pair</th></tr></thead><tbody><tr><td>reworded</td><td class="n">102</td><td class="n">53.4%</td></tr><tr><td>unchanged</td><td class="n">43</td><td class="n">22.5%</td></tr><tr><td>removed</td><td class="n">27</td><td class="n">14.1%</td></tr><tr><td>added</td><td class="n">19</td><td class="n">9.9%</td></tr></tbody></table></div>
+    <p>This pair moves from 172 risk items to 164, so a reader comparing headline counts would see a handful disappear. The diff shows 148 material movements underneath.</p>
+  </div>
+</section>
+
+<section>
+  <h2>What this run does not compute</h2>
+  <div class="stack-lg">
     <div class="note">
-      <h3>The quiet pair is the important one</h3>
-      <p>Steadfast Services files an identical Item 1A in both periods, and the detector
-      reports 0 material changes for it. That is
-      the property that decides whether a tool like this gets used: a report that flags
-      something every quarter is indistinguishable from not running it.</p>
-      <p>Byte-identical risks are classified as unchanged only when similarity is above
-      0.97 <em>and</em> no figure has moved. A risk whose wording is untouched but whose
-      concentration percentage went from 31 to 42 is a material change, and catching
-      that is most of the value here.</p>
+      <h3>There is no labelled change list to score against</h3>
+      <p>real filing pairs carry no human-annotated list of material changes, so there is no denominator for precision or recall</p>
+      <p>The throughput figure is a machine measurement with
+      <code>human_baseline_measured: false</code>
+      beside it. No human comparison was run, so no time saving is quoted from it.</p>
     </div>
   </div>
 </section>
 
 <section>
-  <h2>Finding the right Item 1A</h2>
-  <div class="stack-lg">
-    <div class="tw"><table><thead><tr><th>Check</th><th>Result</th></tr></thead><tbody><tr><td>Occurrences of &#x27;Item 1A&#x27; in the test document</td><td class="n">2</td></tr><tr><td>Selected the section body, not the table of contents</td><td class="n">yes</td></tr><tr><td>Characters selected</td><td class="n">1405</td></tr></tbody></table></div>
-    <p>A 10-K names Item 1A in its table of contents, in cross-references, and at the
-    section itself. The naive first match lands in the table of contents every time.
-    The rule used here is that the real heading is the occurrence followed by the most
-    text before the next item heading — simple, checkable, and stated so a reader can
-    judge it rather than trust it.</p>
-  </div>
-</section>
-
-<section>
-  <h2>Timing, and the number that is missing</h2>
-  <div class="stack-lg">
-    <div class="tw"><table><thead><tr><th>Measure</th><th>Value</th></tr></thead><tbody><tr><td>Characters processed per second</td><td>6,464,545</td></tr><tr><td>Time for one pass over the corpus</td><td>0.6 ms</td></tr><tr><td>Human baseline measured</td><td>NO</td></tr></tbody></table></div>
-    <div class="note">
-      <h3>No time-saving percentage is claimed</h3>
-      <p>Throughput is measured and reported above. A <em>reduction</em> figure needs
-      two numbers — machine time and human time on the same documents — and the second
-      has never been measured here. Dividing a measured machine time by an assumed human
-      time produces a percentage that looks empirical and is not.</p>
-      <p>Getting that number honestly means timing analysts reading the same filings,
-      with the same task definition, and reporting the spread. Until then this page
-      reports characters per second and nothing more.</p>
-    </div>
-  </div>
-</section>
-
-<section>
-  <h2>Getting real filings in</h2>
-  <div class="stack-lg">
-    <p><code>src/edgar.py</code> implements the submissions API, rate limiting at the
-    SEC's requested 10 requests per second, and the mandatory descriptive User-Agent.
-    It is not called by the demo or the tests: a build whose output depends on a live
-    third-party service is not reproducible, and a test suite should not be hitting
-    EDGAR.</p>
-    <pre>from src.edgar import fetch_company_filings, USER_AGENT
-# set USER_AGENT to a real contact address first -- the SEC refuses requests without one
-refs = fetch_company_filings(cik="0000320193", forms=("10-K",), limit=4)</pre>
-    <p>Configured for live pulls: <strong>no</strong>.
-    Filings pulled in this run: <strong>0</strong>.</p>
-  </div>
-</section>
-
-<section>
-  <h2>Reproduce it</h2>
+  <h2>Reproduce</h2>
   <div class="stack">
-    <pre>cd filing-intelligence
-pip install -r requirements.txt
-python -m pytest tests/ -q
-python -m src.demo</pre>
-  </div>
-</section>
-
-<section>
-  <h2>What this does not establish</h2>
-  <div class="stack">
-    <ul class="tight">
-      <li><strong>No filings have been processed.</strong> Three authored pairs is a
-      correctness test for the matching logic, not a corpus, and no scale claim
-      follows from it.</li>
-      <li>The pairs were written by the same person who wrote the matcher, so 100%
-      recall here shows the rules handle the cases they were written against.</li>
-      <li>Real Item 1A sections run to tens of thousands of words with nested
-      sub-headings and exhibits; the paragraph splitter used here would need work
-      before it survived one.</li>
-      <li>Matching is lexical. Two risks describing the same exposure in different
-      vocabulary will be reported as one removed and one added.</li>
-      <li>No time-saving percentage, for the reason set out above.</li>
-    </ul>
+    <pre>python -m src.demo --real   # pulls live from SEC EDGAR
+# -&gt; results/latest-real.json
+pytest -q</pre>
   </div>
 </section>
 
@@ -244,7 +178,7 @@ python -m src.demo</pre>
   <p>3.0-Financial-Ai-Systems &middot; filing-intelligence &middot; part of a five-repository portfolio on optimization-driven,
      system-level decision frameworks.</p>
   <p>Every figure on this page was produced by running <code>python -m src.demo</code> in this
-     project and reading <code>results.json</code>. Nothing here is hand-entered. The run used clearly-labelled synthetic data; swap in the real source and the same pipeline reports real numbers.</p>
+     project and reading <code>results.json</code>. Nothing here is hand-entered. Built from results/latest-real.json. Real filing pairs carry no human-annotated list of material changes, so precision and recall have no denominator and the run reports what it found rather than how often it was right.</p>
 </div>
 </div>
 </body>
