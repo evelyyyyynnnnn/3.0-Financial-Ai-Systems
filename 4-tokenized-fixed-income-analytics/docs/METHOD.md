@@ -9,7 +9,7 @@ Measure liquidity, holder concentration, and redemption latency for tokenized de
 
 ## Why the approach is non-obvious
 
-Notion structural opportunity #2. Bridges the financial-stability and secure-digital-infrastructure pillars, which the petition currently treats as separate. Building it makes the "three pillars, one framework" story true rather than asserted.
+On-chain trade data looks complete and is not directly comparable to a TRACE-style liquidity measure. Wrapped and bridged positions, AMM fills alongside bilateral transfers, and one holder spread over many addresses all push a naive holder count toward overstating dispersion. Concentration cannot be measured until addresses are resolved to economic holders, and that resolution step is the method.
 
 ## Method
 

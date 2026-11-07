@@ -1,8 +1,8 @@
-# Trading Simulation Platform - Project Summary for NIW Application
+# Trading Simulation Platform — Project Summary
 
 ## 🎯 Executive Summary
 
-This **Trading Simulation Platform** represents a comprehensive demonstration of advanced quantitative trading capabilities, professional software development expertise, and innovative financial technology implementation. It showcases the skills and knowledge required for successful NIW (National Interest Waiver) applications in the quantitative finance domain.
+This **Trading Simulation Platform** represents a comprehensive demonstration of advanced quantitative trading capabilities, professional software development expertise, and innovative financial technology implementation.
 
 ## 🚀 Platform Status: **LIVE & OPERATIONAL**
 
@@ -84,7 +84,7 @@ This **Trading Simulation Platform** represents a comprehensive demonstration of
 
 ## 🎯 Business Value Proposition
 
-### **For NIW Applications**
+### **Capabilities demonstrated**
 
 #### **Advanced Quantitative Skills**
 - **Mathematical Modeling**: Complex financial algorithms and statistical analysis
@@ -170,7 +170,7 @@ This **Trading Simulation Platform** represents a comprehensive demonstration of
 - **Sentiment Analysis**: News and social media integration
 - **Alternative Data**: Satellite, weather, social media data
 
-## 📈 NIW Application Strengths
+## 📈 Strengths
 
 ### **National Interest Criteria**
 
@@ -201,7 +201,7 @@ This **Trading Simulation Platform** represents a comprehensive demonstration of
 4. **Business Acumen**: Understanding of financial markets, trading strategies, and portfolio management
 5. **Innovation Leadership**: Cutting-edge technology implementation in financial services
 
-The platform is **fully operational** and demonstrates both theoretical knowledge and practical implementation skills, making it an excellent portfolio piece for quantitative professionals seeking to showcase their expertise for NIW applications.
+The platform is **fully operational** and demonstrates both theoretical knowledge and practical implementation skills, making it a portfolio piece for quantitative work.
 
 **Key Success Factors:**
 - ✅ **Live Platform**: Fully functional and accessible
@@ -210,4 +210,4 @@ The platform is **fully operational** and demonstrates both theoretical knowledg
 - ✅ **Technical Excellence**: Modern technology stack and best practices
 - ✅ **Business Value**: Real-world financial technology application
 
-This project successfully demonstrates the skills, knowledge, and innovation capabilities required for successful NIW applications in the quantitative finance and financial technology domains.
+This project demonstrates quantitative trading infrastructure end to end: backtesting, portfolio management and the surrounding application.

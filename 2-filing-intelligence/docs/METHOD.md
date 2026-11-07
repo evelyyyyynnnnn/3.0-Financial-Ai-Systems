@@ -9,7 +9,7 @@ Report what CHANGED in a company's SEC risk disclosures since its prior filing, 
 
 ## Why the approach is non-obvious
 
-Carries two of the petition's scale claims. Simulated data underneath a real number is the sharpest RFE risk in the portfolio.
+Summarising a filing is what every tool does; the signal is in the delta. Risk-factor sections are heavy with boilerplate, so a naive diff returns mostly renumbering and legal reformatting. The hard part, and the only part worth reporting, is separating substantive change from cosmetic churn.
 
 ## Method
 

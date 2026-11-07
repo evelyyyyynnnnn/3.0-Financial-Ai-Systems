@@ -33,7 +33,7 @@ __all__ = ["Fetcher", "Source", "NetworkBlocked", "FetchError", "utc_now"]
 # sources do not require it but none object to it. Override with DATAKIT_UA.
 DEFAULT_UA = os.environ.get(
     "DATAKIT_UA",
-    "niw-portfolio-research/0.1 (contact: set DATAKIT_UA env var)",
+    "3.0-financial-ai-systems/0.1 (contact: set DATAKIT_UA env var)",
 )
 
 RETRYABLE_STATUS = {408, 425, 429, 500, 502, 503, 504}

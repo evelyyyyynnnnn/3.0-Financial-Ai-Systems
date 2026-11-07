@@ -174,7 +174,7 @@ there is no public series of per-unit hospital staffing demand to download; a pr
 **`3-quant-productivity-toolkit` — survivorship**  
 a survivorship audit needs the returns of the names that died, and no free source publishes point-in-time index membership with delisted constituents. A ticker that returns no data has not necessarily been delisted, so treating a fetch failure as a delisting would manufacture the very bias the check measures.
 
-## Petition claims vs. what this portfolio can show
+## Stated claims vs. what this portfolio can show
 
 The point of this table is the gap. A claim listed as *partially
 addressed* or *not evidenced* must not be cited to this repository.
