@@ -128,7 +128,7 @@ def render(results: dict) -> str:
             add(f"- `{p['project']}` — `{p['headline_error']}`")
         add("")
 
-    add("## Petition claims vs. what this portfolio can show")
+    add("## Stated claims vs. what this portfolio can show")
     add("")
     add("The point of this table is the gap. A claim listed as *partially")
     add("addressed* or *not evidenced* must not be cited to this repository.")

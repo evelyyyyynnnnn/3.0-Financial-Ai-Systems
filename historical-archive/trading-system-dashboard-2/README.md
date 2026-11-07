@@ -1,6 +1,6 @@
 # Trading Simulation Platform - Quantitative Trading Strategy Platform
 
-## 🚀 Professional Trading Platform for NIW Application
+## 🚀 Professional Trading Platform
 
 A sophisticated, enterprise-grade trading simulation platform that demonstrates advanced quantitative trading capabilities, algorithmic strategy development, and comprehensive backtesting infrastructure.
 

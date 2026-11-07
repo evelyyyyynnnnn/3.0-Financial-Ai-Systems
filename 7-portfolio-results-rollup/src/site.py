@@ -69,7 +69,7 @@ def build_site(results: dict) -> pathlib.Path:
 <section>
   <h2>Why this page exists</h2>
   <div class="stack">
-    <p>Numbers get quoted in a CV, a README or a petition, and over time nobody can say
+    <p>Numbers get quoted in a CV, a README or a slide, and over time nobody can say
     which run produced them or whether that run still exists. Every figure below is read
     from the JSON file the project's own demo wrote. A number with no run behind it
     cannot appear here, and a project that has never been run is listed as such rather
@@ -92,7 +92,7 @@ def build_site(results: dict) -> pathlib.Path:
 </section>
 
 <section>
-  <h2>Petition claims against what the code shows</h2>
+  <h2>Stated claims against what the code shows</h2>
   <div class="stack-lg">
     {claim_tbl}
     <div class="note warn" style="background:var(--warn-bg);border-color:transparent">

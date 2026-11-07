@@ -1,240 +1,284 @@
 {
-  "generated_at": "2026-08-31T21:50:23+00:00",
-  "is_synthetic": true,
-  "data_source": "3 authored filing pairs with labelled changes (src/corpus.py)",
-  "edgar_configured": false,
-  "edgar_used_in_this_run": false,
-  "corpus": {
-    "n_pairs": 3,
-    "n_added": 2,
-    "n_removed": 1,
-    "n_reworded": 3,
-    "n_unchanged": 4
+ "generated_at": "2026-09-07T00:04:56+00:00",
+ "is_synthetic": false,
+ "data_source": "real 10-K filings retrieved from SEC EDGAR (see data/MANIFEST.json for URLs, hashes and retrieval times)",
+ "edgar_configured": false,
+ "edgar_used_in_this_run": true,
+ "accuracy_reported": false,
+ "accuracy_withheld_because": "real filing pairs carry no human-annotated list of material changes, so there is no denominator for precision or recall",
+ "provenance": [
+  {
+   "ticker": "AAPL",
+   "status": "ok",
+   "prior": {
+    "filed": "2024-11-01",
+    "sha256": "24a830a0f1256e37",
+    "url": "https://www.sec.gov/Archives/edgar/data/320193/000032019324000123/aapl-20240928.htm",
+    "item_1a_chars": 1657
+   },
+   "current": {
+    "filed": "2025-10-31",
+    "sha256": "548ae59778cf08ee",
+    "url": "https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927.htm",
+    "item_1a_chars": 2148
+   }
   },
-  "scoring": {
-    "pairs": [
-      {
-        "company": "Meridian Components",
-        "periods": "FY2023 \u2192 FY2024",
-        "n_prior_risks": 3,
-        "n_current_risks": 3,
-        "counts": {
-          "added": 1,
-          "removed": 1,
-          "reworded": 1,
-          "unchanged": 1,
-          "total": 4,
-          "material": 3
-        },
-        "expected_material": 3,
-        "per_kind": {
-          "added": {
-            "expected": 1,
-            "found": 1,
-            "missed": []
-          },
-          "removed": {
-            "expected": 1,
-            "found": 1,
-            "missed": []
-          },
-          "reworded": {
-            "expected": 1,
-            "found": 1,
-            "missed": []
-          },
-          "unchanged": {
-            "expected": 1,
-            "found": 1,
-            "missed": []
-          }
-        },
-        "changes": [
-          {
-            "kind": "reworded",
-            "similarity": 0.6757,
-            "numbers_changed": [
-              "2024",
-              "42"
-            ],
-            "summary": "REWORDED: We depend on a limited number of suppliers for critical components. A single supplier\u2026 (figures changed: 2024, 42; 68% similar)",
-            "current": "We depend on a limited number of suppliers for critical components. A single supplier\naccounted for 42 percent of component purchases during fiscal 2024, compared with 31\npercent in fiscal 2023. This concentration has increased, and any interruption in supply\ncould materially affect our ability to meet customer demand and could require us to\nqualify alternative sources on an accelerated timeline.",
-            "prior": "We depend on a limited number of suppliers for critical components. A single supplier\naccounted for 31 percent of component purchases during fiscal 2023. Any interruption in\nsupply could materially affect our ability to meet customer demand."
-          },
-          {
-            "kind": "unchanged",
-            "similarity": 1.0,
-            "numbers_changed": [],
-            "summary": "unchanged: Our operating results may fluctuate significantly from quarter to quarter due to the timing\u2026",
-            "current": "Our operating results may fluctuate significantly from quarter to quarter due to the\ntiming of large orders, changes in customer mix, and the seasonality of demand in our\nprincipal end markets.",
-            "prior": "Our operating results may fluctuate significantly from quarter to quarter due to the\ntiming of large orders, changes in customer mix, and the seasonality of demand in our\nprincipal end markets."
-          },
-          {
-            "kind": "added",
-            "similarity": 0.0488,
-            "numbers_changed": [],
-            "summary": "NEW: We are subject to evolving data protection and artificial intelligence regulation in the jurisdictions\u2026",
-            "current": "We are subject to evolving data protection and artificial intelligence regulation in the\njurisdictions in which we operate. Compliance with new requirements may increase our\ncosts, and failure to comply could result in penalties or restrictions on our products.",
-            "prior": ""
-          },
-          {
-            "kind": "removed",
-            "similarity": 0.0,
-            "numbers_changed": [],
-            "summary": "REMOVED: We face intense competition in all of our markets. Some of our competitors have\u2026",
-            "current": "",
-            "prior": "We face intense competition in all of our markets. Some of our competitors have greater\nfinancial and technical resources than we do, and may be able to respond more quickly to\nnew technologies or customer requirements."
-          }
-        ],
-        "note": "One added, one removed, one materially reworded with a changed concentration figure, one untouched."
-      },
-      {
-        "company": "Harborline Bancorp",
-        "periods": "FY2023 \u2192 FY2024",
-        "n_prior_risks": 3,
-        "n_current_risks": 4,
-        "counts": {
-          "added": 1,
-          "removed": 0,
-          "reworded": 2,
-          "unchanged": 1,
-          "total": 4,
-          "material": 3
-        },
-        "expected_material": 3,
-        "per_kind": {
-          "added": {
-            "expected": 1,
-            "found": 1,
-            "missed": []
-          },
-          "removed": {
-            "expected": 0,
-            "found": 0,
-            "missed": []
-          },
-          "reworded": {
-            "expected": 2,
-            "found": 2,
-            "missed": []
-          },
-          "unchanged": {
-            "expected": 1,
-            "found": 1,
-            "missed": []
-          }
-        },
-        "changes": [
-          {
-            "kind": "unchanged",
-            "similarity": 1.0,
-            "numbers_changed": [],
-            "summary": "unchanged: Changes in interest rates may adversely affect our net interest margin. A sustained period\u2026",
-            "current": "Changes in interest rates may adversely affect our net interest margin. A sustained\nperiod of elevated rates could reduce loan demand and increase funding costs.",
-            "prior": "Changes in interest rates may adversely affect our net interest margin. A sustained\nperiod of elevated rates could reduce loan demand and increase funding costs."
-          },
-          {
-            "kind": "reworded",
-            "similarity": 0.4828,
-            "numbers_changed": [
-              "18",
-              "24"
-            ],
-            "summary": "REWORDED: We are exposed to credit risk in our commercial real estate portfolio, which represented\u2026 (figures changed: 18, 24; 48% similar)",
-            "current": "We are exposed to credit risk in our commercial real estate portfolio, which represented\n24 percent of total loans at year end. Office exposure within that portfolio has\nexperienced valuation declines, and we increased our allowance for credit losses\naccordingly during the period.",
-            "prior": "We are exposed to credit risk in our commercial real estate portfolio, which represented\n18 percent of total loans at year end."
-          },
-          {
-            "kind": "reworded",
-            "similarity": 0.6667,
-            "numbers_changed": [],
-            "summary": "REWORDED: Our business depends on the continued availability of deposits. A significant withdrawal of deposits\u2026 (67% similar)",
-            "current": "Our business depends on the continued availability of deposits. A significant withdrawal\nof deposits over a short period could require us to obtain funding on less favourable\nterms, and recent industry events have increased the speed at which deposits may move.",
-            "prior": "Our business depends on the continued availability of deposits. A significant withdrawal\nof deposits over a short period could require us to obtain funding on less favourable\nterms."
-          },
-          {
-            "kind": "added",
-            "similarity": 0.0,
-            "numbers_changed": [],
-            "summary": "NEW: We rely on third-party cloud infrastructure for core banking functions. A prolonged outage at\u2026",
-            "current": "We rely on third-party cloud infrastructure for core banking functions. A prolonged\noutage at a major provider could interrupt customer access to accounts.",
-            "prior": ""
-          }
-        ],
-        "note": "Two rewordings, one addition, nothing removed. The interest-rate risk is byte-identical and must not be reported as changed."
-      },
-      {
-        "company": "Steadfast Services",
-        "periods": "FY2023 \u2192 FY2024",
-        "n_prior_risks": 2,
-        "n_current_risks": 2,
-        "counts": {
-          "added": 0,
-          "removed": 0,
-          "reworded": 0,
-          "unchanged": 2,
-          "total": 2,
-          "material": 0
-        },
-        "expected_material": 0,
-        "per_kind": {
-          "added": {
-            "expected": 0,
-            "found": 0,
-            "missed": []
-          },
-          "removed": {
-            "expected": 0,
-            "found": 0,
-            "missed": []
-          },
-          "reworded": {
-            "expected": 0,
-            "found": 0,
-            "missed": []
-          },
-          "unchanged": {
-            "expected": 2,
-            "found": 2,
-            "missed": []
-          }
-        },
-        "changes": [
-          {
-            "kind": "unchanged",
-            "similarity": 1.0,
-            "numbers_changed": [],
-            "summary": "unchanged: Our results depend on general economic conditions in the markets we serve. A downturn\u2026",
-            "current": "Our results depend on general economic conditions in the markets we serve. A downturn\ncould reduce demand for our services and affect our results of operations.",
-            "prior": "Our results depend on general economic conditions in the markets we serve. A downturn\ncould reduce demand for our services and affect our results of operations."
-          },
-          {
-            "kind": "unchanged",
-            "similarity": 1.0,
-            "numbers_changed": [],
-            "summary": "unchanged: We may not realise the anticipated benefits of our acquisitions. Integration may take longer\u2026",
-            "current": "We may not realise the anticipated benefits of our acquisitions. Integration may take\nlonger or cost more than expected.",
-            "prior": "We may not realise the anticipated benefits of our acquisitions. Integration may take\nlonger or cost more than expected."
-          }
-        ],
-        "note": "Identical filings. A change detector that reports anything here is producing noise, which is the failure mode that makes these tools ignored in practice."
-      }
-    ],
-    "material_expected": 6,
-    "material_found": 6,
-    "recall": 1.0,
-    "false_alarms_on_unchanged_pairs": 0,
-    "n_quiet_pairs": 1
+  {
+   "ticker": "BA",
+   "status": "ok",
+   "prior": {
+    "filed": "2025-02-03",
+    "sha256": "5543e481852dd01f",
+    "url": "https://www.sec.gov/Archives/edgar/data/12927/000001292725000015/ba-20241231.htm",
+    "item_1a_chars": 70983
+   },
+   "current": {
+    "filed": "2026-01-30",
+    "sha256": "5e6dd009813c7851",
+    "url": "https://www.sec.gov/Archives/edgar/data/12927/000162828026004357/ba-20251231.htm",
+    "item_1a_chars": 68916
+   }
   },
-  "timing": {
-    "seconds_per_corpus_pass": 0.00058,
-    "chars_processed": 3781,
-    "chars_per_second": 6464545,
-    "human_baseline_measured": false
+  {
+   "ticker": "KO",
+   "status": "ok",
+   "prior": {
+    "filed": "2025-02-20",
+    "sha256": "03e0f59ce1b6115d",
+    "url": "https://www.sec.gov/Archives/edgar/data/21344/000002134425000011/ko-20241231.htm",
+    "item_1a_chars": 101247
+   },
+   "current": {
+    "filed": "2026-02-20",
+    "sha256": "22dd41f1aab4928f",
+    "url": "https://www.sec.gov/Archives/edgar/data/21344/000162828026010047/ko-20251231.htm",
+    "item_1a_chars": 96919
+   }
   },
-  "toc_check": {
-    "picked_the_body_not_the_toc": true,
-    "picked_len": 1405,
-    "n_occurrences": 2
+  {
+   "ticker": "MSFT",
+   "status": "ok",
+   "prior": {
+    "filed": "2025-07-30",
+    "sha256": "99d693f6c1544144",
+    "url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+    "item_1a_chars": 69098
+   },
+   "current": {
+    "filed": "2026-07-29",
+    "sha256": "4bcf2da2871acc19",
+    "url": "https://www.sec.gov/Archives/edgar/data/789019/000119312526323660/msft-20260630.htm",
+    "item_1a_chars": 81351
+   }
+  },
+  {
+   "ticker": "PFE",
+   "status": "ok",
+   "prior": {
+    "filed": "2025-02-27",
+    "sha256": "ecf7be6bf680c4ca",
+    "url": "https://www.sec.gov/Archives/edgar/data/78003/000007800325000054/pfe-20241231.htm",
+    "item_1a_chars": 46564
+   },
+   "current": {
+    "filed": "2026-02-26",
+    "sha256": "175e07c21ee258ed",
+    "url": "https://www.sec.gov/Archives/edgar/data/78003/000007800326000026/pfe-20251231.htm",
+    "item_1a_chars": 45070
+   }
   }
+ ],
+ "reports": [
+  {
+   "company": "AAPL",
+   "prior_period": "FY2023",
+   "current_period": "FY2024",
+   "n_risks_prior": 6,
+   "n_risks_current": 7,
+   "counts": {
+    "added": 2,
+    "removed": 1,
+    "reworded": 4,
+    "unchanged": 1,
+    "total": 8,
+    "material": 7
+   },
+   "examples": [
+    {
+     "kind": "reworded",
+     "headline": "Operating Expenses Operating expenses for 2025, 2024 and 2023 were as follows (dollars in millions):"
+    },
+    {
+     "kind": "reworded",
+     "headline": "2025 Change 2024 Change 2023 Research and development $ 34,550 10 % $ 31,370 5 % $ 29,915 Percentage of total net sales 8 % 8 % 8 % Selling, general and administrative $ 27,601 6 %"
+    },
+    {
+     "kind": "added",
+     "headline": "Selling, General and Administrative The growth in selling, general and administrative expense during 2025 compared to 2024 was primarily driven by increases in headcount-related ex"
+    },
+    {
+     "kind": "reworded",
+     "headline": "Apple Inc. | 2025 Form 10-K | 24 Provision for Income Taxes Provision for income taxes, effective tax rate and statutory federal income tax rate for 2025, 2024 and 2023 were as fol"
+    },
+    {
+     "kind": "added",
+     "headline": "2025 2024 2023 Provision for income taxes $ 20,719 $ 29,749 $ 16,741 Effective tax rate 15.6 % 24.1 % 14.7 % Statutory federal income tax rate 21 % 21 % 21 % The Company's effectiv"
+    }
+   ]
+  },
+  {
+   "company": "BA",
+   "prior_period": "FY2024",
+   "current_period": "FY2025",
+   "n_risks_prior": 111,
+   "n_risks_current": 107,
+   "counts": {
+    "added": 15,
+    "removed": 19,
+    "reworded": 50,
+    "unchanged": 42,
+    "total": 126,
+    "material": 84
+   },
+   "examples": [
+    {
+     "kind": "reworded",
+     "headline": "We are committed to creating a work environment where every teammate around the world can perform at their best and grow their careers while supporting our company's mission to pro"
+    },
+    {
+     "kind": "added",
+     "headline": "2 Table of Contents We also invest in rewarding performance and have established a multi-level recognition program to acknowledge the achievements of excellent individual or team p"
+    },
+    {
+     "kind": "reworded",
+     "headline": "We support our employees' continuous development of professional, technical and leadership skills through access to digital learning resources and partnerships with leading profess"
+    },
+    {
+     "kind": "reworded",
+     "headline": "Competition The commercial jet aircraft market and the airline industry remain extremely competitive. BCA faces aggressive international competitors who are intent on increasing th"
+    },
+    {
+     "kind": "reworded",
+     "headline": "BDS faces strong competition primarily from General Dynamics Corporation, Lockheed Martin Corporation, Northrop Grumman Corporation, RTX Corporation and SpaceX. Non-U.S. companies "
+    }
+   ]
+  },
+  {
+   "company": "KO",
+   "prior_period": "FY2024",
+   "current_period": "FY2025",
+   "n_risks_prior": 172,
+   "n_risks_current": 164,
+   "counts": {
+    "added": 19,
+    "removed": 27,
+    "reworded": 102,
+    "unchanged": 43,
+    "total": 191,
+    "material": 148
+   },
+   "examples": [
+    {
+     "kind": "reworded",
+     "headline": "CRITICAL ACCOUNTING POLICIES AND ESTIMATES Our consolidated financial statements are prepared in accordance with accounting principles generally accepted in the United States (\"U.S"
+    },
+    {
+     "kind": "reworded",
+     "headline": "\u2022Principles of Consolidation \u2022Recoverability of Equity Method Investments and Indefinite-Lived Intangible Assets \u2022Pension Plan Valuations \u2022Revenue Recognition \u2022Income Taxes 38 Mana"
+    },
+    {
+     "kind": "reworded",
+     "headline": "Recoverability of Equity Method Investments and Indefinite-Lived Intangible Assets Our Company faces many uncertainties and risks related to various economic, political and regulat"
+    },
+    {
+     "kind": "reworded",
+     "headline": "Equity Method Investments Equity method investments are reviewed for impairment whenever significant events or changes in circumstances indicate that the carrying amount of the inv"
+    },
+    {
+     "kind": "added",
+     "headline": "39 evaluating estimated future cash flows when employing the discounted cash flow or estimates of sales proceeds valuation methodologies. The ability to accurately predict future c"
+    }
+   ]
+  },
+  {
+   "company": "MSFT",
+   "prior_period": "FY2024",
+   "current_period": "FY2025",
+   "n_risks_prior": 83,
+   "n_risks_current": 100,
+   "counts": {
+    "added": 23,
+    "removed": 6,
+    "reworded": 50,
+    "unchanged": 27,
+    "total": 106,
+    "material": 79
+   },
+   "examples": [
+    {
+     "kind": "reworded",
+     "headline": "ITEM 1A. RISK FACTORS Our operations and financial results are subject to various risks and uncertainties, including those described below, that could adversely affect our business"
+    },
+    {
+     "kind": "reworded",
+     "headline": "Competition in the technology sector Our competitors range in size from diversified global companies with significant research and development resources to small, specialized firms"
+    },
+    {
+     "kind": "reworded",
+     "headline": "Competition among platform-based ecosystems An important element of our business model has been to create platform-based ecosystems on which many participants can build diverse sol"
+    },
+    {
+     "kind": "reworded",
+     "headline": "\u2022\nA competing vertically-integrated model, in which a single firm controls the hardware and software elements of a product and related services, has succeeded with some consumer pr"
+    },
+    {
+     "kind": "reworded",
+     "headline": "\u2022\nWe derive substantial revenue from licenses of Windows operating systems on PCs. We face significant competition from competing platforms developed for new types of devices, incl"
+    }
+   ]
+  },
+  {
+   "company": "PFE",
+   "prior_period": "FY2024",
+   "current_period": "FY2025",
+   "n_risks_prior": 51,
+   "n_risks_current": 55,
+   "counts": {
+    "added": 18,
+    "removed": 14,
+    "reworded": 30,
+    "unchanged": 7,
+    "total": 69,
+    "material": 62
+   },
+   "examples": [
+    {
+     "kind": "reworded",
+     "headline": "--Pricing and Reimbursement sections. RAW MATERIALS We procure raw materials essential to our business from numerous suppliers worldwide. In general, these materials have been avai"
+    },
+    {
+     "kind": "reworded",
+     "headline": "In the U.S. Drug and Biologic Regulation. The FDA, pursuant to the FFDCA, the Public Health Service Act and other federal statutes and regulations, extensively regulates pre- and p"
+    },
+    {
+     "kind": "reworded",
+     "headline": "For a biopharmaceutical company to market a drug or a biologic product, including vaccines, the FDA must approve a product's NDA or BLA (or supplemental NDA or supplemental BLA). P"
+    },
+    {
+     "kind": "reworded",
+     "headline": "A drug or biologic may be subject to post marketing commitments, which are studies or clinical trials that the product sponsor agrees to conduct, or post marketing requirements, wh"
+    },
+    {
+     "kind": "added",
+     "headline": "Biosimilar Regulation. The FDA regulates biosimilars which are follow-on products that reference an innovative biological product. A product is biosimilar if the products are highl"
+    }
+   ]
+  }
+ ],
+ "timing": {
+  "seconds_per_corpus_pass": 0.00031,
+  "chars_processed": 3781,
+  "chars_per_second": 12167092,
+  "human_baseline_measured": false
+ }
 }

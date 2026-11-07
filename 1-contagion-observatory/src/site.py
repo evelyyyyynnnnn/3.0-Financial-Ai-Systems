@@ -23,6 +23,11 @@ META = {
 
 
 def build_site(results: dict) -> pathlib.Path:
+    # The real run and the authored run have different shapes; dispatch on the
+    # flag the results file carries rather than on which keys happen to exist.
+    if not results.get("is_synthetic", True):
+        return build_site_real(results)
+
     u, b = results["universe"], results["best"]
     dc, shocks = results["design_comparison"], results["shocks"]
     winner = dc[0]
@@ -213,3 +218,124 @@ python -m src.demo</pre>
 </section>
 """
     return sk.build(ROOT, META, body, results)
+
+
+# --------------------------------------------------------------------------
+# Real-data page: the observatory on real industry returns, where the true
+# transmission graph is unknown -- which is the question, not the answer.
+# --------------------------------------------------------------------------
+
+REAL_META = dict(META)
+REAL_META.update({
+    "tags": [("real Ken French", "real"), ("10 industry portfolios", ""),
+             ("756 trading days", ""), ("tail lift", "")],
+    "banner": "Run on daily value-weighted returns of the Fama-French 10 industry "
+              "portfolios from the Kenneth R. French Data Library, retrieved with URL, "
+              "SHA-256 and retrieval time recorded in data/MANIFEST.json.",
+    "datanote": "Built from results/latest-real.json. Edge-recovery accuracy belongs to "
+                "the synthetic panel, where the transmitting edges are planted and "
+                "therefore known; on real data there is no true graph to score against.",
+})
+
+
+def build_site_real(results: dict) -> pathlib.Path:
+    u = results["universe"]
+    raw = results.get("tail_raw", [])
+    res = results.get("tail_residual", [])
+    edges = results.get("top_edges", [])
+    raw0 = raw[0] if raw else {"tail_lift": 0, "tail_dep": 0}
+    res0 = res[0] if res else {"tail_lift": 0, "tail_dep": 0}
+    drop = (1 - res0["tail_lift"] / raw0["tail_lift"]) * 100 if raw0["tail_lift"] else 0
+
+    metrics = sk.metric_grid([
+        ("Trading days", f"{u['n_days']:,}", f"{u['first_date']} to {u['last_date']}"),
+        ("Tail lift, raw", f"{raw0['tail_lift']:.3f}x",
+         "unlinked pairs appear to co-crash"),
+        ("After the market factor", f"{res0['tail_lift']:.3f}x",
+         f"{drop:.0f}% of it was the market"),
+        ("Stress days", f"{u['stress_days']}", f"{u['stress_share'] * 100:.1f}% of the sample"),
+    ])
+
+    tail_tbl = sk.table(
+        ["Series", "Tail lift", "Tail dependence"],
+        [["Raw returns", f"{raw0['tail_lift']:.3f}", f"{raw0['tail_dep']:.3f}"],
+         ["Residual, common factor removed",
+          f"{res0['tail_lift']:.3f}", f"{res0['tail_dep']:.3f}"]],
+        numeric_cols=(1, 2))
+    tail_chart = sk.bar_chart(
+        [("raw returns", raw0["tail_lift"]),
+         ("residual, factor removed", res0["tail_lift"]),
+         ("no excess co-crashing", 1.0)], fmt="{:.3f}")
+
+    edge_tbl = sk.table(
+        ["Source → destination", "Lagged correlation", "Tail lift"],
+        [[f"{e['src']} → {e['dst']}", f"{e['lagged_corr']:+.4f}",
+          f"{e['tail_lift']:.2f}x"] for e in edges[:10]],
+        numeric_cols=(1, 2))
+    edge_chart = sk.bar_chart(
+        [(f"{e['src']} → {e['dst']}", abs(e["lagged_corr"])) for e in edges[:10]],
+        fmt="{:.4f}")
+
+    body = f"""
+<section>
+  <h2>This run</h2>
+  <div class="stack-lg">
+    {metrics}
+    <p class="mono" style="color:var(--muted);font-size:12.5px">
+      generated {sk.esc(results['generated_at'])} &middot;
+      {u['n_assets']} industry portfolios &middot;
+      {u['n_candidate_pairs']} directed candidate pairs
+    </p>
+  </div>
+</section>
+
+<section>
+  <h2>The measurement that survives having no answer key</h2>
+  <div class="stack-lg">
+    {tail_chart}
+    {tail_tbl}
+    <p>Tail lift is how much more often the destination crashes on days the source
+    crashes than on other days, averaged over the pairs with no direct link. Roughly
+    {drop:.0f}% of the apparent co-crashing disappears once the common market factor is
+    removed. That is the headline: most of what looks like contagion in raw return data
+    is the market moving as one, and what is left over is the part a transmission model
+    is obliged to account for.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Top ranked candidate links</h2>
+  <div class="stack-lg">
+    {edge_chart}
+    {edge_tbl}
+    <p>These are candidates, ranked by absolute lagged correlation, not a confirmed
+    transmission graph. Correlations of this size over {u['n_days']:,} days are small;
+    the table shows what the method surfaces and in what order.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Why the accuracy figures are not on this page</h2>
+  <div class="stack-lg">
+    <div class="note">
+      <h3>Edge recovery needs a graph to score against</h3>
+      <p>{sk.esc(results.get('recovery_withheld_because', ''))}</p>
+      <p>Correlation is everywhere in market data and almost none of it is transmission,
+      so the method is validated first on a demo market where the transmitting edges are
+      planted and therefore known. Precision, recall and shock propagation are measured
+      there and reported there, and are never carried across to this run.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Reproduce</h2>
+  <div class="stack">
+    <pre>python -m src.demo --real   # the real Ken French panel
+python -m src.demo          # the synthetic panel, with planted known edges
+# -&gt; results/latest-real.json
+pytest -q</pre>
+  </div>
+</section>
+"""
+    return sk.build(ROOT, REAL_META, body, results)

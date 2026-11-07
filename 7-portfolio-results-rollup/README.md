@@ -42,7 +42,6 @@ data/
   |-- sample/
 docs/
   |-- DATA.md
-  |-- EVIDENCE.md
   |-- METHOD.md
 requirements.txt
 results/

@@ -1,6 +1,6 @@
 # Tokenized Fixed-Income Analytics — website
 
-Static site for `4-tokenized-fixed-income-analytics`. No build step: Vercel serves this folder as-is.
+Static site for `tokenized-fixed-income-analytics`. No build step: Vercel serves this folder as-is.
 
 ## Deploy on its own
 

@@ -2,20 +2,20 @@
 
 [![tests](https://github.com/evelyyyyynnnnn/3.0-Financial-Ai-Systems/actions/workflows/tests.yml/badge.svg)](https://github.com/evelyyyyynnnnn/3.0-Financial-Ai-Systems/actions/workflows/tests.yml)
 
-The repository carrying the petition. Seven projects with no baselines read as volume; four with measured results read as contribution.
+Seven projects with no baselines read as volume; four with measured results read as contribution.
 
-Part of a five-repository portfolio supporting the endeavor described in the
-EB2-NIW petition: **optimization-driven, system-level decision frameworks** —
+Part of a five-repository portfolio on one theme: **optimization-driven,
+system-level decision frameworks** —
 integrating operations research, mathematical optimization and applied AI — for
 domains where a wrong decision carries systemic consequences. The three pillars
 are financial stability, healthcare safety and secure digital infrastructure.
 
 | | |
 |---|---|
-| Petition-grade projects today | 7 built (3 core) |
+| Projects built | 7 (3 core) |
 | Verdict | **Count is fine — depth is the problem** |
 
-> "Petition-grade" means: original work, a stated method, real data at a stated
+> "Measured" means: original work, a stated method, real data at a stated
 > scale, a measured result, and a README a reviewer can follow. Counts exclude
 > duplicates, forks of third-party work, retired projects, and asset-only
 > folders.
@@ -44,7 +44,7 @@ Extract terms from private credit documents where every extracted value carries 
 
 Measure liquidity, holder concentration, and redemption latency for tokenized debt from on-chain trade data.
 
-*Why it earns its place:* Notion structural opportunity #2. Bridges the financial-stability and secure-digital-infrastructure pillars, which the petition currently treats as separate. Building it makes the "three pillars, one framework" story true rather than asserted.
+*Why it earns its place:* On-chain trade data looks complete and is not directly comparable to a TRACE-style liquidity measure. Wrapped and bridged positions, AMM fills alongside bilateral transfers, and one holder spread over many addresses all push a naive holder count toward overstating dispersion. Concentration cannot be measured until addresses are resolved to economic holders, and that resolution step is the method.
 
 *Target scale:* On-chain tokenized-debt trade data (universe to be stated)
 
@@ -52,7 +52,7 @@ Measure liquidity, holder concentration, and redemption latency for tokenized de
 
 Report what CHANGED in a company's SEC risk disclosures since its prior filing, rather than summarising the filing.
 
-*Why it earns its place:* Carries two of the petition's scale claims. Simulated data underneath a real number is the sharpest RFE risk in the portfolio.
+*Why it earns its place:* Summarising a filing is what every tool does; the signal is in the delta. Risk-factor sections are heavy with boilerplate, so a naive diff returns mostly renumbering and legal reformatting. The hard part, and the only part worth reporting, is separating substantive change from cosmetic churn.
 
 *Target scale:* 600+ U.S. corporate filings (10-K / 10-Q)
 
@@ -93,8 +93,9 @@ Every rebuilt project carries the same skeleton: `README.md`, `src/`, `data/`, `
 
 ## Ground rules
 
-1. **No number without a run log.** Anything cited in the petition must appear
-   in that project's `results/README.md` with a run date behind it.
+1. **No number without a run log.** Any figure quoted anywhere in this
+   repository must appear in that project's `results/README.md` with a run
+   date behind it.
 2. **No simulated data under a real claim.** Sample data lives in
    `data/sample/`, labelled, and is never the source of a cited figure.
 3. **Adoption must be documentable** — named institutions, dated
@@ -112,8 +113,17 @@ Nothing was deleted except items the rebuild genuinely supersedes; those remain 
 | [`6-portfolio-optimization-engine/`](6-portfolio-optimization-engine/) | Multi-agent portfolio allocation policy. | Prior original work. |
 | [`5-volatility-forecasting/`](5-volatility-forecasting/) | LSTM volatility forecasting. | Prior original work. |
 
-**Read the third column before citing anything here.** Forks of third-party work, duplicates, retired projects and asset-only folders are labelled as such and are not part of the petition's evidence.
+**Read the third column before citing anything here.** Forks of third-party work, duplicates, retired projects and asset-only folders are labelled as such and are not counted as results.
 
 
 ---
-Scaffold generated from `NIW_Project_Portfolio_and_Gap_Plan.xlsx` (sheets: Repo Build-Out Plan, Core Ideas at a Glance, NIW Claim vs Repo Evidence, Notion 创业 Alignment). Structure only — no results are claimed here yet.
+Structure only — no results are claimed here unless a project's `results/README.md` records a dated run.
+
+## Licence
+
+[Apache License 2.0](LICENSE). The code, benchmarks and documentation in this
+repository may be reused, modified and redistributed under its terms, including
+by projects that need a patent grant to incorporate them.
+
+Third-party data and vendored code kept under `*/data/` and
+`historical-archive/` carry their own terms and are labelled where they appear.

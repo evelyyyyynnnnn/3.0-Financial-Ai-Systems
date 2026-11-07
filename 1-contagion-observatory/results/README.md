@@ -1,7 +1,7 @@
 # Results — Contagion Observatory
 
-Nothing measured yet. This file is the only source for numbers cited in the
-petition; if a figure is not here with a run date, it does not get cited.
+Nothing measured yet. This file is the only source for the numbers quoted
+elsewhere in this repository; if a figure is not here with a run date, it is not cited.
 
 ## Measured results
 
