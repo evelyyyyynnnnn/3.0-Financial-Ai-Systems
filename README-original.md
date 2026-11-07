@@ -1,7 +1,6 @@
 # 3.0 Financial AI Systems
 
-Portfolio of work supporting the endeavor described in the [redacted] [redacted]:
-the design and implementation of **optimization-driven, system-level decision
+Portfolio of work on one theme: the design and implementation of **optimization-driven, system-level decision
 frameworks** — integrating operations research, mathematical optimization, and
 applied AI — for domains where a wrong decision carries systemic consequences.
 
@@ -19,7 +18,7 @@ Alongside them: `roadmap/` (planned, not built) and `project-1/reference/`
 Every project has its own README with the method, the run instructions, and an
 explicit statement of what it does *not* establish.
 
-## Coverage against the [redacted]
+## Coverage by pillar
 
 | Pillar | Status |
 |---|---|

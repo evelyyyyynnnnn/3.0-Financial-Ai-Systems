@@ -190,7 +190,7 @@ node --version
 ## 📚 Documentation
 
 - **Demo Guide**: `DEMO_GUIDE.md` - Comprehensive feature overview
-- **Project Summary**: `PROJECT_SUMMARY.md` - [redacted] application highlights
+- **Project Summary**: `PROJECT_SUMMARY.md` - project highlights
 - **API Documentation**: Built into the platform
 - **Code Comments**: Extensive inline documentation
 
@@ -206,7 +206,7 @@ This platform demonstrates:
 - ✅ **Software Engineering Excellence**: Professional architecture and code quality
 - ✅ **Business Value**: Real-world financial technology application
 
-**Perfect for [redacted] applications showcasing quantitative expertise!**
+**A demonstration of quantitative trading infrastructure.**
 
 ---
 
