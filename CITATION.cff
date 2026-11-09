@@ -23,3 +23,10 @@ keywords:
 - data provenance
 - evaluation protocol
 - reproducibility
+identifiers:
+- type: doi
+  value: 10.5281/zenodo.24094767
+  description: The concept DOI, which always resolves to the latest version.
+- type: doi
+  value: 10.5281/zenodo.24094768
+  description: The DOI of version 1.0.0.

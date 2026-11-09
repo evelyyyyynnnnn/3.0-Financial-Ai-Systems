@@ -1,6 +1,7 @@
 # 3.0 — Financial AI Systems
 
 [![tests](https://github.com/evelyyyyynnnnn/3.0-Financial-Ai-Systems/actions/workflows/tests.yml/badge.svg)](https://github.com/evelyyyyynnnnn/3.0-Financial-Ai-Systems/actions/workflows/tests.yml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24094767.svg)](https://doi.org/10.5281/zenodo.24094767)
 
 Seven projects with no baselines read as volume; four with measured results read as contribution.
 
