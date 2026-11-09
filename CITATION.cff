@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it using these metadata.
+type: software
+title: Financial AI Systems
+abstract: Quantitative finance prototypes spanning contagion monitoring, regulatory filing analysis, data
+  provenance, tokenized fixed income, volatility forecasting and portfolio optimization. Projects whose
+  evaluation protocol does not support a performance claim record that fact in the results file instead
+  of publishing the number.
+authors:
+- given-names: Wenke
+  family-names: Du
+  orcid: https://orcid.org/0009-0007-5579-234X
+version: 1.0.0
+date-released: '2026-11-09'
+license: Apache-2.0
+repository-code: https://github.com/evelyyyyynnnnn/3.0-financial-ai-systems
+url: https://github.com/evelyyyyynnnnn/3.0-financial-ai-systems
+keywords:
+- quantitative finance
+- volatility forecasting
+- portfolio optimization
+- reinforcement learning
+- data provenance
+- evaluation protocol
+- reproducibility
