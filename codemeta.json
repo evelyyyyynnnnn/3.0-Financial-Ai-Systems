@@ -1,0 +1,30 @@
+{
+  "@context": "https://w3id.org/codemeta/3.0",
+  "@type": "SoftwareSourceCode",
+  "name": "Financial AI Systems",
+  "description": "Quantitative finance prototypes spanning contagion monitoring, regulatory filing analysis, data provenance, tokenized fixed income, volatility forecasting and portfolio optimization. Projects whose evaluation protocol does not support a performance claim record that fact in the results file instead of publishing the number.",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Wenke",
+      "familyName": "Du"
+    }
+  ],
+  "version": "1.0.0",
+  "dateModified": "2026-11-09",
+  "datePublished": "2026-11-09",
+  "license": "https://spdx.org/licenses/Apache-2.0",
+  "codeRepository": "https://github.com/evelyyyyynnnnn/3.0-financial-ai-systems",
+  "programmingLanguage": "Python",
+  "keywords": [
+    "quantitative finance",
+    "volatility forecasting",
+    "portfolio optimization",
+    "reinforcement learning",
+    "data provenance",
+    "evaluation protocol",
+    "reproducibility"
+  ],
+  "developmentStatus": "active",
+  "applicationCategory": "Research software"
+}

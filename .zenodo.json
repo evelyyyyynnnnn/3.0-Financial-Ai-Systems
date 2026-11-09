@@ -1,0 +1,28 @@
+{
+  "upload_type": "software",
+  "title": "Financial AI Systems",
+  "description": "Quantitative finance prototypes spanning contagion monitoring, regulatory filing analysis, data provenance, tokenized fixed income, volatility forecasting and portfolio optimization. Projects whose evaluation protocol does not support a performance claim record that fact in the results file instead of publishing the number.",
+  "creators": [
+    {
+      "name": "Du, Wenke"
+    }
+  ],
+  "license": "apache-2.0",
+  "access_right": "open",
+  "keywords": [
+    "quantitative finance",
+    "volatility forecasting",
+    "portfolio optimization",
+    "reinforcement learning",
+    "data provenance",
+    "evaluation protocol",
+    "reproducibility"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/evelyyyyynnnnn/3.0-financial-ai-systems",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}
