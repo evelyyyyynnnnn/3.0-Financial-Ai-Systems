@@ -4,7 +4,8 @@
   "description": "Quantitative finance prototypes spanning contagion monitoring, regulatory filing analysis, data provenance, tokenized fixed income, volatility forecasting and portfolio optimization. Projects whose evaluation protocol does not support a performance claim record that fact in the results file instead of publishing the number.",
   "creators": [
     {
-      "name": "Du, Wenke"
+      "name": "Du, Wenke",
+      "orcid": "0009-0007-5579-234X"
     }
   ],
   "license": "apache-2.0",

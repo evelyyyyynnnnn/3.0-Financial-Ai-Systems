@@ -9,6 +9,7 @@ abstract: Quantitative finance prototypes spanning contagion monitoring, regulat
 authors:
 - given-names: Wenke
   family-names: Du
+  orcid: https://orcid.org/0009-0007-5579-234X
 version: 1.0.0
 date-released: '2026-11-09'
 license: Apache-2.0
