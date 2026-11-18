@@ -1,4 +1,7 @@
 ---
+# FAIR4ML vocabulary version this card targets. The schema is WIP; pin it.
+_fair4mlVersion: "0.1.0"
+_fair4mlVocabulary: https://w3id.org/fair4ml/0.1.0
 identifier: https://github.com/evelyyyyynnnnn/3.0-Financial-Ai-Systems/tree/main/5-volatility-forecasting
 name: LSTM Realised-Volatility Forecaster (S&P 500)
 version: 1.0.0
