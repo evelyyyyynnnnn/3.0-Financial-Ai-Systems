@@ -1,0 +1,127 @@
+---
+# FAIR4ML vocabulary version this card targets. The schema is WIP; pin it.
+_fair4mlVersion: "0.1.0"
+_fair4mlVocabulary: https://w3id.org/fair4ml/0.1.0
+
+identifier: https://github.com/evelyyyyynnnnn/3.0-Financial-Ai-Systems/blob/main/6-portfolio-optimization-engine/models/dqn_sb3.zip
+name: DQN Portfolio Allocation Agent (5-asset daily)
+version: 1.0.0
+keywords:
+  - reinforcement learning
+  - portfolio allocation
+  - in-sample evaluation
+  - withheld metrics
+headline: A Deep Q-Network allocation agent over five ETFs, released with its
+  performance metrics withheld because the train/test split was never applied.
+description: >
+  Allocates daily across SPY, QQQ, IWM, GLD and TLT from a 30-day observation
+  window, with a 0.001 per-trade cost. The trained agent is released as a
+  reproducible artefact (models/dqn_sb3.zip), but its performance figures are
+  not reported as evaluation results: `config['data']['train_test_split']` was
+  declared in every YAML config and read by no code, so the environment loaded
+  the whole 2010-2023 series and `evaluate()` scored the agent on the same data
+  it trained on. The numbers that exist are training-set scores.
+task:
+  - Sequential decision making
+  - Portfolio allocation
+modelCategory:
+  - Reinforcement learning
+  - Deep Q-Network
+language:
+  - en
+license: https://www.apache.org/licenses/LICENSE-2.0
+developmentStatus: Active
+dateCreated: 2025-11-12
+dateModified: 2026-09-11
+citation: >
+  Du, Wenke (2026). Financial AI Systems (Version 1.0.0) [Computer software].
+  Zenodo. https://doi.org/10.5281/zenodo.24094767
+codeRepository: https://github.com/evelyyyyynnnnn/3.0-Financial-Ai-Systems/tree/main/6-portfolio-optimization-engine
+referencePublication: # none
+developmentLibrary: stable-baselines3
+usageInstructions: >
+  python -m src.demo   # loads models/dqn_sb3.zip
+modelRisks:
+  - No performance claim is made or should be inferred. The agent was evaluated
+    on its own training data; any comparison against the baselines below would
+    be invalid.
+  - Trained for 2,000 timesteps, which is short. Even a clean out-of-sample
+    score from this run should not be read as a converged result.
+  - Five US ETFs over one 2010-2023 window. No other market, period or asset
+    class was tested.
+evaluationMetrics:
+  - Sharpe ratio
+  - Sortino ratio
+  - Calmar ratio
+  - Maximum drawdown
+  - Total return
+evaluationResults: # WITHHELD -- metrics exist but are in-sample; see note
+#
+#   Computed and deliberately NOT reported as evaluation results. The reason is
+#   recorded machine-readably in results/latest-real.json under
+#   `agents_in_sample_because`:
+#
+#     "config['data']['train_test_split'] was declared in every YAML config and
+#      read by no code, so PortfolioEnv loaded the whole 2010-2023 series and
+#      evaluate() built the same environment. These figures are therefore
+#      training-set scores, not held-out evaluation."
+#
+#   For the record, the in-sample figures are Sharpe -0.3525, Sortino -0.4542,
+#   Calmar -0.0387, max drawdown -0.2747, total return -0.1371. They are listed
+#   here as provenance, not as performance.
+#
+#   This is the same gap as the LSTM volatility card: `evaluationResults` is
+#   free text (range schema:Text, schema:PropertyValue), so a producer can write
+#   prose -- but a consumer cannot distinguish "withheld, for this stated
+#   reason" from "nobody computed it". Both parse to None.
+#
+softwareRequirements:
+  - Python 3.11
+  - stable-baselines3
+  - gymnasium
+operatingSystem:
+  - Linux
+  - macOS
+processorRequirements: # CPU only
+GPURequirements: # none
+hasCO2eEmissions: # not measured for this run
+distribution:
+  - encodingFormat: application/zip
+    contentUrl: https://github.com/evelyyyyynnnnn/3.0-Financial-Ai-Systems/blob/main/6-portfolio-optimization-engine/models/dqn_sb3.zip
+    contentSize: 1679452
+trainedOn:
+  - identifier: https://finance.yahoo.com/
+    name: Daily OHLCV for SPY, QQQ, IWM, GLD, TLT
+    description: >
+      Retrieved via yfinance, 2010-01-04 to 2023-12-29, 3,522 trading days.
+      Cached in data/market_data.pkl.
+    url: https://finance.yahoo.com/
+testedOn:
+  - identifier: https://finance.yahoo.com/
+    name: Same series as trainedOn
+    description: >
+      Not a held-out split. The declared train_test_split was never read, so
+      training and evaluation used the same 2010-2023 series.
+evaluatedOn:
+  - identifier: https://finance.yahoo.com/
+    name: Same series as trainedOn
+    description: See evaluationResults.
+validatedOn: # no external validation period
+author:
+  - name: Wenke Du
+    identifier: https://orcid.org/0009-0007-5579-234X
+successorOf: # first released version
+funder: # unfunded
+sharedBy:
+  - name: Wenke Du
+    identifier: https://orcid.org/0009-0007-5579-234X
+wasGeneratedBy:
+  -
+    cloudProvider: # trained locally
+    duration: 2000 timesteps
+    hardwareType: CPU
+fineTunedFromModel: # trained from scratch
+sdPublisher:
+  - name: Wenke Du
+    url: https://orcid.org/0009-0007-5579-234X
+sdLicense: https://www.apache.org/licenses/LICENSE-2.0

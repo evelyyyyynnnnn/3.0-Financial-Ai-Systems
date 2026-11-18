@@ -1,0 +1,121 @@
+---
+identifier: https://github.com/evelyyyyynnnnn/3.0-Financial-Ai-Systems/tree/main/5-volatility-forecasting
+name: LSTM Realised-Volatility Forecaster (S&P 500)
+version: 1.0.0
+keywords:
+  - realised volatility
+  - time-series forecasting
+  - lookahead bias
+  - withheld metrics
+headline: An LSTM forecaster for realised volatility on S&P 500 daily prices,
+  released with its performance metrics deliberately withheld.
+description: >
+  Forecasts close-to-close realised volatility for ^GSPC from daily prices,
+  2010-2023. The committed run is released as a reproducible artefact, but its
+  accuracy metrics are not reported: the feature scaler was fitted with
+  fit_transform over the whole series, so every number the run produced is
+  contaminated by lookahead. The card is included here precisely because it is
+  the case the current schema cannot express.
+task:
+  - Time-series regression
+modelCategory:
+  - Supervised regression
+  - LSTM
+language:
+  - en
+license: https://www.apache.org/licenses/LICENSE-2.0
+parameterSize: # not recorded for this run
+developmentStatus: Active
+dateCreated: 2026-09-09
+dateModified: 2026-09-09
+citation: >
+  Du, Wenke (2026). Financial AI Systems (Version 1.0.0) [Computer software].
+  Zenodo. https://doi.org/10.5281/zenodo.24094767
+codeRepository: https://github.com/evelyyyyynnnnn/3.0-Financial-Ai-Systems/tree/main/5-volatility-forecasting
+referencePublication: # none
+developmentLibrary: TensorFlow
+usageInstructions: >
+  python -m src.demo   # needs TensorFlow and network access to Yahoo Finance
+modelRisks:
+  - No performance claim is made or should be inferred. The run that exists is
+    known to be affected by lookahead through the feature scaler.
+evaluationMetrics:
+  - MSE
+  - RMSE
+  - MAE
+  - R-squared
+evaluationResults: # WITHHELD -- see note below; the schema has no way to say this
+#
+#   The metrics were computed and are deliberately NOT reported. The reason, as
+#   recorded machine-readably in the project's own results file under
+#   `metrics_withheld_because`:
+#
+#     "this run predates the lookahead fix in data/data_loader.py. The feature
+#      scaler was fitted with fit_transform over the whole series, so the test
+#      split saw information from its own future."
+#
+#   The shape that should have prompted the question: validation R-squared
+#   (0.931) exceeded training R-squared (0.878).
+#
+#   Expressing this is the gap. `evaluationResults` is free text, so a producer
+#   can write prose here -- but a consumer cannot distinguish "withheld, for this
+#   stated reason" from "nobody computed it". In this file the explanation lives
+#   in YAML comments, which vanish on parse. See RDA-FAIR4ML/FAIR4ML-schema#17
+#   for the same question asked about hasCO2eEmissions.
+#
+softwareRequirements:
+  - Python 3.11
+  - TensorFlow
+storageRequirements:
+  - 100 MB
+memoryRequirements:
+  - 4 GB of RAM
+operatingSystem:
+  - Linux
+  - macOS
+processorRequirements: # CPU only
+GPURequirements: # none
+hasCO2eEmissions: # not measured for this run
+distribution:
+  - encodingFormat: application/json
+    contentUrl: https://github.com/evelyyyyynnnnn/3.0-Financial-Ai-Systems/blob/main/5-volatility-forecasting/results/latest-real.json
+    contentSize: null
+    quantizationBits:
+    quantizationMethod:
+trainedOn:
+  - identifier: https://finance.yahoo.com/quote/%5EGSPC/
+    name: S&P 500 daily closing prices (^GSPC)
+    description: >
+      Daily prices retrieved via yfinance, 2010-01-01 to 2023-12-31. Target is
+      close-to-close realised volatility.
+    url: https://finance.yahoo.com/quote/%5EGSPC/
+testedOn:
+  - identifier: https://finance.yahoo.com/quote/%5EGSPC/
+    name: S&P 500 daily closing prices (^GSPC), held-out tail
+    description: >
+      A chronological held-out split -- but see evaluationResults: the scaler was
+      fitted across the whole series, so the split is not clean.
+evaluatedOn:
+  - identifier: https://finance.yahoo.com/quote/%5EGSPC/
+    name: S&P 500 daily closing prices (^GSPC), held-out tail
+    description: Same split as testedOn.
+validatedOn: # no external validation series
+author:
+  - name: Wenke Du
+    identifier: https://orcid.org/0009-0007-5579-234X
+successorOf: # first released version
+funder: # unfunded
+sharedBy:
+  - name: Wenke Du
+    identifier: https://orcid.org/0009-0007-5579-234X
+wasGeneratedBy:
+  -
+    trainingRegion:
+    cloudProvider: # trained locally
+    duration: 20 epochs
+    hardwareType: CPU
+fineTunedFromModel: # trained from scratch
+sdPublisher:
+  - name: Wenke Du
+    url: https://orcid.org/0009-0007-5579-234X
+sdLicense: https://www.apache.org/licenses/LICENSE-2.0
