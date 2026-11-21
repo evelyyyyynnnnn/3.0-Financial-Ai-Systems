@@ -1,12 +1,39 @@
-name: Giant Portfolio — Quarterly 13F Refresh
+# The one workflow that updates the Giant Portfolio Tracker.
+#
+# It writes two files, both of which must be committed for the site to change:
+#   9-giant-portfolio-tracker/data.json   — the data
+#   9-giant-portfolio-tracker/index.html  — the page, with that data inlined
+# Vercel deploys from main automatically, so a successful run here is the whole
+# update: there is nothing else to click afterwards.
+#
+# Two earlier workflows also targeted this folder and never once succeeded
+# (refresh-13f.yml called scripts that are not in the repo; refresh-data.yml ran
+# the scraper from the repo root, where its relative paths do not resolve). Both
+# were removed so this is the only button.
+
+name: Giant Portfolio — 13F Refresh
 
 on:
   schedule:
+    # 13F filings are due 45 days after each quarter end (Feb 14, May 15,
+    # Aug 14, Nov 14). These run a few days later so funds filing on the
+    # deadline, and the aggregators' own indexing lag, are both covered.
     - cron: "0 10 17 2  *"
     - cron: "0 10 18 5  *"
     - cron: "0 10 18 8  *"
     - cron: "0 10 17 11 *"
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "full = scrape the sources; rebuild = fix the page from data already in the repo (no network)"
+        type: choice
+        options: [full, rebuild]
+        default: full
+
+# Never let two refreshes write data.json at once.
+concurrency:
+  group: giant-portfolio-refresh
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -19,18 +46,62 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
       - run: pip install requests beautifulsoup4 yfinance
-      - name: Run refresh from subfolder
-        run: cd 9-giant-portfolio-tracker && python3 refresh_data.py
+
+      # refresh_data.py opens "data.json" and "index.html" by relative path, so
+      # it has to run from its own folder. Running it from the repo root is what
+      # broke the workflow this one replaces.
+      - name: Refresh
+        working-directory: 9-giant-portfolio-tracker
+        run: |
+          if [ "${{ inputs.mode }}" = "rebuild" ]; then
+            python3 refresh_data.py --rebuild
+          else
+            python3 refresh_data.py
+          fi
+
+      # Print what the run concluded, so a glance at the Actions log answers
+      # "which quarter is the site on now?" without opening data.json.
+      - name: Report
+        working-directory: 9-giant-portfolio-tracker
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          d = json.load(open("data.json"))
+          m = d.get("meta", {})
+          print("### Giant Portfolio refresh\n")
+          print("| field | value |")
+          print("|---|---|")
+          for k in ("quarter", "quarter_end", "filing_date",
+                    "quarter_coverage", "next_quarter", "next_refresh",
+                    "generated_at"):
+              print(f"| {k} | {m.get(k, '—')} |")
+          print()
+          latest = m.get("quarter")
+          behind = [i["name"] for i in d.get("investors", [])
+                    if i.get("quarter") != latest]
+          if behind:
+              print(f"{len(behind)} fund(s) have not filed {latest} yet: "
+                    + ", ".join(behind))
+          else:
+              print(f"All {len(d.get('investors', []))} funds have filed {latest}.")
+          PY
+
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          # index.html carries the inlined data, so committing data.json alone
+          # would leave the live page unchanged.
           git add 9-giant-portfolio-tracker/data.json 9-giant-portfolio-tracker/index.html
-          git diff --quiet --cached || git commit -m "auto: giant-portfolio refresh $(date +'%Y-%m-%d')"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          if git diff --quiet --cached; then
+            echo "Nothing changed — no commit."
+          else
+            git commit -m "auto: giant-portfolio refresh $(date -u +'%Y-%m-%d')"
+            git push
+          fi
