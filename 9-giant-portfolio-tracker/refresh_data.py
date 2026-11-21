@@ -17,7 +17,7 @@ Run: pip install requests beautifulsoup4
 """
 
 import json, time, re, sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 try:
     import requests
@@ -842,23 +842,9 @@ def build_extended_filers(tracked_investors, ww_filers=None):
     combined.sort(key=lambda x: x.get("aum",0), reverse=True)
     return combined
 
-# ── Quarter date lookup (matches frontend Q_DATES) ─────────────────────────
-QUARTER_DATES = {
-    # "Q{n} {year}": {"portfolio": "Jun 30, YYYY", "filing": "Aug 14-15, YYYY"}
-}
-def _build_quarter_dates():
-    pe = {1:'Mar 31', 2:'Jun 30', 3:'Sep 30', 4:'Dec 31'}
-    fd = {1:'May 15', 2:'Aug 14-15', 3:'Nov 14-15', 4:'Feb 14-15'}
-    for year in range(2026, 1992, -1):
-        for q in [1,2,3,4]:
-            fy = year if q != 4 else year + 1
-            QUARTER_DATES[f"Q{q} {year}"] = {
-                "portfolio": f"{pe[q]}, {year}",
-                "filing": f"{fd[q]}, {fy}",
-                "portfolio_short": pe[q],
-                "filing_short": fd[q],
-            }
-_build_quarter_dates()
+# Quarter display dates are generated in index.html (buildQuarterCalendar), not
+# here: a Python copy of the same table existed but was never read, and its
+# hardcoded 2026 ceiling would have silently gone stale.
 
 
 def fetch_dataroma_holdings(dataroma_url):
@@ -1234,20 +1220,234 @@ def fetch_yahoo_prices(tickers):
     return results
 
 
+def canon_quarter(label):
+    """Canonicalise any quarter label to the single site-wide format "Qn YYYY".
+
+    Dataroma writes "2026 Q3", valuesider writes "Q3 2026", and older rows in
+    data.json carry both. Everything downstream — the history list, the quarter
+    picker, Q_DATES in index.html — keys off one spelling, so normalise here.
+    Returns None for anything that is not a quarter.
+    """
+    if not label:
+        return None
+    t = str(label).strip()
+    m = re.search(r"\b(\d{4})\s*[-/ ]?\s*Q([1-4])\b", t)
+    if m:
+        return f"Q{m.group(2)} {m.group(1)}"
+    m = re.search(r"\bQ([1-4])\s*[-/ ]?\s*(\d{4})\b", t)
+    if m:
+        return f"Q{m.group(1)} {m.group(2)}"
+    return None
+
+
+def quarter_sort_key(label):
+    """Sort key so quarters order chronologically regardless of spelling."""
+    c = canon_quarter(label)
+    if not c:
+        return (0, 0)
+    return (int(c[3:]), int(c[1]))
+
+
+def quarter_end_date(label):
+    """ISO date the 13F portfolio was measured on, e.g. "Q3 2026" -> 2026-09-30."""
+    c = canon_quarter(label)
+    if not c:
+        return None
+    q, year = int(c[1]), int(c[3:])
+    return f"{year}-{ {1:'03-31', 2:'06-30', 3:'09-30', 4:'12-31'}[q] }"
+
+
+def quarter_filing_deadline(label):
+    """ISO date the 13F for that quarter is due — 45 days after the quarter end."""
+    c = canon_quarter(label)
+    if not c:
+        return None
+    q, year = int(c[1]), int(c[3:])
+    if q == 1:
+        return f"{year}-05-15"
+    if q == 2:
+        return f"{year}-08-14"
+    if q == 3:
+        return f"{year}-11-14"
+    return f"{year + 1}-02-14"
+
+
+def next_quarter(label):
+    """The quarter after this one, e.g. "Q4 2026" -> "Q1 2027"."""
+    c = canon_quarter(label)
+    if not c:
+        return None
+    q, year = int(c[1]), int(c[3:])
+    return f"Q1 {year + 1}" if q == 4 else f"Q{q + 1} {year}"
+
+
+def _ticker_or_name(h):
+    """Tickers are the only thing the history list shows, so never store ''.
+
+    valuesider sometimes returns rows with no ticker; falling back to a short
+    form of the company name keeps the Top-10 column readable instead of blank.
+    """
+    tk = (h.get("ticker") or "").strip()
+    if tk:
+        return tk
+    co = (h.get("company") or "").strip()
+    return co[:12] if co else "—"
+
+
+def _list_information(items):
+    """How much a history list actually tells the reader.
+
+    Ranks two versions of the same list so the merge keeps the better one. Rows
+    without a ticker are the failure mode worth catching: a placeholder snapshot
+    had the right number of positions but every ticker blank, so counting rows
+    alone would have let it win over the real holdings.
+    """
+    score = 0
+    for x in items or []:
+        if isinstance(x, dict):
+            if (x.get("ticker") or "").strip():
+                score += 2          # a usable position row
+            elif (x.get("company") or "").strip():
+                score += 1          # identifiable, but no ticker
+        elif x not in ("", None, "—"):
+            score += 1              # a real ticker string
+    return score
+
+
+def _merge_history_entry(old, new):
+    """Combine two records of the same quarter, keeping the richer field each time.
+
+    A quarter can be described twice: Dataroma's history table gives the AUM and
+    a ticker list but no per-position rows, while an archived snapshot gives the
+    full rows. Neither is a superset, so merge rather than let one win.
+    """
+    out = dict(old or {})
+    for k, v in (new or {}).items():
+        if k == "period":
+            continue
+        cur = out.get(k)
+        if isinstance(v, list):
+            if _list_information(v) > _list_information(cur):
+                out[k] = v
+        elif v not in (None, "", "—"):
+            if cur in (None, "", "—"):
+                out[k] = v
+    return out
+
+
+def normalize_history(history):
+    """Canonicalise every period label and fold duplicates of the same quarter.
+
+    Two spellings of one quarter used to coexist ("2026 Q2" alongside "Q2 2026"),
+    which showed the same quarter twice in the history tab and stopped the
+    quarter picker from matching either. Returns newest-first.
+    """
+    merged = {}
+    for h in history or []:
+        c = canon_quarter(h.get("period"))
+        if not c:
+            continue
+        entry = dict(h)
+        entry["period"] = c
+        merged[c] = _merge_history_entry(merged.get(c), entry) if c in merged else entry
+    out = sorted(merged.values(), key=lambda h: quarter_sort_key(h["period"]), reverse=True)
+    return out[:60]  # keep last 60 quarters
+
+
 def preserve_quarter_to_history(inv_existing, inv_new, quarter_label):
-    """Save current full holdings to history before overwriting with new data."""
-    history = inv_existing.get('history', [])
-    if any(h['period'] == quarter_label for h in history):
+    """Archive the quarter now on display before new holdings overwrite it.
+
+    Merges into any record already held for that quarter instead of skipping it:
+    the old early-return meant a thin placeholder row (right period, no holdings)
+    silently discarded the real positions it was supposed to protect.
+    """
+    history = normalize_history(inv_existing.get("history"))
+    label = canon_quarter(quarter_label)
+    if not label:
         return history
-    h_entry = {
-        'period': quarter_label,
-        'aum_display': inv_existing.get('aum_display', '—'),
-        'top10': [h['ticker'] for h in (inv_existing.get('holdings') or [])[:10]],
-        'top20': [h['ticker'] for h in (inv_existing.get('holdings') or [])[:20]],
-        'holdings_snapshot': inv_existing.get('holdings', []),
+    holdings = inv_existing.get("holdings") or []
+    entry = {
+        "period": label,
+        "aum_display": inv_existing.get("aum_display", "—"),
+        "top10": [_ticker_or_name(h) for h in holdings[:10]],
+        "top20": [_ticker_or_name(h) for h in holdings[:20]],
+        "holdings_snapshot": holdings,
     }
-    history.insert(0, h_entry)
-    return history[:60]  # keep last 60 quarters
+    for idx, h in enumerate(history):
+        if h["period"] == label:
+            history[idx] = _merge_history_entry(h, entry)
+            return history
+    history.insert(0, entry)
+    return normalize_history(history)
+
+
+def build_meta(investors, prev_meta=None):
+    """Derive the site header's meta block from the data, never from literals.
+
+    quarter / quarter_end / filing_date drive the header line and the quarter
+    picker. They used to be hardcoded, so the page kept announcing Q2 2026 and
+    "Updated 2026-08-14" long after the holdings underneath had moved to Q3.
+    """
+    quarters = [canon_quarter(i.get("quarter")) for i in (investors or [])]
+    quarters = [q for q in quarters if q]
+    latest_q = max(quarters, key=quarter_sort_key) if quarters else None
+    if not latest_q:
+        # Fall back to the newest quarter any archived history row mentions,
+        # then to whatever the previous meta claimed.
+        seen = [canon_quarter(h.get("period"))
+                for i in (investors or []) for h in (i.get("history") or [])]
+        seen = [q for q in seen if q]
+        latest_q = (max(seen, key=quarter_sort_key) if seen
+                    else canon_quarter((prev_meta or {}).get("quarter")))
+
+    nxt = next_quarter(latest_q)
+    n_funds = len(investors or [])
+    return {
+        # Wall-clock time this run finished — what "Updated …" shows in the header.
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+        "quarter": latest_q or "—",
+        "quarter_end": quarter_end_date(latest_q) or "—",
+        "filing_date": quarter_filing_deadline(latest_q) or "—",
+        # How many funds have actually reported the latest quarter yet.
+        "quarter_coverage": f"{sum(1 for q in quarters if q == latest_q)}/{n_funds} funds",
+        # New numbers can first appear at the next quarter's filing deadline.
+        "next_quarter": nxt or "—",
+        "next_refresh": quarter_filing_deadline(nxt) or "—",
+        "refresh_schedule": "Feb 17 · May 18 · Aug 18 · Nov 17 (UTC 10:00)",
+        "sources": "valuesider.com (holdings) · dataroma.com (prices + history) · whalewisdom.com (filers)",
+    }
+
+
+def rebuild_from_data():
+    """Re-derive meta and tidy history from the existing data.json — no scraping.
+
+    Used by `refresh_data.py --rebuild`. Cheap and offline, so it is the right
+    thing to run when the numbers are already current but the page is showing
+    them wrongly, and a safe last step after a scrape too.
+    """
+    with open("data.json") as f:
+        base = json.load(f)
+
+    investors = base.get("investors", [])
+    for inv in investors:
+        q = canon_quarter(inv.get("quarter"))
+        if q:
+            inv["quarter"] = q
+        inv["history"] = normalize_history(inv.get("history"))
+
+    before = base.get("meta", {})
+    base["meta"] = build_meta(investors, before)
+
+    with open("data.json", "w") as f:
+        json.dump(base, f, indent=2, ensure_ascii=False)
+    inject_data_into_html(base)
+
+    print("Rebuilt from data.json — no network calls made.")
+    print(f"  quarter      {before.get('quarter')!r}  ->  {base['meta']['quarter']!r}")
+    print(f"  filing_date  {before.get('filing_date')!r}  ->  {base['meta']['filing_date']!r}")
+    print(f"  generated_at {before.get('generated_at')!r}  ->  {base['meta']['generated_at']!r}")
+    print(f"  coverage     {base['meta']['quarter_coverage']}")
+    print("  data.json + index.html updated")
 
 
 def main():
@@ -1268,10 +1468,10 @@ def main():
 
         # Save current quarter to history BEFORE overwriting
         if existing.get("holdings"):
-            current_q = existing.get("quarter", "Q2 2026")
+            current_q = existing.get("quarter")
             inv["history"] = preserve_quarter_to_history(existing, inv, current_q)
         else:
-            inv["history"] = existing.get("history", [])
+            inv["history"] = normalize_history(existing.get("history"))
 
         # Auto-fetch dynamic metadata (style, performance)
         # earliest_13f_quarter is authoritative from INVESTORS_MASTER (SEC records)
@@ -1297,7 +1497,7 @@ def main():
             inv["aum"] = fetched["aum"]
             inv["aum_display"] = fetched["aum_display"]
             inv["num_holdings"] = fetched["num_holdings"] or existing.get("num_holdings")
-            inv["quarter"] = fetched["quarter"] or "Q2 2026"
+            inv["quarter"] = canon_quarter(fetched["quarter"]) or existing.get("quarter")
             # Ensure rank is assigned by position (1-10)
             holdings = fetched["holdings"]
             for i, h in enumerate(holdings):
@@ -1538,13 +1738,7 @@ def main():
                 hMap[tk]["current_price"] = h["current_price"]
     holdings_list = sorted(hMap.values(), key=lambda x: (x.get("current_price") or x.get("price") or 0), reverse=True)[:100]
 
-    base["meta"] = {
-        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
-        "quarter": "Q2 2026", "quarter_end": "2026-06-30", "filing_date": "2026-08-14",
-        "next_refresh": "Nov 17, 2026",
-        "refresh_schedule": "Feb 17 · May 18 · Aug 18 · Nov 17 (UTC 10:00)",
-        "sources": "valuesider.com (holdings) · dataroma.com (prices + history) · whalewisdom.com (filers)",
-    }
+    base["meta"] = build_meta(updated, base.get("meta"))
     base["investors"] = updated
     base["map_overview"] = {
         "all_filers": extended_filers,
@@ -1562,4 +1756,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # --rebuild re-derives the header meta and tidies history from the existing
+    # data.json without touching the network. Use it when the numbers are
+    # already current but the page is displaying them wrongly.
+    if "--rebuild" in sys.argv:
+        rebuild_from_data()
+    else:
+        main()
